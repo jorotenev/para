@@ -2,26 +2,41 @@ import {Observable} from "data/observable";
 
 export class User extends Observable {
 
-    private email: string = "";
-    private password: string = "";
-    private name: string = "";
+    private _email: string = "";
+    private _password: string = "";
+    private _name: string = "";
 
 
     constructor(email?: string, password?: string, name?: string) {
         super();
-        this.email = email;
-        this.password = password;
-        this.name = name;
+        this._email = email;
+        this._password = password;
+        this._name = name;
     }
 
     // You can add properties to observables on creation
 
+    public get email() {
+        return this._email
+    }
+
+    public set email(email: string) {
+        this._email = email;
+    }
+
+    public get password() {
+        return this._password;
+    }
+
+    public set password(pass: string) {
+        this._password = pass;
+    }
 
     public login() {
         console.log(
-            `Username ${this.name}, 
-            user email ${this.email}
-            user pass ${this.password}`
+            `Username ${this._name}, 
+            user email ${this._email}
+            user pass ${this._password}`
         );
     };
 

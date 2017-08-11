@@ -9,12 +9,12 @@
                 row="0"
                 color="black"/>
         <text-field id="password" secure="true" text="{{ password }}" hint="Password"
-                    returnKeyType="done" returnPress="logIn"
+                    returnKeyType="done" returnPress="emailPassLoginBtnPressed"
                     row="1"
                     color="black"/>
 
 
-        <button text="Login" id="submit-button" tap="logIn"/>
+        <button text="Login" id="submit-button" tap="emailPassLoginBtnPressed"/>
 
         <Button text="Fb" tap="onFbLoginBtnPressed" class="btn btn-primary btn-active"/>
     </StackLayout>
