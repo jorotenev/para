@@ -1,0 +1,20 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page">
+    <StackLayout class="p-20">
+        <Label text="Add new expense" class="h1 text-center"/>
+
+        <text-field
+                id="name" text="{{ name }}" hint="Name"
+                returnKeyType="next" returnPress="focusAmount"
+                autocorrect="true" autocapitalizationType="none"
+                row="0"
+                color="black"/>
+        <text-field id="amount" secure="false" text="{{ amount, amount | numberConverter }}" hint="Amount"
+                    returnKeyType="done" returnPress="submit"
+                    row="1" keyboardType="number"
+                    color="black"/>
+
+
+        <button text="Add expense" id="submit-button" tap="submit"/>
+
+    </StackLayout>
+</Page>

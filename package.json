@@ -10,9 +10,11 @@
 		}
 	},
 	"dependencies": {
+		"moment": "^2.18.1",
 		"nativescript-plugin-firebase": "^4.0.5",
 		"nativescript-theme-core": "~1.0.2",
-		"tns-core-modules": "~3.1.0"
+		"tns-core-modules": "~3.1.0",
+		"underscore": "^1.8.3"
 	},
 	"devDependencies": {
 		"babel-traverse": "6.25.0",

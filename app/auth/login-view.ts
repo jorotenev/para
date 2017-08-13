@@ -1,37 +1,20 @@
 import {EventData} from 'data/observable';
 import {Page} from 'ui/page';
-import {User} from '../models/user-model';
-import firebase = require("nativescript-plugin-firebase");
+import {LoginViewModel} from './login-view-model';
 
-let user = new User();
+let loginModel = new LoginViewModel();
 
 export function navigatingTo(args: EventData) {
     let page = <Page>args.object;
 
-    page.bindingContext = user;
+    page.bindingContext = loginModel;
 }
 
 export function emailPassLoginBtnPressed() {
-    console.log('logging in in login-view');
-    console.log(user);
+    loginModel.login()
 
-    firebase.login({
-        type: firebase.LoginType.PASSWORD,
-        passwordOptions: {
-            email: user.email,
-            password: user.password
-        }
-    }).then(
-        function (result) {
-            let r = JSON.stringify(result);
-            console.log("LOGGED IN!");
-            console.log(r)
-        },
-        function (errorMessage) {
-            console.log(errorMessage);
-        }
-    );
 }
+
 
 export function onFbLoginBtnPressed() {
     console.log("FB btn pressed");
