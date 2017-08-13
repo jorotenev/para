@@ -1,6 +1,11 @@
 import {Observable} from "data/observable";
 
-export class User extends Observable {
+export interface IUser {
+    email: string,
+    password: string;
+    name: string;
+}
+export class User extends Observable implements IUser {
 
     private _email: string = "";
     private _password: string = "";
@@ -30,6 +35,14 @@ export class User extends Observable {
 
     public set password(pass: string) {
         this._password = pass;
+    }
+
+    public set name(name: string) {
+        this._name = name;
+    }
+
+    public get name() {
+        return this._name;
     }
 
     public login() {

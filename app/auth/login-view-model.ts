@@ -3,6 +3,7 @@ import firebase = require("nativescript-plugin-firebase");
 import {navigateTo} from "../utils/nav";
 var dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
+
 export class LoginViewModel extends Observable {
     email: string;
     password: string;
@@ -16,7 +17,7 @@ export class LoginViewModel extends Observable {
     public loginWithEmailAndPassword() {
 
 
-        console.log('logging in in login-view');
+        console.log('logging in login-view');
         console.log(this);
 
         firebase.login({
@@ -39,7 +40,6 @@ export class LoginViewModel extends Observable {
 
     public loginWithFacebook() {
         firebase.login({
-            // note that you need to enable Facebook auth in your firebase instance
             type: firebase.LoginType.FACEBOOK
         }).then(
             function (result) {
@@ -62,8 +62,6 @@ export class LoginViewModel extends Observable {
 }
 
 function onSuccessfulLogin() {
-
-    console.log("LOGGED IN!");
     navigateTo(appSettings.getString('start-view'), true);
 
 }

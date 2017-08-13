@@ -9,13 +9,17 @@ let loginModel = new LoginViewModel();
 
 
 export function navigatingTo(args: EventData) {
-    if (firebase.getCurrentUser()) {
+    firebase.getCurrentUser().then((usr) => {
+        console.log("USER is already logged in.")
         navigateTo(appSettings.getString("start-view", true))
-    }
+    });
+    console.log("here")
+
     let page = <Page>args.object;
 
     page.bindingContext = loginModel;
 }
+
 
 export function emailPassLoginBtnPressed() {
     loginModel.loginWithEmailAndPassword()
