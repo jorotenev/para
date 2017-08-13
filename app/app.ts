@@ -1,8 +1,9 @@
-﻿
-// import "./_bundle-config";
+﻿// import "./_bundle-config";
 import * as app from 'application';
 import firebase = require("nativescript-plugin-firebase");
 import {ValueConverter} from "tns-core-modules/ui/core/bindable";
+var appSettings = require("application-settings");
+
 
 firebase.init({
     // Optionally pass in properties for database, authentication and cloud messaging,
@@ -34,6 +35,10 @@ let numberConverter: ValueConverter = {
 app.setResources({
     'numberConverter': numberConverter
 });
+
+// view after log in
+appSettings.setString('start-view', 'expense/add-expense');
+
 app.start({moduleName: 'auth/login-view'});
 
 

@@ -1,7 +1,8 @@
 import {Observable} from "data/observable";
 import firebase = require("nativescript-plugin-firebase");
-let frameModule = require("tns-core-modules/ui/frame");
-
+import {navigateTo} from "../utils/nav";
+var dialogs = require("ui/dialogs");
+var appSettings = require("application-settings");
 export class LoginViewModel extends Observable {
     email: string;
     password: string;
@@ -12,37 +13,57 @@ export class LoginViewModel extends Observable {
         this.password = password;
     }
 
-    public login() {
-        navigateTo('expense/add-expense');
-        return;
-        // console.log('logging in in login-view');
-        // console.log(this);
-        //
-        // firebase.login({
-        //     type: firebase.LoginType.PASSWORD,
-        //     passwordOptions: {
-        //         email: this.email,
-        //         password: this.password
-        //     }
-        // }).then(
-        //     function (result) {
-        //         let r = JSON.stringify(result);
-        //
-        //         console.log("LOGGED IN!");
-        //         console.log(r);
-        //
-        //
-        //     },
-        //     function (errorMessage) {
-        //         console.log(errorMessage);
-        //     }
-        // );
+    public loginWithEmailAndPassword() {
+
+
+        console.log('logging in in login-view');
+        console.log(this);
+
+        firebase.login({
+            type: firebase.LoginType.PASSWORD,
+            passwordOptions: {
+                email: this.email,
+                password: this.password
+            }
+        }).then(
+            function (result) {
+                let r = JSON.stringify(result);
+                console.dir(r);
+                onSuccessfulLogin()
+            },
+            function (errorMessage) {
+                console.log(errorMessage);
+            }
+        );
+    }
+
+    public loginWithFacebook() {
+        firebase.login({
+            // note that you need to enable Facebook auth in your firebase instance
+            type: firebase.LoginType.FACEBOOK
+        }).then(
+            function (result) {
+                dialogs.alert({
+                    title: "Login OK",
+                    message: JSON.stringify(result),
+                    okButtonText: "Nice!"
+                });
+                onSuccessfulLogin();
+            },
+            function (errorMessage) {
+                dialogs.alert({
+                    title: "Login error",
+                    message: errorMessage,
+                    okButtonText: "OK, pity"
+                });
+            }
+        );
     }
 }
-function navigateTo(path: string) {
-    let topmost = frameModule.topmost();
-    topmost.navigate({
-        moduleName: path,
-        clearHistory: true
-    });
+
+function onSuccessfulLogin() {
+
+    console.log("LOGGED IN!");
+    navigateTo(appSettings.getString('start-view'), true);
+
 }
