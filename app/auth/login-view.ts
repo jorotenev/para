@@ -13,7 +13,7 @@ export function navigatingTo(args: EventData) {
         console.log("USER is already logged in.")
         navigateTo(appSettings.getString("start-view", true))
     });
-    console.log("here")
+    console.log("here");
 
     let page = <Page>args.object;
 

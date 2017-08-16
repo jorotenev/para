@@ -9,12 +9,31 @@
                 row="0"
                 color="black"/>
         <text-field id="amount" secure="false" text="{{ amount, amount | numberConverter }}" hint="Amount"
-                    returnKeyType="done" returnPress="submit"
+                    returnKeyType="next" returnPress="focusTags"
                     row="1" keyboardType="number"
                     color="black"/>
+
+        <text-field id="tags" secure="false" text="{{ tags }}" hint="Comma separated tags"
+                    returnKeyType="done" returnPress="submit"
+                    row="1" autocorrect="true" autocapitalizationType="none"
+                    color="black"
+        />
+        <WrapLayout orientation="horizontal" itemWidth="50" itemHeight="50" width="210" height="210"
+                    style.backgroundColor="lightgray">
+            <ListView items="{{ parsed_tags }}">
+
+
+                <ListView.itemsLayout>
+                    <Label text="{{ $value }}" backgroundColor="red"/>
+                </ListView.itemsLayout>
+
+            </ListView>
+        </WrapLayout>
 
 
         <button text="Add expense" id="submit-button" tap="submit"/>
 
     </StackLayout>
+
+
 </Page>

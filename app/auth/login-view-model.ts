@@ -62,6 +62,7 @@ export class LoginViewModel extends Observable {
 }
 
 function onSuccessfulLogin() {
+    console.log("Navigating to start-view")
     navigateTo(appSettings.getString('start-view'), true);
 
 }

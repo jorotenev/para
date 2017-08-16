@@ -6,6 +6,8 @@ export interface IExpense {
     amount: number;
     name: string;
     timestamp_utc: string;
+    tags: string[];
+
 }
 
 
@@ -14,16 +16,18 @@ export class Expense extends Observable implements IExpense {
 
     amount: number;
     name: string;
+    tags: string[];
     timestamp_utc: string;
 
 
-    constructor(amount: number, name: string, timestamp: string, id: string) {
+    constructor(obj: IExpense) {
         super();
-        this.amount = amount;
-        this.name = name;
-        this.timestamp_utc = timestamp;
+        this.id = obj.id;
 
-        this.id = id;
+        this.amount = obj.amount;
+        this.name = obj.name;
+        this.timestamp_utc = obj.timestamp_utc;
+        this.tags = obj.tags;
     }
 
 
