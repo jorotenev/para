@@ -1,18 +1,19 @@
 import {Observable} from "data/observable";
-
+let moment = require('moment');
 export interface IExpense {
-    id: string;
+    id: number;
 
     amount: number;
     name: string;
     timestamp_utc: string;
     tags: string[];
 
+    readable_timestamp: string;
 }
 
 
 export class Expense extends Observable implements IExpense {
-    id: string;
+    id: number;
 
     amount: number;
     name: string;
@@ -29,6 +30,11 @@ export class Expense extends Observable implements IExpense {
         this.timestamp_utc = obj.timestamp_utc;
         this.tags = obj.tags;
     }
+
+    get readable_timestamp(): string {
+        return moment.utc(this.timestamp_utc).calendar()
+    };
+
 
 
 }

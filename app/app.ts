@@ -37,12 +37,6 @@ app.setResources({
 });
 
 // view after log in
-appSettings.setString('start-view', 'expense/add-expense');
+appSettings.setString('start-view', 'expense/list/list');
 
 app.start({moduleName: 'auth/login-view'});
-
-
-/*
- Do not place any code after the application has been started as it will not
- be executed on iOS.
- */

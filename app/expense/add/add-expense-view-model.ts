@@ -1,8 +1,8 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense} from '../models/expense'
+import {IExpense} from '~/models/expense'
 import {getPersistor, IExpensePersistor} from "./persistor";
 import {isNumber, isString} from "tns-core-modules/utils/types";
-import {currentTime} from '../utils/time'
+import {currentTime} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 var dialogs = require("ui/dialogs");
 
@@ -39,7 +39,6 @@ export class AddExpenseModel extends Observable {
             that.parsed_tags.push(el);
         });
 
-        console.dir(this.parsed_tags._array)
     }
 
     public createNewExpense() {

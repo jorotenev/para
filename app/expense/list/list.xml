@@ -1,0 +1,33 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="true">
+
+    <StackLayout orientation="vertical">
+        <StackLayout id="empty-list" visibility="{{ isEmpty() ? 'visible' : 'collapsed' }}">
+            <Label text="No expenses yet!">_</Label>
+        </StackLayout>
+
+        <StackLayout visibility="{{ isEmpty() ? 'collapsed' : 'visible' }}">
+
+
+            <ListView items="{{ expenses }}" id="expenses-list" loadMoreItems="loadMoreItems" itemTap="onTap">
+
+                <ListView.itemTemplate>
+                    <DockLayout stretchLastChild="false" class='expense' height="200">
+                        <StackLayout dock='left'>
+
+                            <Label text='{{name}}' class='expense-name'>_</Label>
+
+                            <Label text="{{readable_timestamp}}">_</Label>
+
+                        </StackLayout>
+                        <Label dock='right' class='expense-amount' text='{{amount}}' style.verticalAlignment="center"
+                        >asd
+                        </Label>
+                    </DockLayout>
+                </ListView.itemTemplate>
+            </ListView>
+        </StackLayout>
+    </StackLayout>
+
+
+</Page>
+

@@ -29,7 +29,6 @@ export class LoginViewModel extends Observable {
         }).then(
             function (result) {
                 let r = JSON.stringify(result);
-                console.dir(r);
                 onSuccessfulLogin()
             },
             function (errorMessage) {
@@ -62,7 +61,8 @@ export class LoginViewModel extends Observable {
 }
 
 function onSuccessfulLogin() {
-    console.log("Navigating to start-view")
-    navigateTo(appSettings.getString('start-view'), true);
+    let navTo = appSettings.getString('start-view');
+    console.log("Navigating to " + navTo)
+    navigateTo(navTo, true);
 
 }

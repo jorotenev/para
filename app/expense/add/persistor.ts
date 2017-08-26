@@ -1,4 +1,5 @@
-import {IExpense} from "../models/expense";
+import {IExpense} from "~/models/expense";
+
 
 export interface IExpensePersistor {
     persistNew(expense: IExpense): void;
@@ -8,7 +9,6 @@ export interface IExpensePersistor {
 class Persistor implements IExpensePersistor {
     persistNew(expense: IExpense): void {
         console.log("Persisting expense");
-        console.dir(expense);
         try {
             // write to db
         } catch (err) {

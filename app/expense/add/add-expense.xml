@@ -1,5 +1,6 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page">
-    <StackLayout class="p-20">
+    <StackLayout class="p-20" row="1">
+
         <Label text="Add new expense" class="h1 text-center"/>
 
         <text-field
@@ -18,22 +19,23 @@
                     row="1" autocorrect="true" autocapitalizationType="none"
                     color="black"
         />
-        <WrapLayout orientation="horizontal" itemWidth="50" itemHeight="50" width="210" height="210"
-                    style.backgroundColor="lightgray">
-            <ListView items="{{ parsed_tags }}">
 
 
-                <ListView.itemsLayout>
-                    <Label text="{{ $value }}" backgroundColor="red"/>
-                </ListView.itemsLayout>
 
-            </ListView>
-        </WrapLayout>
+        <Repeater items="{{ parsed_tags }}">
+            <Repeater.itemsLayout>
+                <WrapLayout orientation="horizontal" backgroundColor="#d3d3d3"/>
+            </Repeater.itemsLayout>
+
+            <Repeater.itemTemplate>
+                <Label text="{{ $value }}" backgroundColor="#84ddff" marginRight="5" marginLeft="5"/>
+            </Repeater.itemTemplate>
+        </Repeater> 
 
 
-        <button text="Add expense" id="submit-button" tap="submit"/>
+        <button text="Add expense" id="submit-button" tap="submit" verticalAlignment="bottom"/>
+
 
     </StackLayout>
-
-
+ 
 </Page>

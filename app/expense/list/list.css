@@ -1,0 +1,24 @@
+#empty-list {
+}
+#expenses-list > .expense {
+    margin-top: 3;
+
+    border-color: lightgray;
+    border-width: 2;
+
+    padding-left: 5;
+    padding-right: 5;
+
+    background-color: lightblue;
+}
+
+.expense-name {
+    font-size: 22;
+    font-weight: bold;
+}
+
+.expense-amount {
+    font-size: 20;
+    margin-right: 5;
+
+}
