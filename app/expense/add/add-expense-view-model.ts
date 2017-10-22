@@ -15,7 +15,7 @@ export class AddExpenseModel extends Observable {
     private name: string;
     private tags: string = '';
 
-    public parsed_tags;
+    public parsed_tags: ObservableArray<string>;
 
     private _persistor: IExpensePersistor;
 
@@ -25,19 +25,45 @@ export class AddExpenseModel extends Observable {
         this.parsed_tags = new ObservableArray([]);
     }
 
-    public onTagsTextFieldChange(ev) {
-        console.log("Here");
-        console.log(`${ev.propertyName} has changed. new val ${ev.value}`);
-        const tag_string = ev.value;
-        let that = this;
+    private clearAllTags() {
+        this.parsed_tags.splice(0);
+        // const that = this;
+        // u.forEach(u.range(this.parsed_tags.length), function (_) {
+        //     that.parsed_tags.pop()
+        // });
 
-        u.forEach(u.range(this.parsed_tags.length), function (_) {
-            that.parsed_tags.pop()
-        });
+    }
+
+    public onTagsTextFieldChange(ev) {
+
+        const tag_string = ev.value;
+        const that = this;
+
+        // can't change array while iterating it
+        this.clearAllTags();
+
         let parsed = this.parse_tags(tag_string);
+        // this.parsed_tags = new ObservableArray(parsed)
         u.forEach(parsed, function (el) {
             that.parsed_tags.push(el);
         });
+    }
+
+    public removeTag(tagToDelete: string) {
+
+        let indexToRemove = null;
+        this.parsed_tags.forEach((tag, index) => {
+            if (tag === tagToDelete) {
+                indexToRemove = index;
+            }
+        })
+        if (isNumber(indexToRemove)) {
+            console.log(`Len of array is ${this.parsed_tags.length}`);
+            this.parsed_tags.splice(indexToRemove, indexToRemove + 1);
+            console.log(`After deleting Len of array is ${this.parsed_tags.length}`);
+        } else {
+            console.error(`${tagToDelete} is not recognised as a tag,boom`)
+        }
 
     }
 
@@ -49,10 +75,9 @@ export class AddExpenseModel extends Observable {
             return;
         }
 
-
         //then create the expense
         let expense: IExpense = {
-            id: null,
+            id: null, // this will be set by the back-end
             amount: this.amount,
             name: this.name,
             timestamp_utc: currentTime(),
@@ -76,7 +101,7 @@ export class AddExpenseModel extends Observable {
         let arr = u.map(tag_string.split(','), (tag: string) => tag.trim().toLocaleLowerCase());
 
         arr = u.uniq(arr);
-        arr = u.filter(arr, u.negate(u.isEmpty))
+        arr = u.filter(arr, u.negate(u.isEmpty));
 
         return arr;
     }
@@ -86,8 +111,6 @@ export class AddExpenseModel extends Observable {
      * If an error is found an exceptions is raised.
      */
     private validate(): void {
-        console.log(`isNumber= ${isNumber(this.amount)}`);
-        console.log(`isNumber= ${this.amount} ${typeof this.amount}`);
         if (!isNumber(this.amount) || isNaN(this.amount)) {
             throw new Error(`You entered an invalid value for the amount field`);
         }
