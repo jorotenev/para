@@ -14,10 +14,14 @@ export function navigatingTo(args: EventData) {
     page.bindingContext = listModel;
 }
 
+
 export function loadMoreItems(ev: EventData): void {
-    listModel.loadMoreItems(ev);
-    let l: ListExpenseModel = <ListExpenseModel> ev.object;
-    let view: ListView = <ListView> page.getViewById('expenses-list')
+    // https://github.com/NativeScript/NativeScript/issues/4931
+    console.log("loadMoreItems");
+    const fireEventAfter = 200; //ms
+    setTimeout(() => {
+        listModel.loadMoreItems(ev);
+    }, fireEventAfter);
 }
 
 
@@ -25,5 +29,4 @@ export function onTap(ev: ItemEventData): void {
     let itemIndex: number = ev.index;
     let expense: IExpense = listModel.expenses.getItem(itemIndex);
     console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}}`)
-
 }
