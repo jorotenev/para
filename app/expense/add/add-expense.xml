@@ -21,14 +21,20 @@
         />
 
 
-
+        <Label text="Tags:"/>
+        <!--https://github.com/NativeScript/NativeScript/issues/1692-->
+        <Label text="N/A" id="empty-tags-filler" visibility="{{ parsed_tags.length, parsed_tags.length === 0 ? 'visible' : 'collapsed' }} "/>
         <Repeater items="{{ parsed_tags }}">
             <Repeater.itemsLayout>
-                <WrapLayout orientation="horizontal" backgroundColor="#d3d3d3"/>
+                <WrapLayout orientation="horizontal" />
             </Repeater.itemsLayout>
 
             <Repeater.itemTemplate>
-                <Label text="{{ $value }}" backgroundColor="#84ddff" marginRight="5" marginLeft="5"/>
+                <WrapLayout orientation="horizontal" class="tag-container" >
+                    <Label text="x"  class="tag-delete-btn" ontap="delete_tag" />
+                    <Label  text="{{ $value }}" class="tag-text" marginRight="5" marginLeft="0"/>
+                </WrapLayout>
+
             </Repeater.itemTemplate>
         </Repeater> 
 
