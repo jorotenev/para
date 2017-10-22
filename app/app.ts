@@ -39,8 +39,8 @@ app.setResources({
 });
 
 const viewLogIn = 'auth/login-view';
-// const viewAfterLogIn = 'expense/add/add-expense';
-const viewAfterLogIn = 'expense/list/list';
+const viewAfterLogIn = 'expense/add/add-expense';
+// const viewAfterLogIn = 'expense/list/list';
 
 appSettings.setString('start-view', viewAfterLogIn);
 
