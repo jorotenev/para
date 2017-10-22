@@ -11,59 +11,16 @@ let u = require('underscore');
 
 export class AddExpenseModel extends Observable {
 
+    public tagsHandler: ITagsHandler = new TagsHandler();
+
     private amount: number;
     private name: string;
-    private tags: string = '';
-
-    public parsed_tags: ObservableArray<string>;
 
     private _persistor: IExpensePersistor;
 
     constructor() {
         super();
         this._persistor = getPersistor();
-        this.parsed_tags = new ObservableArray([]);
-    }
-
-    private clearAllTags() {
-        this.parsed_tags.splice(0);
-        // const that = this;
-        // u.forEach(u.range(this.parsed_tags.length), function (_) {
-        //     that.parsed_tags.pop()
-        // });
-
-    }
-
-    public onTagsTextFieldChange(ev) {
-
-        const tag_string = ev.value;
-        const that = this;
-
-        // can't change array while iterating it
-        this.clearAllTags();
-
-        let parsed = this.parse_tags(tag_string);
-        // this.parsed_tags = new ObservableArray(parsed)
-        u.forEach(parsed, function (el) {
-            that.parsed_tags.push(el);
-        });
-    }
-
-    public removeTag(tagToDelete: string) {
-
-        let indexToRemove = null;
-        this.parsed_tags.forEach((tag, index) => {
-            if (tag === tagToDelete) {
-                indexToRemove = index;
-            }
-        })
-        if (isNumber(indexToRemove)) {
-            console.log(`Len of array is ${this.parsed_tags.length}`);
-            this.parsed_tags.splice(indexToRemove, indexToRemove + 1);
-            console.log(`After deleting Len of array is ${this.parsed_tags.length}`);
-        } else {
-            console.error(`${tagToDelete} is not recognised as a tag,boom`)
-        }
 
     }
 
@@ -81,7 +38,7 @@ export class AddExpenseModel extends Observable {
             amount: this.amount,
             name: this.name,
             timestamp_utc: currentTime(),
-            tags: this.getParsedTags(),
+            tags: this.tagsHandler.tag_names,
         };
 
         //then persist it
@@ -90,20 +47,6 @@ export class AddExpenseModel extends Observable {
         } catch (err) {
             alert(`Cannot persist the expense. ${err.message}`);
         }
-    }
-
-    private getParsedTags() {
-        return u.map(this.parsed_tags, (el: string) => el)
-    }
-
-    private parse_tags(tag_string) {
-
-        let arr = u.map(tag_string.split(','), (tag: string) => tag.trim().toLocaleLowerCase());
-
-        arr = u.uniq(arr);
-        arr = u.filter(arr, u.negate(u.isEmpty));
-
-        return arr;
     }
 
     /**
@@ -120,6 +63,55 @@ export class AddExpenseModel extends Observable {
         }
     }
 }
+
+export interface ITagsHandler {
+
+    tag_names: ObservableArray<string>;
+
+    /**
+     * adds a new tag. returns false if a tag with the same name is already managed by the handler
+     * @param tag_name:string - the name of the tag
+     * :returns boolean
+     */
+    add(tag_name: string): boolean;
+
+    /**
+     * Removes the tag. returns false if attempting to delete a tag which's not managed by this handler.
+     * @param tag_name
+     * :returns boolean
+     */
+    delete(tag_name: string): boolean;
+}
+
+class TagsHandler implements ITagsHandler {
+    tag_names: ObservableArray<string> = new ObservableArray([]);
+
+    add(tag_name: string): boolean {
+        console.log('adding tag ', tag_name);
+        if (this.tag_names.indexOf(tag_name) !== -1) {
+            return false;
+        }
+        if (tag_name.length === 0) {
+            return false;
+        }
+        this.tag_names.push(tag_name)
+
+        return true;
+    }
+
+    delete(tag_name: string): boolean {
+        console.log('removing tag ', tag_name);
+        let index = this.tag_names.indexOf(tag_name);
+        if (index === -1) {
+            console.error(`${tag_name} is not in the managed tags`);
+            return false;
+        }
+
+        this.tag_names.splice(index, index + 1);
+        return true;
+    }
+}
+
 function panic(msg) {
     dialogs.alert({
         title: 'Invalid entry',

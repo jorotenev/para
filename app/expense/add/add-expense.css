@@ -1,18 +1,31 @@
-.tag-container{
-padding-top: 0;
+.tag-container {
+    /*margin-top: 5;*/
+    margin-bottom: 5;
 }
-.tag-delete-btn{
-    background-color: red;
-    font-size: 20;
-    padding-left:  10 ;
-    padding-right:  10 ;
+
+
+.single-tag-container {
+    padding-top: 0;
+    margin-right: 5;
+}
+
+.tag-delete-btn {
+
+    font-size: 15;
+    padding-left: 7.5;
+    padding-right: 7.5;
 
     text-align: center;
 }
-.tag-text{
+
+.tag-text {
     border-color: lightgray;
     border-width: .6;
-    font-size: 20;
+    font-size: 15;
     padding-left: 5;
     padding-right: 5;
+}
+
+#add-tag-container {
+
 }

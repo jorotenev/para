@@ -1,47 +1,50 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page">
-    <StackLayout class="p-20" row="1">
+    <StackLayout class="p-20 form" row="1">
 
         <Label text="Add new expense" class="h1 text-center"/>
 
-        <text-field
-                id="name" text="{{ name }}" hint="Name"
+        <TextField
+                id="name" class="input" text="{{ name }}" hint="Name"
                 returnKeyType="next" returnPress="focusAmount"
                 autocorrect="true" autocapitalizationType="none"
                 row="0"
                 color="black"/>
-        <text-field id="amount" secure="false" text="{{ amount, amount | numberConverter }}" hint="Amount"
+        <TextField id="amount" class="input" secure="false" text="{{ amount, amount | numberConverter }}" hint="Amount"
                     returnKeyType="next" returnPress="focusTags"
                     row="1" keyboardType="number"
                     color="black"/>
 
-        <text-field id="tags" secure="false" text="{{ tags }}" hint="Comma separated tags"
-                    returnKeyType="done" returnPress="submit"
-                    row="1" autocorrect="true" autocapitalizationType="none"
-                    color="black"
-        />
+        <WrapLayout orientation="vertical" class="tag-container">
+
+            <!--<Label class='label' text="Tags:"/>-->
+
+            <WrapLayout orientation="horizontal" class="input-field">
+
+                <Repeater items="{{ tagsHandler.tag_names }}">
+                    <Repeater.itemsLayout>
+                        <WrapLayout orientation="horizontal"/>
+                    </Repeater.itemsLayout>
+
+                    <Repeater.itemTemplate>
+                        <WrapLayout orientation="horizontal" class="single-tag-container">
+                            <Label text="{{ $value }}" class="tag-text"/>
+                            <Label text="x" class="tag-delete-btn bg-danger" ontap="delete_tag"/>
+                        </WrapLayout>
+
+                    </Repeater.itemTemplate>
+                </Repeater>
+
+            </WrapLayout>
+            <WrapLayout orientation="horizontal" id="add-tag-container">
+                <TextField class="input" id="add-tag-text" hint="Add tag..." returnPress="add_tag"></TextField>
+                <Button text="+" id="add-tag-btn" class="btn" tap="add_tag"></Button>
+            </WrapLayout>
+        </WrapLayout>
 
 
-        <Label text="Tags:"/>
-        <!--https://github.com/NativeScript/NativeScript/issues/1692-->
-        <Label text="N/A" id="empty-tags-filler" visibility="{{ parsed_tags.length, parsed_tags.length === 0 ? 'visible' : 'collapsed' }} "/>
-        <Repeater items="{{ parsed_tags }}">
-            <Repeater.itemsLayout>
-                <WrapLayout orientation="horizontal" />
-            </Repeater.itemsLayout>
-
-            <Repeater.itemTemplate>
-                <WrapLayout orientation="horizontal" class="tag-container" >
-                    <Label text="x"  class="tag-delete-btn" ontap="delete_tag" />
-                    <Label  text="{{ $value }}" class="tag-text" marginRight="5" marginLeft="0"/>
-                </WrapLayout>
-
-            </Repeater.itemTemplate>
-        </Repeater> 
-
-
-        <button text="Add expense" id="submit-button" tap="submit" verticalAlignment="bottom"/>
+        <button text="Add expense" id="submit-button" class="btn btn-primary" tap="submit" verticalAlignment="bottom"/>
 
 
     </StackLayout>
- 
+
 </Page>
