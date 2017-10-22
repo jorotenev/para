@@ -31,12 +31,17 @@ let numberConverter: ValueConverter = {
         return Number(val)
     }
 };
+
+
 // https://docs.nativescript.org/core-concepts/data-binding#example-7-adding-converters-in-the-application-module-resources
 app.setResources({
     'numberConverter': numberConverter
 });
 
-// view after log in
-appSettings.setString('start-view', 'expense/list/list');
+const viewLogIn = 'auth/login-view';
+// const viewAfterLogIn = 'expense/add/add-expense';
+const viewAfterLogIn = 'expense/list/list';
 
-app.start({moduleName: 'auth/login-view'});
+appSettings.setString('start-view', viewAfterLogIn);
+
+app.start({moduleName: viewLogIn});
