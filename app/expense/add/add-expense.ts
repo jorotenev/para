@@ -5,6 +5,10 @@ let u = require('underscore');
 import {navigateTo} from "~/utils/nav"
 import {Button} from "tns-core-modules/ui/button";
 import {TextField} from "tns-core-modules/ui/text-field";
+var device = require("platform").device;
+var platformNames = require("platform").platformNames;
+var utils = require("utils/utils");
+
 
 let expenseModel = new AddExpenseModel();
 let page: Page;
@@ -22,17 +26,22 @@ export function submit() {
 }
 
 export function add_tag(ev) {
-    let tag_name: string = add_tag_textfield.text;
-    tag_name= tag_name.trim();
-    let tag_added = expenseModel.tagsHandler.add(tag_name);
-    if (tag_added) {
-        add_tag_textfield.text = '';
+    let tag_name: string = add_tag_textfield.text.trim();
+
+    let isTagAdded = expenseModel.tagsHandler.add(tag_name);
+
+    if (isTagAdded) {
+        //TODO https://github.com/jorotenev/para/issues/1
         setTimeout(() => {
+            add_tag_textfield.text = '';
             add_tag_textfield.focus();
-        }, 0)
+        }, 200) // setting the timeout to a larger value seems to resolve the issue
+
     } else {
-        // todo inform user why adding the tag failed.
+        // TODO inform user why adding the tag failed.
     }
+
+
 }
 
 export function delete_tag(ev) {

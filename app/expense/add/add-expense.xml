@@ -14,6 +14,8 @@
                     row="1" keyboardType="number"
                     color="black"/>
 
+
+        <!-- TODO make the tags span a single line and scroll when line is overflown -->
         <WrapLayout orientation="vertical" class="tag-container">
 
             <!--<Label class='label' text="Tags:"/>-->
