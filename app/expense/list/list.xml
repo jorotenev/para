@@ -6,7 +6,7 @@
 
                         <StackLayout dock="left" orientation="vertical">
                             <Label text='{{name}}' class='expense-name'/>
-                            <Label text="{{readable_timestamp}}"/>
+                            <Label text="{{timestamp_utc | readableTimestamp }}"/>
                         </StackLayout>
 
                         <Label dock='right' class='expense-amount' text='{{amount}}' style.verticalAlignment="center"/>

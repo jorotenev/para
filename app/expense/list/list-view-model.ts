@@ -1,8 +1,8 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
 import {IExpense,Expense} from '~/models/expense'
-import {currentTime} from '~/utils/time'
+import {currentTimeUTC, readableTimestamp} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-
+import {ExpenseConstructor} from "~/models/expense";
 let dialogs = require("ui/dialogs");
 let u = require('underscore');
 
@@ -40,15 +40,16 @@ export class ListExpenseModel extends Observable {
             return;
         }
 
-        let exp = new Expense(<IExpense> {
+        let exp = new Expense(<ExpenseConstructor> {
             amount: u.sample(u.range(100)), // pick a random number from 0 to 100
             name: `id: ${id}`,
-            id: id,
-            timestamp_utc: currentTime(),
+            timestamp_utc: currentTimeUTC(),
+            tags:[],
         });
+        exp.id = id; // HACK id is not part of the constructor
 
 
-        this.expenses.push(u.clone(exp))
+        this.expenses.push(exp)
 
     }
 

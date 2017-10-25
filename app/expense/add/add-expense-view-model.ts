@@ -1,11 +1,11 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense} from '~/models/expense'
+import {IExpense, Expense} from '~/models/expense'
 import {getPersistor, IExpensePersistor} from "./persistor";
-import {isNumber, isString} from "tns-core-modules/utils/types";
-import {currentTime} from '~/utils/time'
+import {isNumber} from "tns-core-modules/utils/types";
+import {currentTimeUTC} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
+import {ExpenseConstructor} from "~/models/expense";
 var dialogs = require("ui/dialogs");
-
 let u = require('underscore');
 
 
@@ -16,12 +16,13 @@ export class AddExpenseModel extends Observable {
     private amount: number;
     private name: string;
 
+
     private _persistor: IExpensePersistor;
+    private _expense: IExpense;
 
     constructor() {
         super();
         this._persistor = getPersistor();
-
     }
 
     public createNewExpense() {
@@ -33,13 +34,13 @@ export class AddExpenseModel extends Observable {
         }
 
         //then create the expense
-        let expense: IExpense = {
-            id: null, // this will be set by the back-end
+        let expenseData: ExpenseConstructor = {
             amount: this.amount,
             name: this.name,
-            timestamp_utc: currentTime(),
+            timestamp_utc: currentTimeUTC(),
             tags: this.tagsHandler.tag_names,
         };
+        let expense: IExpense = new Expense(expenseData);
 
         //then persist it
         try {
@@ -94,7 +95,7 @@ class TagsHandler implements ITagsHandler {
         if (tag_name.length === 0) {
             return false;
         }
-        this.tag_names.push(tag_name)
+        this.tag_names.push(tag_name);
 
         return true;
     }

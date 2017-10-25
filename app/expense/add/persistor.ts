@@ -28,6 +28,7 @@ class Persistor implements IExpensePersistor {
     }
 }
 
+// TODO is this really the way to have a singleton in javascript?
 let persistor = null;
 export function getPersistor() {
     if (persistor === null) {

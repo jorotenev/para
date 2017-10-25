@@ -1,7 +1,6 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {ItemEventData, ListView} from "tns-core-modules/ui/list-view";
 import {Page} from "tns-core-modules/ui/page";
-
 import {ListExpenseModel} from "./list-view-model";
 import {navigateTo} from "~/utils/nav"
 import {IExpense} from "../../models/expense";

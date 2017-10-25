@@ -5,14 +5,11 @@ let u = require('underscore');
 import {navigateTo} from "~/utils/nav"
 import {Button} from "tns-core-modules/ui/button";
 import {TextField} from "tns-core-modules/ui/text-field";
-var device = require("platform").device;
-var platformNames = require("platform").platformNames;
-var utils = require("utils/utils");
-
 
 let expenseModel = new AddExpenseModel();
 let page: Page;
 let add_tag_textfield: TextField;
+
 export function navigatingTo(args: EventData) {
     page = <Page> args.object;
     add_tag_textfield = <TextField> page.getViewById('add-tag-text');
@@ -35,8 +32,7 @@ export function add_tag(ev) {
         setTimeout(() => {
             add_tag_textfield.text = '';
             add_tag_textfield.focus();
-        }, 200) // setting the timeout to a larger value seems to resolve the issue
-
+        }, 50) // setting the timeout to a larger value seems to resolve the issue
     } else {
         // TODO inform user why adding the tag failed.
     }
