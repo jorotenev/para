@@ -1,37 +1,44 @@
 import {Observable} from "data/observable";
 let moment = require('moment');
 
-export class ExpenseConstructor {
-    amount: number;
+export type ExpenseIdType = number;
+
+export interface ExpenseAmount {
+    raw_amount: number;
+    currency: string;
+}
+
+export interface ExpenseConstructor {
+
+}
+
+export interface IExpense {
+    id: ExpenseIdType | null;
+    amount: ExpenseAmount;
     name: string;
     tags: string[];
     timestamp_utc: string;
-}
-
-export interface IExpense extends ExpenseConstructor {
-    id: number;
 }
 
 
 export class Expense extends Observable implements IExpense {
-    id: number;
 
-    amount: number;
-    name: string;
-    tags: string[];
-    timestamp_utc: string;
+    public id: ExpenseIdType;
+    public amount: ExpenseAmount;
+    public name: string;
+    public tags: string[];
+    public timestamp_utc: string;
+
     // TODO `recurring` flag + date
 
-
-    constructor(obj: ExpenseConstructor) {
+    constructor(obj: IExpense) {
         super();
-        this.id = null;
+        this.id = obj.id;
 
         this.amount = obj.amount;
         this.name = obj.name;
         this.timestamp_utc = obj.timestamp_utc;
         this.tags = obj.tags;
     }
-
 
 }

@@ -1,8 +1,7 @@
-import {IExpense} from "~/models/expense";
-
+import {ExpenseConstructor, IExpense} from "~/models/expense";
 
 export interface IExpensePersistor {
-    persistNew(expense: IExpense): void;
+    persistNew(expense: ExpenseConstructor): void;
     update(expense: IExpense): void;
 }
 

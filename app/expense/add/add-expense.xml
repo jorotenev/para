@@ -21,7 +21,7 @@
 
             <WrapLayout orientation="horizontal" class="input-field">
 
-                <Repeater items="{{ tagsHandler.tag_names }}">
+                <Repeater items="{{ tagsHandler.tagNamesObservable }}">
                     <Repeater.itemsLayout>
                         <WrapLayout orientation="horizontal"/>
                     </Repeater.itemsLayout>

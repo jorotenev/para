@@ -9,7 +9,7 @@
                             <Label text="{{timestamp_utc | readableTimestamp }}"/>
                         </StackLayout>
 
-                        <Label dock='right' class='expense-amount' text='{{amount}}' style.verticalAlignment="center"/>
+                        <Label dock='right' class='expense-amount' text='{{amount | expenseAmountToString}}' style.verticalAlignment="center"/>
 
 
                 </DockLayout>

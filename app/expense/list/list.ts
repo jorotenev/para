@@ -27,5 +27,5 @@ export function loadMoreItems(ev: EventData): void {
 export function onTap(ev: ItemEventData): void {
     let itemIndex: number = ev.index;
     let expense: IExpense = listModel.expenses.getItem(itemIndex);
-    console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}}`)
+    console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}, 'timestamp': ${expense.timestamp_utc}`)
 }

@@ -1,5 +1,5 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense, Expense} from '~/models/expense'
+import {IExpense, Expense, ExpenseAmount} from '~/models/expense'
 import {getPersistor, IExpensePersistor} from "./persistor";
 import {isNumber} from "tns-core-modules/utils/types";
 import {currentTimeUTC} from '~/utils/time'
@@ -18,7 +18,6 @@ export class AddExpenseModel extends Observable {
 
 
     private _persistor: IExpensePersistor;
-    private _expense: IExpense;
 
     constructor() {
         super();
@@ -35,16 +34,15 @@ export class AddExpenseModel extends Observable {
 
         //then create the expense
         let expenseData: ExpenseConstructor = {
-            amount: this.amount,
+            amount: {'raw_amount': this.amount, 'currency': 'EUR'},
             name: this.name,
             timestamp_utc: currentTimeUTC(),
-            tags: this.tagsHandler.tag_names,
+            tags: this.tagsHandler.tags,
         };
-        let expense: IExpense = new Expense(expenseData);
 
         //then persist it
         try {
-            this._persistor.persistNew(expense);
+            this._persistor.persistNew(expenseData);
         } catch (err) {
             alert(`Cannot persist the expense. ${err.message}`);
         }
@@ -67,7 +65,7 @@ export class AddExpenseModel extends Observable {
 
 export interface ITagsHandler {
 
-    tag_names: ObservableArray<string>;
+    tags: string[];
 
     /**
      * adds a new tag. returns false if a tag with the same name is already managed by the handler
@@ -85,30 +83,35 @@ export interface ITagsHandler {
 }
 
 class TagsHandler implements ITagsHandler {
-    tag_names: ObservableArray<string> = new ObservableArray([]);
 
-    add(tag_name: string): boolean {
+    public tagNamesObservable: ObservableArray<string> = new ObservableArray([]);
+
+    public get tags(): string[] {
+        return this.tagNamesObservable.map((e: string) => e)
+    }
+
+    public add(tag_name: string): boolean {
         console.log('adding tag ', tag_name);
-        if (this.tag_names.indexOf(tag_name) !== -1) {
+        if (this.tagNamesObservable.indexOf(tag_name) !== -1) {
             return false;
         }
         if (tag_name.length === 0) {
             return false;
         }
-        this.tag_names.push(tag_name);
+        this.tagNamesObservable.push(tag_name);
 
         return true;
     }
 
-    delete(tag_name: string): boolean {
+    public delete(tag_name: string): boolean {
         console.log('removing tag ', tag_name);
-        let index = this.tag_names.indexOf(tag_name);
+        let index = this.tagNamesObservable.indexOf(tag_name);
         if (index === -1) {
             console.error(`${tag_name} is not in the managed tags`);
             return false;
         }
 
-        this.tag_names.splice(index, index + 1);
+        this.tagNamesObservable.splice(index, index + 1);
         return true;
     }
 }
