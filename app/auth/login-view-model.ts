@@ -1,6 +1,7 @@
 import {Observable} from "data/observable";
 import firebase = require("nativescript-plugin-firebase");
 import {navigateTo} from "../utils/nav";
+import {viewAfterLogIn} from "~/app_config";
 var dialogs = require("ui/dialogs");
 var appSettings = require("application-settings");
 
@@ -61,8 +62,7 @@ export class LoginViewModel extends Observable {
 }
 
 function onSuccessfulLogin() {
-    let navTo = appSettings.getString('start-view');
-    console.log("Navigating to " + navTo)
+    let navTo = viewAfterLogIn;
+    console.log("Navigating to " + navTo);
     navigateTo(navTo, true);
-
 }
