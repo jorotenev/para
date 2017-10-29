@@ -22,3 +22,4 @@ export const viewAfterLogIn = 'expense/add/add-expense';
 // export const viewAfterLogIn='expense/list/list';
 export const viewLogIn = 'auth/login-view';
 export const userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
+export const apiAddress = "http://10.0.2.2:5000/"; //TODO hack
