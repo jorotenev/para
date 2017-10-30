@@ -59,15 +59,15 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         return new Promise(function (resolve, reject) {
             http.getJSON(url).then((response: object[]) => {
                     try {
-                        resolve(response.map((raw) => new Expense(<IExpense> raw)))
+                        resolve(response.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
                     } catch (_) {
                         reject(new Error("Invalid response"))
                     }
                 },
-                (err) => {
+                (err: Error) => {
                     console.log("PRINTING ERROR");
                     console.log(err);
-                    reject(new Error(err))
+                    reject(new Error(`Can't get expenses: ${err.message} `))
                 })
         })
     }

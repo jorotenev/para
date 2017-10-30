@@ -1,4 +1,4 @@
-export let ten_results  : object[] = [
+export let ten_expenses  : object[] = [
     {
         "id": 1,
         "name": "server id 1",
