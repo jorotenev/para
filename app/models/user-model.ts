@@ -19,8 +19,6 @@ export class User extends Observable implements IUser {
         this._name = name;
     }
 
-    // You can add properties to observables on creation
-
     public get email() {
         return this._email
     }
