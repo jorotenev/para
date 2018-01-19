@@ -18,8 +18,12 @@ export function navigatingTo(args: EventData) {
 
 
 export function submit() {
-    expenseModel.createNewExpense();
-    navigateTo('expense/list/list');
+    try{
+        expenseModel.createNewExpense();
+        navigateTo('expense/list/list');
+    } catch (err){
+        console.log(err)
+    }
 }
 
 export function add_tag(ev) {

@@ -29,7 +29,7 @@ export class AddExpenseModel extends Observable {
             this.validate();
         } catch (err) {
             panic(err.message);
-            return;
+            throw new Error(err.message)
         }
 
         //then create the expense
@@ -45,7 +45,10 @@ export class AddExpenseModel extends Observable {
             this._persistor.persistNew(expenseData);
         } catch (err) {
             alert(`Cannot persist the expense. ${err.message}`);
+            throw new Error(err.message)
+
         }
+
     }
 
     /**
