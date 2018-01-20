@@ -25,44 +25,48 @@ export interface IExpenseDatabaseFacade {
 
 }
 
-export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
+export class Utils {
+    static makeRequest(url, method = "GET", timeout = 1000): Promise<any> {
 
-export function makeRequest(url, method = "GET", timeout = 1000): Promise<any> {
+        return new Promise<any>(function (resolve, reject) {
+            http.request({
+                "url": url,
+                "method": method,
+                "timeout": timeout,
+            }).then(
+                function (response: HttpResponse) {
 
-    return new Promise<any>(function (resolve, reject) {
-        http.request({
-            "url": url,
-            "method": method,
-            "timeout": timeout,
-        }).then(
-            function (response: HttpResponse) {
+                    if (response.statusCode < 300) {
+                        try {
+                            let json = response.content.toJSON();
+                            console.log("FULFILLED");
+                            resolve(json);
+                        } catch (err) {
+                            reject("Can't decode received JSON")
+                        }
+                    } else {
+                        const err = "Status code is " + response.statusCode + ` [${method}:${url}]`;
+                        console.log("REJECTING: " + err);
+                        reject(err);
 
-                if (response.statusCode < 300) {
-                    try {
-                        let json = response.content.toJSON();
-                        console.log("FULFILLED");
-                        resolve(json);
-                    } catch (err) {
-                        reject("Can't decode received JSON")
+
                     }
-                } else {
-                    const err = "Status code is " + response.statusCode + ` [${method}:${url}]`;
-                    console.log("REJECTING: " + err);
-                    reject(err);
-
-
+                },
+                function (err) {
+                    console.log("MAJKATA SI E EBALO");
+                    console.error(err);
+                    reject(err)
                 }
-            },
-            function (err) {
-                console.log("MAJKATA SI E EBALO");
-                console.error(err);
-                reject(err)
-            }
-        )
-    })
+            )
+        })
+    }
+
 }
 
-export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
+
+export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
+
+ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     // http://underscorejs.org/#template
     static readonly GETListEndpointTemplate = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
     static readonly GETRangeEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_range/<%= fromID %>/<%= toID %>`);
@@ -87,7 +91,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     get_single(id: ExpenseIdType): Promise<IExpense> {
         let url = ExpenseDatabaseFacade.GETSingleEndpoint({id: id});
         return new Promise<IExpense>(function (resolve, reject) {
-            makeRequest(url).then(resolve, function (err) {
+            Utils.makeRequest(url).then(resolve, function (err) {
                 reject("Cannot find expense with id " + id + ". Reason: " + err);
             })
         });
@@ -99,19 +103,17 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
             startFromId: startFromId,
             batchSize: batchSize
         });
+
         return new Promise(function (resolve, reject) {
-            http.getJSON(url).then((response: object[]) => {
-                    try {
-                        resolve(response.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
-                    } catch (_) {
-                        reject(new Error("Invalid response"))
-                    }
-                },
-                (err: Error) => {
-                    reject(new Error(`Can't get expenses: ${err.message} `))
-                })
+            Utils.makeRequest(url).then(function (json) {
+                try {
+                    resolve(json.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
+                } catch (_) {
+                    reject(new Error("Invalid response"))
+                }
+            }, function (err) {
+                reject(new Error(`Can't get expenses: ${err.message} `))
+            })
         })
     }
-
-
 }
