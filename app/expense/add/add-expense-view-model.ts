@@ -60,7 +60,7 @@ export class AddExpenseModel extends Observable {
             throw new Error(`You entered an invalid value for the amount field`);
         }
 
-        if (this.name.length === 0) {
+        if (!this.name || this.name.length === 0) {
             throw new Error("The name of the expense cannot be empty.")
         }
     }
