@@ -23,11 +23,13 @@ export interface IExpenseDatabaseFacade {
 
 }
 
+export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
+
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     // http://underscorejs.org/#template
-    static readonly GETListEndpointTemplate =  u.template(`${apiAddress}get_expenses_list/<%= startFromId %>?batch_size=<%= batchSize %>`);
-    static readonly GETRangeEndpoint = u.template(`${apiAddress}get_expenses_range/<%= fromID %>/<%= toID %>`);
-    static readonly GETSingleEndpoint = `${apiAddress}get_expense_by_id/<%= id %>`;
+    static readonly GETListEndpointTemplate =  u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
+    static readonly GETRangeEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_range/<%= fromID %>/<%= toID %>`);
+    static readonly GETSingleEndpoint = `${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`;
 
 
     constructor() {
@@ -50,7 +52,6 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         return undefined;
 
     }
-
     get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
         let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
             startFromId: startFromId,
@@ -66,7 +67,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
                 },
                 (err: Error) => {
                     console.log("PRINTING ERROR");
-                    console.log(err);
+                    console.log(err.stack);
                     reject(new Error(`Can't get expenses: ${err.message} `))
                 })
         })
