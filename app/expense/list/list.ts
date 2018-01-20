@@ -10,13 +10,14 @@ let page: Page;
 
 export function navigatingTo(args: EventData) {
     page = <Page>args.object;
-    page.bindingContext = listModel;
+    page.bindingContext = {
+        filter_by: ['Amount', "Date"],
+        stuffs: listModel
+    };
 }
-
 
 export function loadMoreItems(ev: EventData): void {
     // https://github.com/NativeScript/NativeScript/issues/4931
-    console.log("loadMoreItems");
     const fireEventAfter = 200; //ms
     setTimeout(() => {
         listModel.loadMoreItems(ev);
