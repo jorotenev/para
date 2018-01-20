@@ -1,16 +1,13 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT} from "~/expense/db_facade/facade";
+import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, makeRequest} from "~/expense/db_facade/facade";
 import {ten_expenses} from './sample_responses';
 import {http} from "~/expense/db_facade/facade"
 import {Expense, IExpense} from "~/models/expense";
 import {apiAddress} from "~/app_config";
-import {instance} from "ts-mockito";
+
 
 var u = require('underscore');
-var mocker = require('ts-mockito');
 
-const promised_ten_results: Promise<IExpense[]> = new Promise(function (resolve, _) {
-    resolve(ten_expenses)
-});
+const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
 
 export function test_list_expenses(expenses: IExpense[], startFromId: number, batchSize: number) {
     expect(typeof expenses).toBe(typeof []);
@@ -31,8 +28,8 @@ describe("Testing the get_expenses_list of  db facade", async () => {
         // sanity checking
 
         expect(this.endpointURL).toBe(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=${this.startFromId}&batch_size=${this.batchSize}`);
-        spyOn(http, 'getJSON');
-        this.mockedGetJSON = <any> http.getJSON;
+        spyOn(http, 'request');
+        this.mockedGetJSON = <any> http.request;
     });
 
     beforeEach(function () {
@@ -64,7 +61,7 @@ describe("Testing the get_expenses_list of  db facade", async () => {
     it("api/get_expenses_list - when the server returns an error", async function () {
         // pretend that calling the API resulted in an error
         let error: Promise<IExpense[]> = new Promise((resolve, reject) => {
-            reject(new Error("Some error"));
+            reject(new Error("Some expected testing error"));
         });
 
         this.mockedGetJSON.and.returnValue(error);
@@ -78,7 +75,7 @@ describe("Testing the get_expenses_list of  db facade", async () => {
 
 });
 
-fdescribe("Testing the get_single of the db facade", function () {
+describe("Testing the get_single of the db facade", function () {
 
     beforeAll(function () {
 
@@ -97,36 +94,29 @@ fdescribe("Testing the get_single of the db facade", function () {
 
     it("method should return a promise", function () {
         let expensePromise = new ExpenseDatabaseFacade().get_single(1);
-        expect(!!expensePromise && expensePromise.hasOwnProperty('then')).toBe(true)
+
+        expect(typeof expensePromise.then).toBe('function')
     });
 
     it("when the 'then' of the promise is called, it receives an Expense as a parameter", function (done) {
         new ExpenseDatabaseFacade().get_single(1).then(function (data: IExpense) {
-                const expectedKeys: string[] = ["id", "timestamp_utc", "amount", "name", "tags"];
-                const templateObject: IExpense = {
-                    "id": 1,
-                    "timestamp_utc": "",
-                    "amount": {"raw_amount": 1, 'currency': ''},
-                    "name": "",
-                    "tags": []
-
-                };
-                expect(data).toEqual(templateObject);
+                const expectedKeys = ["id", "timestamp_utc", "amount", "name", "tags"];
+                let responseKeys = Object.keys(data);
+                expect(u.intersection(expectedKeys, responseKeys)).toEqual(expectedKeys);
                 done()
-
             },
             function () {
-                fail();
+                fail("Rejected called on a promise, but expected resolved to be called");
                 done();
             })
-    })
+    });
     it("the promise which get_single returns is rejected if the server doesn't return correctly", function (done) {
-        this.mockedJSON.and.returnValue(new Promise(function (resolve, reject) {
+        this.mockedGetJSON.and.returnValue(new Promise(function (resolve, reject) {
             reject()
         }));
 
         new ExpenseDatabaseFacade().get_single(1).then(function () {
-            fail()
+            fail();
             done()
         }, function (err) {
             expect(err.indexOf("Cannot find expense with id 1") !== -1).toBe(true)
@@ -134,3 +124,60 @@ fdescribe("Testing the get_single of the db facade", function () {
         })
     })
 });
+
+function fakeHTTPResponse(raw, statusCode) {
+    return {
+        "content": {
+            "raw": "",
+            "toJSON": () => {
+                return JSON.parse(raw)
+            },
+            "toFile": () => {
+            },
+            "toSting": () => {
+            },
+            "toImage": () => {
+            }
+        },
+        "statusCode": statusCode,
+        "headers": []
+
+    }
+}
+
+describe("Test of the API facade makeRequest", function () {
+    beforeAll(function () {
+        spyOn(http, 'request');
+        this.mockedRequest = <any> http.request;
+    });
+    beforeEach(function () {
+        this.mockedRequest.calls.reset();
+        this.mockedRequest.and.callThrough();
+    });
+
+    it("returning a 500 leads to a rejection", function (done) {
+        this.mockedRequest.and.returnValue(Promise.resolve(fakeHTTPResponse("", 500)));
+
+
+        makeRequest("http://wonderland:5000/api/test-500").then(function () {
+            fail("Promise should have been rejected.");
+            done()
+        }, function (error) {
+            expect(error.indexOf("Status code is 500") !== -1).toBe(true);
+            done();
+
+        });
+    });
+
+    fit("returning a 200 leads resolving the promise and parsing the json", function (done) {
+        this.mockedRequest.and.returnValue(Promise.resolve(fakeHTTPResponse('{"content":"rebra"}', 200)));
+
+        makeRequest("http://wonderland:5000/api/test-200").then(function (json)  {
+            expect(json.content).toBe("rebra");
+            done();
+        }, function(err){
+            fail(err);
+            done()
+        })
+    })
+})
