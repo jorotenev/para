@@ -25,6 +25,17 @@ export interface IExpenseDatabaseFacade {
 
 }
 
+export interface RawResponseError {
+    msg: string
+    statusCode?: number
+}
+
+export interface ResponseError {
+    readonly reason: string
+    readonly raw?: RawResponseError
+
+}
+
 export class Utils {
     static makeRequest(url, method = "GET", timeout = 1000): Promise<any> {
 
@@ -35,27 +46,27 @@ export class Utils {
                 "timeout": timeout,
             }).then(
                 function (response: HttpResponse) {
-
                     if (response.statusCode < 300) {
                         try {
                             let json = response.content.toJSON();
-                            console.log("FULFILLED");
                             resolve(json);
                         } catch (err) {
                             reject("Can't decode received JSON")
                         }
                     } else {
-                        const err = "Status code is " + response.statusCode + ` [${method}:${url}]`;
-                        console.log("REJECTING: " + err);
-                        reject(err);
+                        const errMsg = "Status code is " + response.statusCode + ` [${method}:${url}]`;
+                        let error: RawResponseError = {
+                            "msg": errMsg,
+                            "statusCode": response.statusCode
+                        };
 
-
+                        reject(error);
                     }
                 },
                 function (err) {
-                    console.log("MAJKATA SI E EBALO");
                     console.error(err);
-                    reject(err)
+                    let error: RawResponseError = {"msg": err};
+                    reject(error)
                 }
             )
         })
@@ -66,7 +77,7 @@ export class Utils {
 
 export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
 
- export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
+export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     // http://underscorejs.org/#template
     static readonly GETListEndpointTemplate = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
     static readonly GETRangeEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_range/<%= fromID %>/<%= toID %>`);
@@ -90,9 +101,9 @@ export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
 
     get_single(id: ExpenseIdType): Promise<IExpense> {
         let url = ExpenseDatabaseFacade.GETSingleEndpoint({id: id});
-        return new Promise<IExpense>(function (resolve, reject) {
+        return new Promise<IExpense>(function (resolve, reject:(reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(resolve, function (err) {
-                reject("Cannot find expense with id " + id + ". Reason: " + err);
+                reject({"reason": "Cannot find expense with id " + id + ". Reason: " + err, "raw": err});
             })
         });
     }
@@ -104,15 +115,21 @@ export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
             batchSize: batchSize
         });
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve, reject:(reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(function (json) {
                 try {
                     resolve(json.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
-                } catch (_) {
-                    reject(new Error("Invalid response"))
+                } catch (err) {
+                    let error: ResponseError = {"reason": "Can't parse JSON"};
+                    reject(error)
                 }
             }, function (err) {
-                reject(new Error(`Can't get expenses: ${err.message} `))
+                let error: ResponseError = {
+                    "reason": `Can't get expenses: ${err.message} `,
+                    "raw": err
+                };
+                reject(error)
+
             })
         })
     }

@@ -6,7 +6,7 @@ import * as http from "http";
 import {apiAddress} from "~/app_config";
 import {ExpenseDatabaseFacade} from "~/expense/db_facade/facade";
 import {IExpense} from "~/models/expense";
-import {test_list_expenses} from "~/tests/test_db_facade/test_db_facade";
+import {testListExpenses} from "~/tests/test_db_facade/test_db_facade";
 import {HttpResponse} from "tns-core-modules/http";
 
 function apiIsUP(): Promise<void> {
@@ -32,6 +32,8 @@ function apiIsUP(): Promise<void> {
         })
     });
 }
+
+
 
 /**
  * If the apiIsUp() promise resolves, then the api is up so we just call the done() to
@@ -59,7 +61,7 @@ describe("Integration test of the API facade for get_list", () => {
         }
         let facade = new ExpenseDatabaseFacade();
         facade.get_list(1, 10).then((expenses: IExpense[]) => {
-            test_list_expenses(expenses, 1, 10)
+            testListExpenses(expenses, 1, 10)
         }, (err) => {
             let e = "The API should have returned a list of expenses";
             fail(e);

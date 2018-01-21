@@ -1,4 +1,4 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, Utils} from "~/expense/db_facade/facade";
+import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, ResponseError, Utils} from "~/expense/db_facade/facade";
 import {ten_expenses} from './sample_responses';
 import {http} from "~/expense/db_facade/facade"
 import {IExpense} from "~/models/expense";
@@ -9,7 +9,7 @@ var u = require('underscore');
 const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
 
 
-export function test_list_expenses(expenses: IExpense[], startFromId: number, batchSize: number) {
+export function testListExpenses(expenses: IExpense[], startFromId: number, batchSize: number) {
     expect(typeof expenses).toBe(typeof []);
     expect(expenses[0].id).toBe(startFromId);
     expect(expenses.length).toBe(batchSize);
@@ -49,7 +49,6 @@ function setUpAfterEach(thisObject) {
 
 }
 
-// A sample Jasmine test
 describe("Testing the get_expenses_list of  db facade", () => {
 
     beforeAll(function () {
@@ -72,7 +71,7 @@ describe("Testing the get_expenses_list of  db facade", () => {
         setUpAfterEach(this)
     });
 
-    it("api/get_expenses_list - Getting a list of expenses", function (done) {
+    it("api/get_expenses_list - requesting a list, returns a valid list", function (done) {
         const startFromId = this.startFromId;
         const batchSize = this.batchSize;
         // mock the API: set the return value of the mocked http.getJSON function
@@ -88,34 +87,36 @@ describe("Testing the get_expenses_list of  db facade", () => {
 
         const that = this;
         resultAsPromise.then(function (payload) {
-            test_list_expenses(payload, startFromId, batchSize);
+            testListExpenses(payload, startFromId, batchSize);
             done()
-        }).catch(function (err) {
-            fail(err);
+        }).catch(function (err: ResponseError) {
+            fail(err.reason);
             done()
         })
     });
 
-    it("api/get_expenses_list - when the server returns an error", function (done) {
-        // pretend that calling the API resulted in an error
-        let error: Promise<IExpense[]> = Promise.reject(new Error("Some expected testing error"));
+    it("api/get_expenses_list - when the server returns an error, the returned promise is rejected",
+        function (done) {
+            // pretend that calling the API resulted in an error
+            let error: Promise<IExpense[]> = Promise.reject(new Error("Some expected testing error"));
+            this.mockedRequest.and.returnValue(error);
 
-        this.mockedRequest.and.returnValue(error);
-        let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(this.startFromId, this.batchSize)
-        resultAsPromise.then(() => {
-            fail("Promise should have been rejected.");
-            done()
-        }, (err: Error) => {
-            expect(err.message).toContain("Can't get expenses");
-            done()
-        })
-    });
+            let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(this.startFromId, this.batchSize);
+
+            resultAsPromise.then(() => {
+                fail("Promise should have been rejected.");
+                done()
+            }, (err: ResponseError) => {
+                expect(err.reason.indexOf("Can't get expenses") !== -1).toBe(true);
+                done()
+            })
+        });
 
 });
 
 describe("Testing the get_single of the db facade", function () {
     beforeEach(function () {
-        setUpBeforeEach(this)
+        setUpBeforeEach(this);
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
     });
     afterEach(function () {
@@ -133,6 +134,7 @@ describe("Testing the get_single of the db facade", function () {
         function (done) {
             new ExpenseDatabaseFacade().get_single(1).then(function (data: IExpense) {
                     const expectedKeys = ["id", "timestamp_utc", "amount", "name", "tags"];
+
                     let responseKeys = Object.keys(data);
                     expect(u.intersection(expectedKeys, responseKeys)).toEqual(expectedKeys);
                     done()
@@ -149,15 +151,16 @@ describe("Testing the get_single of the db facade", function () {
             new ExpenseDatabaseFacade().get_single(1).then(function () {
                 fail();
                 done()
-            }, function (err) {
-                expect(err.indexOf("Cannot find expense with id 1") !== -1).toBe(true);
+            }, function (err: ResponseError) {
+
+                expect(err.reason.indexOf("Cannot find expense with id 1") !== -1).toBe(true);
                 done()
             })
         })
 });
 
 
-describe("Test of the API facade makeRequest", function () {
+describe("Test of the API facade's makeRequest", function () {
 
     beforeEach(function () {
 
@@ -165,11 +168,11 @@ describe("Test of the API facade makeRequest", function () {
 
     });
     afterEach(function () {
-        this.mockedHTTP.calls.reset()
-        this.mockedHTTP.and.callThrough() // important line, otherwise test runner panics at the disco
-    })
+        this.mockedHTTP.calls.reset();
+        this.mockedHTTP.and.callThrough() // important, otherwise test runner panics at the disco
+    });
 
-    it("returning a 500 leads to a rejection", function (done) {
+    it("the api returning a 500 leads to a rejection", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("", 500)));
 
 
@@ -177,7 +180,8 @@ describe("Test of the API facade makeRequest", function () {
             fail("Promise should have been rejected.");
             done()
         }, function (error) {
-            expect(error.indexOf("Status code is 500") !== -1).toBe(true);
+            expect(error.msg.indexOf("Status code is 500") !== -1).toBe(true);
+            expect(error.statusCode).toBe(500);
             done();
 
         });
@@ -187,15 +191,16 @@ describe("Test of the API facade makeRequest", function () {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse('{"payload":"rebra"}', 200)));
 
         Utils.makeRequest("http://wonderland:5000/api/test-200").then(function (json) {
-            Utils.makeRequest("http://wonderland:5000/api/test-200").then(function (json) {
-                expect(json.payload).toBe("rebra");
-                done();
-            }, function (err) {
-                fail(err);
-                done()
-            })
+            expect(json.payload).toBe("rebra");
+            done();
+        }, function (err) {
+            fail(err);
+            done()
         })
+
     });
+    it("POSTing data via the makeRequest will call http.request with correct params", function (done) {
+    })
 });
 
 describe("testing", function () {
