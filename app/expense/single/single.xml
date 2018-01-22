@@ -1,0 +1,13 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="true">
+    <StackLayout class="p-20 form" row="1">
+
+         <TextField
+                id="name" class="input" text="{{ expense.name }}"
+
+                autocorrect="true" autocapitalizationType="none"
+                row="0"
+                color="black"/>
+
+    </StackLayout>
+
+</Page>

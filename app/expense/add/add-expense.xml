@@ -37,8 +37,8 @@
 
             </WrapLayout>
             <WrapLayout orientation="horizontal" id="add-tag-container">
-                <TextField class="input" id="add-tag-text" hint="Add tag..." returnPress="add_tag"></TextField>
-                <Button text="+" id="add-tag-btn" class="btn" tap="add_tag"></Button>
+                <TextField class="input" id="add-tag-text" hint="Add tag..." returnPress="add_tag"/>
+                <Button text="+" id="add-tag-btn" class="btn" tap="add_tag"/>
             </WrapLayout>
         </WrapLayout>
 

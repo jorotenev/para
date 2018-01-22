@@ -1,11 +1,11 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
 import {IExpense, Expense, ExpenseAmount} from '~/models/expense'
-import {getPersistor, IExpensePersistor} from "./persistor";
 import {isNumber} from "tns-core-modules/utils/types";
 import {currentTimeUTC} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-import {ExpenseConstructor} from "~/models/expense";
-var dialogs = require("ui/dialogs");
+import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/expense/db_facade/facade";
+
+let dialogs = require("ui/dialogs");
 let u = require('underscore');
 
 
@@ -17,23 +17,24 @@ export class AddExpenseModel extends Observable {
     private name: string;
 
 
-    private _persistor: IExpensePersistor;
+    private _dbFacade: IExpenseDatabaseFacade;
 
     constructor() {
         super();
-        this._persistor = getPersistor();
+        this._dbFacade = new ExpenseDatabaseFacade();
     }
 
-    public createNewExpense() {
+    public createNewExpense(): Promise<IExpense> {
         try {
             this.validate();
         } catch (err) {
             panic(err.message);
-            throw new Error(err.message)
+            return Promise.reject(new Error(err.message))
         }
 
         //then create the expense
-        let expenseData: ExpenseConstructor = {
+        let expenseData: IExpense = {
+            id: null,
             amount: {'raw_amount': this.amount, 'currency': 'EUR'},
             name: this.name,
             timestamp_utc: currentTimeUTC(),
@@ -41,13 +42,7 @@ export class AddExpenseModel extends Observable {
         };
 
         //then persist it
-        try {
-            this._persistor.persistNew(expenseData);
-        } catch (err) {
-            alert(`Cannot persist the expense. ${err.message}`);
-            throw new Error(err.message)
-
-        }
+        return this._dbFacade.persist(expenseData);
 
     }
 

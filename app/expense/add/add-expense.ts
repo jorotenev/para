@@ -1,10 +1,14 @@
 import {AddExpenseModel} from "./add-expense-view-model";
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
+
 let u = require('underscore');
 import {navigateTo} from "~/utils/nav"
 import {Button} from "tns-core-modules/ui/button";
 import {TextField} from "tns-core-modules/ui/text-field";
+import {ResponseError} from "~/expense/db_facade/facade";
+
+let dialogs = require("ui/dialogs");
 
 let expenseModel = new AddExpenseModel();
 let page: Page;
@@ -13,18 +17,25 @@ let add_tag_textfield: TextField;
 export function navigatingTo(args: EventData) {
     page = <Page> args.object;
     add_tag_textfield = <TextField> page.getViewById('add-tag-text');
-    page.bindingContext = {expenseViewModel:expenseModel,
-    currentDateString: "22/01/2018"};
+    page.bindingContext = {
+        expenseViewModel: expenseModel,
+        currentDateString: "22/01/2018"
+    };
 }
 
 
 export function submit() {
-    try{
-        expenseModel.createNewExpense();
+    expenseModel.createNewExpense().then(function (expense) {
         navigateTo('expense/list/list');
-    } catch (err){
-        console.log(err)
-    }
+        console.log("persisted successfully");
+    }, function (err: ResponseError) {
+        console.dir(err);
+        dialogs.alert({
+            title: 'Couldn\'t save the expense',
+            message: err.reason,
+            okButtonText: 'Cool'
+        })
+    });
 }
 
 export function add_tag(ev) {
