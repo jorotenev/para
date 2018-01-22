@@ -3,12 +3,12 @@
 
         <Label text="Add new expense" class="h1 text-center"/>
         <TextField
-                id="name" class="input" text="{{ name }}" hint="Name"
+                id="name" class="input" text="{{ expenseViewModel.name }}" hint="Name"
                 returnKeyType="next" returnPress="focusAmount"
                 autocorrect="true" autocapitalizationType="none"
                 row="0"
                 color="black"/>
-        <TextField id="amount" class="input" secure="false" text="{{ amount, amount | numberConverter }}" hint="Amount"
+        <TextField id="amount" class="input" secure="false" text="{{ expenseViewModel.amount, expenseViewModel.amount | numberConverter }}" hint="Amount"
                    returnKeyType="next" returnPress="focusTags"
                    row="1" keyboardType="number"
                    color="black"/>
@@ -21,7 +21,7 @@
 
             <WrapLayout orientation="horizontal" class="input-field">
 
-                <Repeater items="{{ tagsHandler.tagNamesObservable }}">
+                <Repeater items="{{ expenseViewModel.tagsHandler.tagNamesObservable }}">
                     <Repeater.itemsLayout>
                         <WrapLayout orientation="horizontal"/>
                     </Repeater.itemsLayout>
@@ -41,7 +41,6 @@
                 <Button text="+" id="add-tag-btn" class="btn" tap="add_tag"></Button>
             </WrapLayout>
         </WrapLayout>
-
 
         <button text="Add expense" id="submit-button" class="btn btn-primary" tap="submit" verticalAlignment="bottom"/>
 

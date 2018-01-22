@@ -13,7 +13,8 @@ let add_tag_textfield: TextField;
 export function navigatingTo(args: EventData) {
     page = <Page> args.object;
     add_tag_textfield = <TextField> page.getViewById('add-tag-text');
-    page.bindingContext = expenseModel;
+    page.bindingContext = {expenseViewModel:expenseModel,
+    currentDateString: "22/01/2018"};
 }
 
 
