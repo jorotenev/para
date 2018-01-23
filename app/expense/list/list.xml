@@ -16,7 +16,7 @@
                             <Label text='{{name}}' class='expense-name'/>
                             <Label text="{{timestamp_utc | readableTimestamp }}"/>
                         </StackLayout>
-                        <Label dock='right' class='expense-amount' text='{{amount | expenseAmountToString}}' />
+                        <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}' />
                 </DockLayout>
             </ListView.itemTemplate>
         </ListView>

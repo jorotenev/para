@@ -133,7 +133,7 @@ describe("Testing the get_single of the db facade", function () {
     it("when the 'then' of the promise is called, it receives an Expense as a parameter",
         function (done) {
             new ExpenseDatabaseFacade().get_single(1).then(function (data: IExpense) {
-                    const expectedKeys = ["id", "timestamp_utc", "amount", "name", "tags"];
+                    const expectedKeys = ["id", "timestamp_utc", "amount", "currency", "name", "tags"];
 
                     let responseKeys = Object.keys(data);
                     expect(u.intersection(expectedKeys, responseKeys)).toEqual(expectedKeys);

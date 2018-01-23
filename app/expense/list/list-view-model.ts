@@ -4,6 +4,7 @@ import {currentTimeUTC, readableTimestamp} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {ExpenseConstructor} from "~/models/expense";
 import {tuple} from "~/types";
+
 let dialogs = require("ui/dialogs");
 let http = require('http');
 let u = require('underscore');
@@ -87,6 +88,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
     }
 
 }
+
 class ExpensesHandler extends ExpensesListManager {
 
 
@@ -154,9 +156,10 @@ class DummyExpensesList extends ExpensesListManager {
             // the "server" doesn't have more than 55 items
             return;
         }
-        let e: IExpense = <IExpense> {
+        let e: IExpense = <ExpenseConstructor> {
             id: null,
-            amount: {'raw_amount':u.sample(u.range(0,100)), 'currency':'EUR'}, // pick a random number from 0 to 100
+            amount: u.sample(u.range(0, 100)),
+            currency: 'EUR',
             name: `id: ${id}`,
             timestamp_utc: currentTimeUTC(),
             tags: [],

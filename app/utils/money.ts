@@ -1,4 +1,5 @@
-import {ExpenseAmount} from "~/models/expense";
-export function expenseAmountToString(amount: ExpenseAmount){
-    return `${amount.raw_amount} ${amount.currency}`
+import {IExpense} from "~/models/expense";
+
+export function expenseAmountToString(expense: IExpense) {
+    return `${expense.amount} ${expense.currency}`
 }

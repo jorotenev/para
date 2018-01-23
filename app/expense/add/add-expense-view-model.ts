@@ -1,9 +1,10 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense, Expense, ExpenseAmount} from '~/models/expense'
+import {IExpense, ExpenseConstructor} from '~/models/expense'
 import {isNumber} from "tns-core-modules/utils/types";
 import {currentTimeUTC} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/expense/db_facade/facade";
+import {userPreferredCurrency} from "~/app_config"
 
 let dialogs = require("ui/dialogs");
 let u = require('underscore');
@@ -33,9 +34,10 @@ export class AddExpenseModel extends Observable {
         }
 
         //then create the expense
-        let expenseData: IExpense = {
+        let expenseData: ExpenseConstructor = {
             id: null,
-            amount: {'raw_amount': this.amount, 'currency': 'EUR'},
+            amount: this.amount,
+            currency: userPreferredCurrency,
             name: this.name,
             timestamp_utc: currentTimeUTC(),
             tags: this.tagsHandler.tags,
