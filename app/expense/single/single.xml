@@ -1,14 +1,13 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" xmlns:df="nativescript-pro-ui/dataform"
+      xmlns:exp="components/expense"
       navigatingTo="navigatingTo" class="page" actionBarHidden="true">
 
     <StackLayout class="p-20 form" row="1">
+        <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
 
-        <df:RadDataForm id="expenseEditForm" source="{{ expense }}" commitMode="Immediate"
-                        propertyCommit="onCommit"
-                        propertyCommitted="onCommitted"
-                        propertyValidate="onValidate"
-                        propertyValidated="onValidated"
-        >
+        <df:RadDataForm id="expenseEditForm" source="{{ expense }}"
+                        commitMode="Manual"
+                        validationMode="OnLostFocus">
             <df:RadDataForm.groups>
                 <df:PropertyGroup collapsible="false" name=" " hidden="false">
 
@@ -18,7 +17,7 @@
                     <df:PropertyGroup.properties>
 
 
-                        <df:EntityProperty name="name" index="0" />
+                        <df:EntityProperty name="name" hintText="Expense description..." index="0"/>
 
                     </df:PropertyGroup.properties>
                 </df:PropertyGroup>
@@ -32,14 +31,14 @@
 
                     <df:PropertyGroup.properties>
 
-                        <df:EntityProperty name="amount" index="1" columnIndex="0">
+                        <df:EntityProperty name="amount" hintText="0.0" index="1" columnIndex="0">
                             <df:EntityProperty.editor>
                                 <df:PropertyEditor type="Number"/>
                             </df:EntityProperty.editor>
                         </df:EntityProperty>
 
                         <df:EntityProperty name="currency" index="1" columnIndex="1"
-                                           valuevaluesProvider="{{ currencies }}">
+                                           valuesProvider="{{ currencies }}" converter="currencyConverter">
                             <df:EntityProperty.editor>
                                 <df:PropertyEditor type="Picker"/>
                             </df:EntityProperty.editor>
@@ -66,7 +65,12 @@
                     </df:PropertyGroup.layout>
                     <df:PropertyGroup.properties>
 
-                        <df:EntityProperty name="tags" converter="{{tagsConverter}}" index="3"/>
+                        <df:EntityProperty name="tags" index="3">
+                            <df:EntityProperty.editor>
+                                <df:PropertyEditor type="Text"/>
+                            </df:EntityProperty.editor>
+                        </df:EntityProperty>
+
 
                         <df:EntityProperty name="id" index="4" hidden="true"/>
                         <df:EntityProperty name="timestamp_utc" index="5" hidden="true"/>
@@ -78,6 +82,7 @@
 
         </df:RadDataForm>
 
+        <Button onTap="updatePressed" class="btn btn-primary" text="Update"/>
     </StackLayout>
 
 </Page>

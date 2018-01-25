@@ -30,8 +30,12 @@ export class Expense implements IExpense {
 
     constructor(obj: ExpenseConstructor) {
 
-        Object.keys(obj).forEach((key) => {
-            this[key] = obj[key]
-        })
+        this.id = obj.id;
+        this.amount = obj.amount;
+        this.currency = obj.currency;
+
+        this.name = obj.name
+        this.tags = obj.tags
+        this.timestamp_utc = obj.timestamp_utc
     }
 }
