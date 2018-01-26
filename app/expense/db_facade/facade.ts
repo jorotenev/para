@@ -55,13 +55,13 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     private send(exp, url, method): Promise<IExpense> {
-        let json = JSON.stringify(exp);
         return new Promise<IExpense>(function (resolve, reject) {
+            let json = JSON.stringify(exp);
             Utils.makeRequest(url, method, json).then(resolve, (err: RawResponseError) => reject({
                 raw: err,
                 reason: err.msg // TODO more informative message.
             }))
-        })
+        });
     }
 
     remove(exp: IExpense): Promise<boolean> {
@@ -125,7 +125,7 @@ export interface ResponseError {
 }
 
 export class Utils {
-    static makeRequest(url: string, method = "GET", payload = null, timeout = 1000): Promise<any> {
+    static makeRequest(url: string, method = "GET", payload = null, timeout = 3000): Promise<any> {
 
         return new Promise<any>(function (resolve, reject) {
             http.request({

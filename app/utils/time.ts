@@ -1,6 +1,6 @@
 let moment = require('moment');
 
-export function currentTimeUTC(): string {
+export function currentTimeUTC(skipMilliseconds=false): string {
     return moment().toISOString();
 }
 
