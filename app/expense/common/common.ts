@@ -80,11 +80,11 @@ abstract class _ExpenseViewModelHelper {
     public updatePressed() {
         const that = this;
         const dataform = this.dataform;
-        if (validate(dataform)) {
-            dataform.validateAndCommitAll().then((ok) => {
+        if (validate(dataform)) { // manually validate
+            dataform.validateAndCommitAll().then((ok) => { //validate via raddataform & attempt to commit
                 if (ok) {
                     this.onSuccessfullyCommitted()
-                } else{
+                } else {
                     console.error("couldnt validated/commit")
                 }
             }, (err) => {
@@ -100,26 +100,27 @@ abstract class _ExpenseViewModelHelper {
         const that = this;
         const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode]
 
-        let expense;
+        let committedExpense;
         try {
-            let parsed = JSON.parse(this.dataform.editedObject)
-            expense = this.convertFromForm(parsed)
+            committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject))
         } catch (err) {
-            console.error(err)
+            console.error(err);
             dialogs.alert({title: `Couldn't ${verb} the expense`})
             return;
         }
 
-        if (this.objectHash === hashCode(JSON.stringify(expense))) {
+        if (this.objectHash === hashCode(JSON.stringify(committedExpense))) {
+            console.log("committed object is the same as the initial one. idling")
             return;
         }
 
         toggleActivityIndicator(this.activityIndicator, true);
 
-        new ExpenseDatabaseFacade().update(expense).then(function (updatedExpense: IExpense) {
+        new ExpenseDatabaseFacade().update(committedExpense).then(function (updatedExpense: IExpense) {
             that.objectHash = hashCode(JSON.stringify(updatedExpense))
 
             toggleActivityIndicator(that.activityIndicator, false)
+            console.log(`${verb} API call: ok`)
         }, function (err) {
             toggleActivityIndicator(that.activityIndicator, false)
             dialogs.alert({
