@@ -1,88 +1,13 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" xmlns:df="nativescript-pro-ui/dataform"
-      xmlns:exp="components/expense"
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+      xmlns:exp="components/expense-form"
       navigatingTo="navigatingTo" class="page" actionBarHidden="true">
 
-    <StackLayout class="p-20 form" row="1">
-        <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
+    <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
 
-        <df:RadDataForm id="expenseEditForm" source="{{ expense }}"
-                        commitMode="Manual"
-                        validationMode="OnLostFocus">
-            <df:RadDataForm.groups>
-                <df:PropertyGroup collapsible="false" name=" " hidden="false">
-
-                    <df:PropertyGroup.layout>
-                        <df:DataFormStackLayout/>
-                    </df:PropertyGroup.layout>
-                    <df:PropertyGroup.properties>
+        <exp:expense-form />
 
 
-                        <df:EntityProperty name="name" hintText="Expense description..." index="0"/>
-
-                    </df:PropertyGroup.properties>
-                </df:PropertyGroup>
-
-
-                <df:PropertyGroup collapsible="false" name="  " hidden="false">
-
-                    <df:PropertyGroup.layout>
-                        <df:DataFormGridLayout/>
-                    </df:PropertyGroup.layout>
-
-                    <df:PropertyGroup.properties>
-
-                        <df:EntityProperty name="amount" hintText="0.0" index="1" columnIndex="0">
-                            <df:EntityProperty.editor>
-                                <df:PropertyEditor type="Number"/>
-                            </df:EntityProperty.editor>
-                        </df:EntityProperty>
-
-                        <df:EntityProperty name="currency" index="1" columnIndex="1"
-                                           valuesProvider="{{ currencies }}" converter="currencyConverter">
-                            <df:EntityProperty.editor>
-                                <df:PropertyEditor type="Picker"/>
-                            </df:EntityProperty.editor>
-                        </df:EntityProperty>
-
-                        <df:EntityProperty name="time" index="2" columnIndex="0">
-                            <df:EntityProperty.editor>
-                                <df:PropertyEditor type="TimePicker"/>
-                            </df:EntityProperty.editor>
-                        </df:EntityProperty>
-
-                        <df:EntityProperty name="date" index="2" columnIndex="1">
-                            <df:EntityProperty.editor>
-                                <df:PropertyEditor type="DatePicker"/>
-                            </df:EntityProperty.editor>
-
-                        </df:EntityProperty>
-                    </df:PropertyGroup.properties>
-                </df:PropertyGroup>
-
-                <df:PropertyGroup collapsible="false" name="   " hidden="false">
-                    <df:PropertyGroup.layout>
-                        <df:DataFormGridLayout/>
-                    </df:PropertyGroup.layout>
-                    <df:PropertyGroup.properties>
-
-                        <df:EntityProperty name="tags" index="3">
-                            <df:EntityProperty.editor>
-                                <df:PropertyEditor type="Text"/>
-                            </df:EntityProperty.editor>
-                        </df:EntityProperty>
-
-
-                        <df:EntityProperty name="id" index="4" hidden="true"/>
-                        <df:EntityProperty name="timestamp_utc" index="5" hidden="true"/>
-
-                    </df:PropertyGroup.properties>
-                </df:PropertyGroup>
-            </df:RadDataForm.groups>
-
-
-        </df:RadDataForm>
-
-        <Button onTap="updatePressed" class="btn btn-primary" text="Update"/>
+        <Button id="actionBtn"  class="btn btn-primary" text="{{actionBtnText}}"/>
     </StackLayout>
 
 </Page>

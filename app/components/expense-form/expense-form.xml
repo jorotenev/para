@@ -1,0 +1,39 @@
+<!--When referencing the component, we follow the syntax of <namespace:component/> where namespace is the
+name we gave to the path and component is the filename (no extension) of our component XML-->
+<StackLayout loaded="loadedRad" xmlns:df="nativescript-pro-ui/dataform">
+    <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
+
+    <df:RadDataForm id="expense-form"
+                    commitMode="Manual"
+                    validationMode="OnLostFocus"
+                    source="{{expense}}"
+                    metadata="{{metadata}}"
+    >
+        <df:RadDataForm.groups>
+            <df:PropertyGroup collapsible="false" name="{{group_1}}" hidden="false">
+                <df:PropertyGroup.layout>
+                    <df:DataFormStackLayout/>
+                </df:PropertyGroup.layout>
+                <df:PropertyGroup.properties>
+                </df:PropertyGroup.properties>
+            </df:PropertyGroup>
+            <df:PropertyGroup collapsible="true" collapsed="true" name="{{group_2}}" hidden="false">
+                <df:PropertyGroup.layout>
+                    <df:DataFormGridLayout/>
+                </df:PropertyGroup.layout>
+                <df:PropertyGroup.properties>
+                </df:PropertyGroup.properties>
+            </df:PropertyGroup>
+
+        </df:RadDataForm.groups>
+
+        <df:PropertyGroup collapsible="false" name="{{group_3}}" hidden="false">
+            <df:PropertyGroup.layout>
+                <df:DataFormStackLayout/>
+            </df:PropertyGroup.layout>
+            <df:PropertyGroup.properties>
+            </df:PropertyGroup.properties>
+        </df:PropertyGroup>
+
+    </df:RadDataForm>
+</StackLayout>
