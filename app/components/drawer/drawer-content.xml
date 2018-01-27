@@ -1,0 +1,8 @@
+<StackLayout class="sidedrawer-left" loaded="onLoaded">
+    <StackLayout class="sidedrawer-content">
+        <Button class='btn' id="new" text="Add new" tap="onTap"/>
+        <Button class='btn' id="view_all" text="View All" tap="onTap"/>
+        <Button class='btn' id="settings" text="Settings" tap="onTap"/>
+        <Button class='btn' id="logout" text="Log out" tap="onTap"/>
+    </StackLayout>
+</StackLayout>
