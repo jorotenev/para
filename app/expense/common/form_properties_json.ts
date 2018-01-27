@@ -28,6 +28,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 groupName: group_2,
 
                 name: 'currency',
+                editor: 'Picker',
                 index: 1,
                 columnIndex: 1,
                 valuesProvider: prepareCurrencyObject(getCurrencies()),
@@ -70,11 +71,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
 
     };
 }
+
 function prepareCurrencyObject(raw) {
-    return Object.keys(raw).map((key) => {
-        return {
-            key: key,
-            label: raw[key]
-        }
-    })
+    return Object.keys(raw)
 }
