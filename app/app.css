@@ -21,3 +21,7 @@ components that have the btn class name.
 }
 
 
+.action-bar{
+    background-color:  #3C5AFD;
+    color: white;
+}

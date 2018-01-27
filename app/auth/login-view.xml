@@ -1,4 +1,4 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page">
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="true">
     <StackLayout class="p-20">
         <Label text="Login" class="h1 text-center"/>
 

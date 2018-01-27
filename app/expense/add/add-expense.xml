@@ -1,10 +1,28 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="true">
-    <StackLayout class="p-20 form" row="1" xmlns:exp="components/expense-form">
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+      navigatingTo="navigatingTo" class="page" actionBarHidden="true"
+      xmlns:sd="nativescript-pro-ui/sidedrawer"
+      xmlns:drawer="components/drawer"
+>
 
-        <exp:expense-form/>
+    <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
+        <sd:RadSideDrawer.drawerContent>
 
-        <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
+            <drawer:drawer-content></drawer:drawer-content>
 
-    </StackLayout>
+        </sd:RadSideDrawer.drawerContent>
+        <sd:RadSideDrawer.mainContent>
+
+            <StackLayout class="p-20 form" row="1" xmlns:exp="components/expense-form">
+
+                <exp:expense-form/>
+
+                <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
+
+            </StackLayout>
+
+        </sd:RadSideDrawer.mainContent>
+
+    </sd:RadSideDrawer>
+
 
 </Page>

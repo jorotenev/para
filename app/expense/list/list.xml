@@ -1,24 +1,41 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="true">
-    <GridLayout rows="60,*">
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="false"
+      xmlns:sd="nativescript-pro-ui/sidedrawer"
+      xmlns:drawer="components/drawer"
+      xmlns:action="components/para-action-bar"
 
-        <DockLayout stretchLastChild="false" row="0" id="top-section-list-expenses">
-            <StackLayout>
-                <Label text="List of all expenses"/>
+>
+    <action:para-action-bar></action:para-action-bar>
 
-            </StackLayout>
-        </DockLayout>
+    <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
+        <sd:RadSideDrawer.drawerContent>
 
-        <ListView row="1" items="{{ stuffs.expenses }}" id="expenses-list" loadMoreItems="loadMoreItems" itemTap="onTap">
-            <ListView.itemTemplate>
-                <DockLayout stretchLastChild="false" class='expense' height="200">
+            <drawer:drawer-content></drawer:drawer-content>
 
-                        <StackLayout dock="left" orientation="vertical" style.verticalAlignment="center">
-                            <Label text='{{name}}' class='expense-name'/>
-                            <Label text="{{timestamp_utc | readableTimestamp }}"/>
-                        </StackLayout>
-                        <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}' />
+        </sd:RadSideDrawer.drawerContent>
+        <sd:RadSideDrawer.mainContent>
+            <GridLayout rows="60,*">
+
+                <DockLayout stretchLastChild="false" row="0" id="top-section-list-expenses">
+                    <StackLayout>
+                        <Label text="List of all expenses"/>
+
+                    </StackLayout>
                 </DockLayout>
-            </ListView.itemTemplate>
-        </ListView>
-    </GridLayout>
+
+                <ListView row="1" items="{{ stuffs.expenses }}" id="expenses-list" loadMoreItems="loadMoreItems"
+                          itemTap="onTap">
+                    <ListView.itemTemplate>
+                        <DockLayout stretchLastChild="false" class='expense' height="200">
+
+                            <StackLayout dock="left" orientation="vertical" style.verticalAlignment="center">
+                                <Label text='{{name}}' class='expense-name'/>
+                                <Label text="{{timestamp_utc | readableTimestamp }}"/>
+                            </StackLayout>
+                            <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}'/>
+                        </DockLayout>
+                    </ListView.itemTemplate>
+                </ListView>
+            </GridLayout>
+        </sd:RadSideDrawer.mainContent>
+    </sd:RadSideDrawer>
 </Page>
