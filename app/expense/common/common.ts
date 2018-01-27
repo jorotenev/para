@@ -2,13 +2,14 @@ import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
-import {ExpenseDatabaseFacade} from "~/expense/db_facade/facade";
+import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/expense/db_facade/facade";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";
 import moment = require("moment");
 import {getJSONForm} from "./form_properties_json"
+import {update} from "nativescript-plugin-firebase";
 
 export const group_1 = " ";
 export const group_2 = "Extra";
@@ -17,9 +18,29 @@ export const group_3 = "   ";
 const dateFormat: string = "YYYY-MM-D";
 const timeFormat: string = "HH:mm";
 
-abstract class _ExpenseViewModelHelper {
-    public expense: IExpense;
-    public readonly mode: ExpenseFormMode;
+export function getViewModel(options: Constructor) {
+    if (options.mode === ExpenseFormMode.new) {
+        return new NewExpenseHelper(options)
+    } else if (options.mode === ExpenseFormMode.update) {
+        return new UpdateExpenseHelper(options)
+    }
+}
+
+export interface CommonExpenseViewModel {
+    metadata: object
+    expense: IExpense
+    actionBtnText: string
+    group_1: string
+    group_2: string
+    group_3: string
+
+    updatePressed(): void
+
+}
+
+abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
+    private _expense: IExpense;
+    private readonly mode: ExpenseFormMode;
 
     private activityIndicator: ActivityIndicator;
     // first it's the initial object; if the object is successfully updated, the hash is also updated
@@ -29,12 +50,14 @@ abstract class _ExpenseViewModelHelper {
     private readonly dataform: RadDataForm;
     private readonly page: Page;
 
+    private onSuccessfulOperation: (IExpense) => void
+
     public constructor(options: Constructor) {
-        this.expense = options.expense;
+        this._expense = options.expense;
         this.dataform = options.dataform;
         this.page = options.page;
         this.mode = options.mode;
-
+        this.onSuccessfulOperation = options.onSuccessfulOperation
         this.activityIndicator = <ActivityIndicator> this.page.getViewById('busy-ind');
         if (!this.activityIndicator) {
             throw new Error("no activity indicator on page")
@@ -52,6 +75,14 @@ abstract class _ExpenseViewModelHelper {
 
         this.expense = this.convertForForm(this.expense);
 
+    }
+
+    public get expense() {
+        return this._expense
+    }
+
+    public set expense(_e) {
+        this._expense = _e
     }
 
     public get actionBtnText() {
@@ -98,31 +129,38 @@ abstract class _ExpenseViewModelHelper {
 
     private onSuccessfullyCommitted() {
         const that = this;
-        const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode]
+        const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode];
 
         let committedExpense;
         try {
             committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject))
         } catch (err) {
             console.error(err);
-            dialogs.alert({title: `Couldn't ${verb} the expense`})
+            dialogs.alert({title: `Couldn't ${verb} the expense`});
             return;
         }
 
         if (this.objectHash === hashCode(JSON.stringify(committedExpense))) {
-            console.log("committed object is the same as the initial one. idling")
+            console.log("committed object is the same as the initial one. idling");
             return;
         }
 
         toggleActivityIndicator(this.activityIndicator, true);
+        let facade: IExpenseDatabaseFacade = new ExpenseDatabaseFacade();
+        let apiMethod = {
+            [ExpenseFormMode.new]: () => facade.persist(committedExpense),
+            [ExpenseFormMode.update]: () => facade.update(committedExpense),
+        }[this.mode];
 
-        new ExpenseDatabaseFacade().update(committedExpense).then(function (updatedExpense: IExpense) {
-            that.objectHash = hashCode(JSON.stringify(updatedExpense))
+        apiMethod().then(function (updatedExpense: IExpense) {
+            that.objectHash = hashCode(JSON.stringify(updatedExpense));
 
-            toggleActivityIndicator(that.activityIndicator, false)
+            toggleActivityIndicator(that.activityIndicator, false);
             console.log(`${verb} API call: ok`)
+            that.onSuccessfulOperation(updatedExpense)
+
         }, function (err) {
-            toggleActivityIndicator(that.activityIndicator, false)
+            toggleActivityIndicator(that.activityIndicator, false);
             dialogs.alert({
                 title: `Couldn't ${verb} the expense`,
                 message: err.reason,
@@ -172,18 +210,22 @@ abstract class _ExpenseViewModelHelper {
     }
 }
 
+class UpdateExpenseHelper extends _ExpenseViewModelHelper {
+
+}
+
+class NewExpenseHelper extends _ExpenseViewModelHelper {
+
+}
 
 export class Constructor {
     page: Page
     dataform: RadDataForm
     expense: IExpense
     mode: ExpenseFormMode
-
+    onSuccessfulOperation?: (IExpense) => void = () => undefined // default implementation
 }
 
-export class UpdateExpenseHelper extends _ExpenseViewModelHelper {
-
-}
 
 export enum ExpenseFormMode {
     new,
@@ -191,9 +233,9 @@ export enum ExpenseFormMode {
 }
 
 function validate(dataform: RadDataForm) {
-    // >> validate the amount
-    let validated = true;
 
+    let validated = true;
+    // >> validate the amount
     let candidateAmount = dataform.getPropertyByName('amount').valueCandidate
     let amountIsValid = true;
     if (!!candidateAmount) { // if something's entered

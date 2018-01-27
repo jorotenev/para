@@ -1,3 +1,6 @@
+import {userPreferredCurrency} from "~/app_config";
+import {currentTimeUTC} from "~/utils/time";
+
 export type ExpenseIdType = number;
 
 
@@ -37,5 +40,17 @@ export class Expense implements IExpense {
         this.name = obj.name
         this.tags = obj.tags
         this.timestamp_utc = obj.timestamp_utc
+    }
+
+    public static createEmptyExpense(): IExpense {
+        return {
+            id: null,
+            amount: null,
+            currency: userPreferredCurrency,
+            name: null,
+            tags: [],
+            timestamp_utc: currentTimeUTC()
+
+        }
     }
 }

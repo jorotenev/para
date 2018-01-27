@@ -1,6 +1,6 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
-import {ExpenseFormMode, UpdateExpenseHelper} from "~/expense/common/common";
+import {ExpenseFormMode, getViewModel} from "~/expense/common/common";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 
 let page: Page;
@@ -12,7 +12,7 @@ export function navigatingTo(args: EventData) {
     expense = page.navigationContext.expense;
     dataform = <RadDataForm> page.getViewById('expense-form');
 
-    page.bindingContext = new UpdateExpenseHelper({
+    page.bindingContext = getViewModel({
         page: page,
         dataform: dataform,
         mode: ExpenseFormMode.update,

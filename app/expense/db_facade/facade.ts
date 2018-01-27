@@ -37,7 +37,6 @@ export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
     static readonly GETListEndpointTemplate = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
-    static readonly GETRangeEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_range/<%= fromID %>/<%= toID %>`);
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
@@ -111,8 +110,8 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
  * returned by the makeRequest. contains information as returned by the server
  */
 export interface RawResponseError {
-    msg: string
-    statusCode?: number
+    readonly msg: string
+    readonly statusCode?: number
 }
 
 /**
@@ -121,12 +120,11 @@ export interface RawResponseError {
 export interface ResponseError {
     readonly reason: string
     readonly raw?: RawResponseError
-
 }
 
 export class Utils {
     static makeRequest(url: string, method = "GET", payload = null, timeout = 3000): Promise<any> {
-
+        console.log(`[${method}::${url}] payload=${JSON.stringify(payload)}`)
         return new Promise<any>(function (resolve, reject) {
             http.request({
                 url: url,
