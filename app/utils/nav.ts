@@ -5,6 +5,9 @@ export function navigateTo(path: string, clearHistory: boolean = false) {
     let topmost = frameModule.topmost();
     topmost.navigate({
         moduleName: path,
-        clearHistory: clearHistory
+        clearHistory: clearHistory,
+        context: {
+            fromDrawer: true
+        }
     });
 }

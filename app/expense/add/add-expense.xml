@@ -1,8 +1,10 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd"
-      navigatingTo="navigatingTo" class="page" actionBarHidden="true"
+      navigatingTo="navigatingTo" class="page" actionBarHidden="false"
       xmlns:sd="nativescript-pro-ui/sidedrawer"
+      xmlns:action="components/para-action-bar"
       xmlns:drawer="components/drawer"
 >
+    <action:para-action-bar title="Add new" action="{{navigationBtnType}}"></action:para-action-bar>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>

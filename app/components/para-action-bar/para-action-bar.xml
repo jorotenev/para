@@ -1,8 +1,11 @@
-<ActionBar title="" class="action-bar" >
-    <navigation-button icon="res://ic_menu" tap="toggleDrawer" ios:visibility="collapsed" />
+<ActionBar title="" id="action-bar" class="action-bar" loaded="onLoad">
+    <android>
+        <navigation-button id="nav-btn" ios:visibility="collapsed"/>
+    </android>
     <action-bar.actionItems>
         <ios>
-            <action-item icon="res://ic_menu" ios.position="left" tap="toggleDrawer" />
+            <action-item id="nav-btn" ios.position="left"/>
+
         </ios>
     </action-bar.actionItems>
 </ActionBar>

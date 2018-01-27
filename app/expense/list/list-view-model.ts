@@ -160,7 +160,7 @@ class DummyExpensesList extends ExpensesListManager {
             id: null,
             amount: u.sample(u.range(0, 100)),
             currency: 'EUR',
-            name: `id: ${id}`,
+            name: `expense: #${id}`,
             timestamp_utc: currentTimeUTC(),
             tags: [],
         };

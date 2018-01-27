@@ -11,13 +11,13 @@ export function navigatingTo(args: EventData) {
     page = <Page>args.object;
     expense = page.navigationContext.expense;
     dataform = <RadDataForm> page.getViewById('expense-form');
-
-    page.bindingContext = getViewModel({
+    let context = getViewModel({
         page: page,
         dataform: dataform,
         mode: ExpenseFormMode.update,
         expense: expense
     })
+    page.bindingContext = context
 
 }
 

@@ -18,7 +18,7 @@ export const group_3 = "   ";
 const dateFormat: string = "YYYY-MM-D";
 const timeFormat: string = "HH:mm";
 
-export function getViewModel(options: Constructor) {
+export function getViewModel(options: Constructor): CommonExpenseViewModel {
     if (options.mode === ExpenseFormMode.new) {
         return new NewExpenseHelper(options)
     } else if (options.mode === ExpenseFormMode.update) {
@@ -36,6 +36,7 @@ export interface CommonExpenseViewModel {
 
     updatePressed(): void
 
+    [key: string]: any
 }
 
 abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {

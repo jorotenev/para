@@ -4,7 +4,7 @@
       xmlns:action="components/para-action-bar"
 
 >
-    <action:para-action-bar></action:para-action-bar>
+    <action:para-action-bar title="All expenses"></action:para-action-bar>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>
@@ -13,16 +13,10 @@
 
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
-            <GridLayout rows="60,*">
+            <GridLayout rows="*">
 
-                <DockLayout stretchLastChild="false" row="0" id="top-section-list-expenses">
-                    <StackLayout>
-                        <Label text="List of all expenses"/>
 
-                    </StackLayout>
-                </DockLayout>
-
-                <ListView row="1" items="{{ stuffs.expenses }}" id="expenses-list" loadMoreItems="loadMoreItems"
+                <ListView row="0" items="{{ stuffs.expenses }}" id="expenses-list" loadMoreItems="loadMoreItems"
                           itemTap="onTap">
                     <ListView.itemTemplate>
                         <DockLayout stretchLastChild="false" class='expense' height="200">
