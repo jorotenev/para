@@ -25,3 +25,6 @@ components that have the btn class name.
     background-color: #fd8c5b;
     color: white;
 }
+.font-awesome {
+    font-family: "FontAwesome";
+}
