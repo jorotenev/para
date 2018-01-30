@@ -2,6 +2,31 @@ import {IExpense} from "~/models/expense";
 import {ExpenseFormMode, group_1, group_2} from "~/expense/common/common";
 import {getCurrencies} from "~/utils/money";
 
+export function metadataForCurrency(options) {
+    let opts = {
+        groupName: "",
+        index: 0,
+        displayName: "",
+        columnIndex: 0,
+        hintText: "",
+        name: 'currency',
+        ...options
+    }
+    return {
+        groupName: opts.groupName,
+
+        displayName: opts.displayName,
+        name: opts.name,
+        editor: 'Picker',
+        index: opts.index,
+        columnIndex: opts.columnIndex,
+        hintText: opts.hintText,
+        required: true,
+        validators: [],
+        valuesProvider: prepareCurrencyObject(getCurrencies()),
+    }
+}
+
 export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
     return {
         commitMode: "Manual",
@@ -24,15 +49,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 columnIndex: 0,
                 editor: 'Number'
             },
-            {
-                groupName: group_2,
-
-                name: 'currency',
-                editor: 'Picker',
-                index: 1,
-                columnIndex: 1,
-                valuesProvider: prepareCurrencyObject(getCurrencies()),
-            },
+            metadataForCurrency({index: 1, columnIndex: 1, groupName: group_2}),
             {
                 groupName: group_2,
 

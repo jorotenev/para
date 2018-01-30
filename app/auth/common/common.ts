@@ -8,7 +8,7 @@ export function generateEmailPasswordMetadata() {
                 displayName: "",
                 index: 0,
                 hintText: "Enter email",
-                editorType: "Email",
+                editor: "Email",
                 required: true,
                 validators: [
                     {name: 'EmailValidator'},
@@ -18,7 +18,7 @@ export function generateEmailPasswordMetadata() {
                 name: 'password',
                 index: 1,
                 displayName: "",
-                editorType: "Password",
+                editor: "Password",
                 hintText: "Enter password",
                 required: true,
                 validators: [{name: "NonEmpty"}, {name: "MinimumLength", params: {min: 5}}]

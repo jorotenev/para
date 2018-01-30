@@ -5,7 +5,11 @@ import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {Page} from "tns-core-modules/ui/page";
 import {generateEmailPasswordMetadata} from "~/auth/common/common";
 import {onFbLoginBtnPressed} from "~/auth/login/login-view";
-import {ObservableProperty} from "~/utils/misc";
+import {ObservableProperty, propertyOf} from "~/utils/misc";
+import {metadataForCurrency} from "~/expense/common/form_properties_json";
+import {userPreferredCurrency} from "~/app_config";
+
+var dialogs = require("ui/dialogs");
 
 let dataform: RadDataForm;
 let page: Page;
@@ -18,15 +22,34 @@ export function navigatingTo(args: EventData) {
 }
 
 export function signupBtnPressed() {
-    dataform.validateAndCommitAll().then((ok) => {
-        if (ok) {
-            let user = JSON.parse(dataform.editedObject);
+    let rejectedDataFormMsg = "rejected dataform promise";
+
+    dataform.validateAndCommitAll()
+        .then((ok) => {
+            if (ok) {
+                return JSON.parse(dataform.editedObject);
+            } else {
+                throw new Error(rejectedDataFormMsg)
+            }
+        })
+        .then((formData: IUser) => {
+            let u: User = new User({
+                email: formData.email,
+                password: formData.password,
+                preferredCurrency: formData.preferredCurrency
+            })
+            return u.register() //it's a promise
+        })
+        .then(() => {
+            navigateTo('expense/add/add-expense', true)
+        }).catch((reason) => {
+        if (reason.indexOf(rejectedDataFormMsg) !== -1) {
+            return
         } else {
-            console.log("rejected dataform promise")
+            dialogs.alert("Failed to register you :(")
         }
-    }, (err) => {
-        console.log("rejected")
     })
+
 }
 
 export let withFb = onFbLoginBtnPressed;
@@ -46,11 +69,19 @@ class SignUpViewModel extends Observable {
 
         super()
         this.activity = false;
-        this.user = {email: null, password: null}
+        this.user = User.emptyUser()
     }
 
 
     get metadata() {
-        return generateEmailPasswordMetadata()
+        let metadata = generateEmailPasswordMetadata();
+        console.log("props len is  " + metadata.propertyAnnotations.length)
+        let currencyMetadata = metadataForCurrency({
+            index: metadata.propertyAnnotations.length,
+            name: propertyOf<IUser>('preferredCurrency'),
+            displayName: "Preferred currency"
+        });
+        metadata.propertyAnnotations.push(currencyMetadata);
+        return metadata
     }
 }
