@@ -1,39 +1,67 @@
 import {Observable} from "data/observable";
 import firebase = require("nativescript-plugin-firebase");
-import {navigateTo} from "../utils/nav";
+import {navigateTo} from "~/utils/nav";
 import {viewAfterLogIn} from "~/app_config";
+import {generateEmailPasswordMetadata} from "~/auth/common/common";
+import {ObservableProperty} from "~/utils/misc";
+
 var dialogs = require("ui/dialogs");
-var appSettings = require("application-settings");
 
 export class LoginViewModel extends Observable {
-    email: string;
-    password: string;
+    public loginData;
 
-    constructor(email: string = '', password: string = '') {
+    @ObservableProperty()
+    public activity: boolean;
+
+    constructor() {
+
         super();
-        this.email = email;
-        this.password = password;
+        this.activity = false;
+        this.loginData = {
+            email: null,
+            password: null
+        }
     }
+
+
+    get metadata() {
+        return generateEmailPasswordMetadata()
+    }
+
 
     public loginWithEmailAndPassword() {
 
-
+        const that = this;
         console.log('logging in login-view');
-        console.log(this);
+        this.activity = true;
 
         firebase.login({
             type: firebase.LoginType.PASSWORD,
             passwordOptions: {
-                email: this.email,
-                password: this.password
+                email: this.loginData.email,
+                password: this.loginData.password
             }
         }).then(
             function (result) {
                 let r = JSON.stringify(result);
+                //TODO log this
+                console.log(r)
                 onSuccessfulLogin()
+                that.activity = false;
+
             },
             function (errorMessage) {
-                console.log(errorMessage);
+                console.log('rejected promise firebase' + errorMessage);
+                that.activity = false;
+
+                if (errorMessage.indexOf("FirebaseAuthInvalidUserException") !== -1) {
+                    dialogs.alert("No such user")
+                } else if(errorMessage.indexOf("FirebaseAuthInvalidCredentialsException")!==-1){
+                    dialogs.alert("Invalid password. Maybe you entered a wrong password " +
+                        "or you have registered with Facebook?")
+                } else {
+                    dialogs.alert("Problem logging you in")
+                }
             }
         );
     }
@@ -43,6 +71,7 @@ export class LoginViewModel extends Observable {
             type: firebase.LoginType.FACEBOOK
         }).then(
             function (result) {
+                // TODO
                 dialogs.alert({
                     title: "Login OK",
                     message: JSON.stringify(result),

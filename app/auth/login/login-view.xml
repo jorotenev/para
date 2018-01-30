@@ -1,0 +1,25 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+      navigatingTo="navigatingTo" class="page" actionBarHidden="true"
+      xmlns:df="nativescript-pro-ui/dataform">
+
+    <StackLayout class="p-20 ">
+        <Label text="Login" class="h1 text-center"/>
+        <Label text="Login with email and password" class="text-center"></Label>
+
+        <ActivityIndicator busy="{{activity}}" visibility="{{activity ? 'visible' : 'collapsed'}}"></ActivityIndicator>
+        <df:RadDataForm id="login-form" source="{{loginData}}" metadata="{{metadata}}"
+
+        ></df:RadDataForm>
+
+        <Button class="btn btn-outline" text="Login" id="submit-button" isEnabled="{{!activity}}" tap="emailPassLoginBtnPressed"/>
+        <Label text="or login via Facebook" class="text-center" style="margin-top:10"></Label>
+
+        <Button text="&#xf230; Sign in with Facebook" tap="onFbLoginBtnPressed"
+                class="btn btn-outline font-awesome" style="//background-color:#3b5998"/>
+        <StackLayout class="hr-light" style="margin-top:40"></StackLayout>
+
+        <Label text="Don't have an account?" class="text-center" style="margin-top:10px"></Label>
+        <Button text="Sign up" tap="goToSignUp" class="btn btn-primary"/>
+
+    </StackLayout>
+</Page>
