@@ -17,7 +17,7 @@ const routes = {
         path: "user/settings",
     },
     "logout": {
-        path: "auth/login-view",
+        path: "auth/login/login-view",
         deleteHistory: true,
         promise: logout
     }
