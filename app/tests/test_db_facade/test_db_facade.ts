@@ -1,6 +1,9 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, ResponseError, Utils} from "~/expense/db_facade/facade";
+import {
+    ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, RawResponseError, ResponseError,
+    Utils
+} from "~/expense/db_facade/facade";
 import {ten_expenses} from './sample_responses';
-import {http} from "~/expense/db_facade/facade"
+import {http, firebase} from "~/expense/db_facade/facade"
 import {IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
 
@@ -40,12 +43,18 @@ function fakeHTTPResponse(raw, statusCode): HttpResponse {
 }
 
 function setUpBeforeEach(thisObject) {
-    thisObject.mockedRequest = spyOn(Utils, 'makeRequest')
+    thisObject.mockedRequest = spyOn(Utils, 'makeRequest');
+
+    thisObject.mockedFirebase = spyOn(firebase, 'getAuthToken');
+    thisObject.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
 }
 
 function setUpAfterEach(thisObject) {
     thisObject.mockedRequest.calls.reset();
     thisObject.mockedRequest.and.callThrough();
+
+    thisObject.mockedFirebase.calls.reset();
+    thisObject.mockedFirebase.and.callThrough();
 
 }
 
@@ -165,11 +174,16 @@ describe("Test of the API facade's makeRequest", function () {
     beforeEach(function () {
 
         this.mockedHTTP = spyOn(http, 'request');
+        this.mockedFirebase = spyOn(firebase, "getAuthToken")
+        this.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
 
     });
     afterEach(function () {
         this.mockedHTTP.calls.reset();
-        this.mockedHTTP.and.callThrough() // important, otherwise test runner panics at the disco
+        this.mockedHTTP.and.callThrough();  // important, otherwise test runner panics at the disco
+
+        this.mockedFirebase.calls.reset();
+        this.mockedFirebase.and.callThrough();
     });
 
     it("the api returning a 500 leads to a rejection", function (done) {
@@ -190,16 +204,34 @@ describe("Test of the API facade's makeRequest", function () {
     it("returning a 200 leads resolving the promise and parsing the json", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse('{"payload":"rebra"}', 200)));
 
-        Utils.makeRequest("http://wonderland:5000/api/test-200").then(function (json) {
+        Utils.makeRequest("wonderland/api/test-200").then(function (json) {
             expect(json.payload).toBe("rebra");
             done();
         }, function (err) {
             fail(err);
-            done()
+            done();
         })
 
     });
     it("POSTing data via the makeRequest will call http.request with correct params", function (done) {
+        fail("not implemented");
+        done()
+    });
+
+    it("if the auth token can't be obtained, " +
+        "no request is made and the promise is rejected with a suitable msg", function (done) {
+        this.mockedFirebase.and.callThrough();
+        this.mockedHTTP.and.callThrough();
+        let that = this;
+        Utils.makeRequest('whatevs').then(function (_) {
+            fail("Promise should have been rejected");
+            done();
+        }, function (error: RawResponseError) {
+            expect(error.msg.indexOf("token") !== -1).toBe(true);
+            expect(that.mockedHTTP.calls().count).toEqual(0)
+            done();
+        });
+
     })
 });
 
@@ -217,4 +249,4 @@ describe("testing", function () {
         });
         done()
     })
-})
+});
