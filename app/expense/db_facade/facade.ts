@@ -123,6 +123,8 @@ export interface ResponseError {
 }
 
 export class Utils {
+    static readonly tokenHeader = "x-firebase-auth-token"
+
     static makeRequest(url: string, method = "GET", payload = null, timeout = 3000): Promise<any> {
         console.log(`[${method}::${url}] payload=${JSON.stringify(payload)}`);
 
@@ -133,7 +135,7 @@ export class Utils {
                             url: url,
                             method: method,
                             timeout: timeout,
-                            headers: [{"x-firebase-auth-token": token}],
+                            headers: [{[Utils.tokenHeader]: token}],
                             content: payload,
                         }
                     )
@@ -142,7 +144,7 @@ export class Utils {
                 }))
                 .then(
                     function (response: HttpResponse) {
-                        if (response.statusCode < 300) {
+                        if (response.statusCode < 300) { // todo check how redirects are handled
                             try {
                                 let json = response.content.toJSON();
                                 resolve(json);
@@ -161,8 +163,9 @@ export class Utils {
                     })
                 .catch((err) => {
                     if (err instanceof Error) {
-                        err = err.message
+                        err = err.message;
                     }
+
                     console.error(err);
                     let error: RawResponseError = {"msg": err};
                     reject(error)

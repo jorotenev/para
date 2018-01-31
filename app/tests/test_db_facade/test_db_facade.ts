@@ -6,6 +6,7 @@ import {ten_expenses} from './sample_responses';
 import {http, firebase} from "~/expense/db_facade/facade"
 import {IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
+import objectContaining = jasmine.objectContaining;
 
 var u = require('underscore');
 
@@ -174,8 +175,8 @@ describe("Test of the API facade's makeRequest", function () {
     beforeEach(function () {
 
         this.mockedHTTP = spyOn(http, 'request');
-        this.mockedFirebase = spyOn(firebase, "getAuthToken")
-        this.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
+        this.mockedFirebase = spyOn(firebase, "getAuthToken");
+        this.mockedFirebase.and.returnValue(Promise.resolve('fake token'))
 
     });
     afterEach(function () {
@@ -222,17 +223,36 @@ describe("Test of the API facade's makeRequest", function () {
         "no request is made and the promise is rejected with a suitable msg", function (done) {
         this.mockedFirebase.and.callThrough();
         this.mockedHTTP.and.callThrough();
-        let that = this;
+        const that = this;
         Utils.makeRequest('whatevs').then(function (_) {
             fail("Promise should have been rejected");
             done();
         }, function (error: RawResponseError) {
             expect(error.msg.indexOf("token") !== -1).toBe(true);
-            expect(that.mockedHTTP.calls().count).toEqual(0)
+            expect(that.mockedHTTP.calls.count()).toEqual(0)
             done();
         });
 
-    })
+    });
+
+    fit("request headers include auth token", function (done) {
+        const that = this;
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+        Utils.makeRequest('whatev').then(() => {
+            try {
+                expect(that.mockedHTTP.calls.count()).toBe(1)
+                let args = that.mockedHTTP.calls.argsFor(0)[0]; // the `options` argument of the first call
+                let headers = args.headers; // array of (header) objects
+                expect(headers).toContain(objectContaining({[Utils.tokenHeader]: "fake token"}))
+                done();
+            } catch (err) {
+                fail(err)
+            }
+        }, () => {
+            fail()
+            done()
+        })
+    });
 });
 
 describe("testing", function () {
