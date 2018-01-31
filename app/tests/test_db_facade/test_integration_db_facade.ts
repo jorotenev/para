@@ -4,10 +4,9 @@
  * */
 import * as http from "http";
 import {apiAddress} from "~/app_config";
-import {ExpenseDatabaseFacade} from "~/expense/db_facade/facade";
+import {ExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {IExpense} from "~/models/expense";
 import {testListExpenses} from "~/tests/test_db_facade/test_db_facade";
-import {HttpResponse} from "tns-core-modules/http";
 
 function apiIsUP(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -32,7 +31,6 @@ function apiIsUP(): Promise<void> {
         })
     });
 }
-
 
 
 /**

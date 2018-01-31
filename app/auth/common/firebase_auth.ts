@@ -1,4 +1,5 @@
-import {firebase} from "~/expense/db_facade/facade";
+import {firebase} from "nativescript-plugin-firebase/firebase-common";
+
 import {viewAfterLogIn} from "~/app_config";
 import {navigateTo} from "~/utils/nav";
 import {

@@ -1,14 +1,14 @@
 import {
-    ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, RawResponseError, ResponseError,
-    Utils
-} from "~/expense/db_facade/facade";
+    ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT,
+} from "~/api_facade/db_facade";
 import {ten_expenses} from './sample_responses';
-import {http, firebase} from "~/expense/db_facade/facade"
+import {http, firebase} from "~/api_facade/db_facade"
 import {IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
 import objectContaining = jasmine.objectContaining;
+import {RawResponseError, ResponseError, Utils} from "~/api_facade/common";
 
-var u = require('underscore');
+let u = require('underscore');
 
 const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
 
@@ -95,7 +95,6 @@ describe("Testing the get_expenses_list of  db facade", () => {
         // the result of the tested method invocation is of correct shape
         expect(resultAsPromise && !!resultAsPromise.then && typeof resultAsPromise.then === 'function').toBe(true);
 
-        const that = this;
         resultAsPromise.then(function (payload) {
             testListExpenses(payload, startFromId, batchSize);
             done()
@@ -229,7 +228,7 @@ describe("Test of the API facade's makeRequest", function () {
             done();
         }, function (error: RawResponseError) {
             expect(error.msg.indexOf("token") !== -1).toBe(true);
-            expect(that.mockedHTTP.calls.count()).toEqual(0)
+            expect(that.mockedHTTP.calls.count()).toEqual(0);
             done();
         });
 
@@ -237,20 +236,20 @@ describe("Test of the API facade's makeRequest", function () {
 
     it("request headers include auth token", function (done) {
         const that = this;
-        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)));
         Utils.makeRequest('whatev').then(() => {
             try {
-                expect(that.mockedHTTP.calls.count()).toBe(1)
+                expect(that.mockedHTTP.calls.count()).toBe(1);
                 let args = that.mockedHTTP.calls.argsFor(0)[0]; // the `options` argument of the first call
                 let headers = args.headers; // array of (header) objects
-                expect(headers).toContain(objectContaining({[Utils.tokenHeader]: "fake token"}))
+                expect(headers).toContain(objectContaining({[Utils.tokenHeader]: "fake token"}));
                 done();
             } catch (err) {
                 fail(err)
             }
         }, () => {
-            fail()
-            done()
+            fail();
+            done();
         })
     });
 });

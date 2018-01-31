@@ -2,14 +2,13 @@ import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
-import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/expense/db_facade/facade";
+import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";
 import moment = require("moment");
 import {getJSONForm} from "./form_properties_json"
-import {update} from "nativescript-plugin-firebase";
 
 export const group_1 = " ";
 export const group_2 = "Extra";
@@ -18,7 +17,8 @@ export const group_3 = "   ";
 const dateFormat: string = "YYYY-MM-D";
 const timeFormat: string = "HH:mm";
 
-export function getViewModel(options: Constructor): CommonExpenseViewModel {
+
+export function viewModelFactory(options: Constructor): CommonExpenseViewModel {
     if (options.mode === ExpenseFormMode.new) {
         return new NewExpenseHelper(options)
     } else if (options.mode === ExpenseFormMode.update) {

@@ -1,15 +1,9 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
-
-let u = require('underscore');
-import {navigateTo} from "~/utils/nav"
-import {TextField} from "tns-core-modules/ui/text-field";
-import {ResponseError} from "~/expense/db_facade/facade";
-import {ExpenseFormMode, getViewModel} from "~/expense/common/common";
+import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {Expense, IExpense} from "~/models/expense";
 
-let dialogs = require("ui/dialogs");
 
 let page: Page;
 
@@ -23,7 +17,7 @@ export function navigatingTo(args: EventData) {
     let expense: IExpense = Expense.createEmptyExpense();
     let dataform = <RadDataForm> page.getViewById('expense-form');
 
-    let viewModel = getViewModel({
+    let viewModel = viewModelFactory({
 
         page: page,
         dataform: dataform,
@@ -39,18 +33,3 @@ export function navigatingTo(args: EventData) {
 
 
 }
-
-
-// export function submit() {
-//     expenseModel.createNewExpense().then(function (expense) {
-//         console.log("persisted successfully");
-//     }, function (err: ResponseError) {
-//         console.dir(err);
-//         dialogs.alert({
-//             title: 'Couldn\'t save the expense',
-//             message: err.reason,
-//             okButtonText: 'Cool'
-//         })
-//     });
-// }
-//

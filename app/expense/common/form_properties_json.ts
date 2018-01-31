@@ -11,7 +11,7 @@ export function metadataForCurrency(options) {
         hintText: "",
         name: 'currency',
         ...options
-    }
+    };
     return {
         groupName: opts.groupName,
 

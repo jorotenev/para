@@ -1,4 +1,6 @@
-export let ten_expenses: object[] = [
+import {IExpense} from "~/models/expense";
+
+export let ten_expenses: IExpense[] = [
     {
         "id": 1,
         "name": "server id 1",
