@@ -1,28 +1,28 @@
 import {navigateTo} from "~/utils/nav";
-import {EventData, Observable} from "tns-core-modules/data/observable";
-import {IUser, User} from "~/models/user-model";
+import {EventData} from "tns-core-modules/data/observable";
+import {IUser} from "~/models/user-model";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {Page} from "tns-core-modules/ui/page";
-import {generateEmailPasswordMetadata} from "~/auth/common/common";
-import {onFbLoginBtnPressed} from "~/auth/login/login-view";
-import {ObservableProperty, propertyOf} from "~/utils/misc";
-import {metadataForCurrency} from "~/expense/common/form_properties_json";
-import {userPreferredCurrency} from "~/app_config";
+import {authWithFacebook, redirectToViewAfterLogin, registerWithPassword} from "~/auth/common/firebase_auth";
+import {SignUpViewModel} from "./signup-view-model"
 
 var dialogs = require("ui/dialogs");
 
 let dataform: RadDataForm;
 let page: Page;
+let model: SignUpViewModel;
 
 export function navigatingTo(args: EventData) {
-
     page = <Page> args.object;
-    dataform = <RadDataForm> page.getViewById('signup-form')
-    page.bindingContext = new SignUpViewModel();
+    dataform = <RadDataForm> page.getViewById('signup-form');
+    model = new SignUpViewModel();
+
+    page.bindingContext = model
 }
 
 export function signupBtnPressed() {
-    let rejectedDataFormMsg = "rejected dataform promise";
+    const rejectedDataFormMsg = "rejected dataform promise";
+    model.activity = true;
 
     dataform.validateAndCommitAll()
         .then((ok) => {
@@ -33,55 +33,48 @@ export function signupBtnPressed() {
             }
         })
         .then((formData: IUser) => {
-            let u: User = new User({
-                email: formData.email,
-                password: formData.password,
-                preferredCurrency: formData.preferredCurrency
-            })
-            return u.register() //it's a promise
+            return registerWithPassword({email: formData.email, password: formData.password})
         })
-        .then(() => {
-            navigateTo('expense/add/add-expense', true)
-        }).catch((reason) => {
-        if (reason.indexOf(rejectedDataFormMsg) !== -1) {
-            return
-        } else {
-            dialogs.alert("Failed to register you :(")
-        }
-    })
+        .then((createdUserInfo) => {
+            console.log("created user:");
+            console.dir(createdUserInfo);
+
+            redirectToViewAfterLogin()
+        })
+        .catch((reason) => {
+            if (reason instanceof Error) {
+                reason = reason.message
+            }
+
+            model.activity = false;
+
+            let msg;
+            if (reason.indexOf(rejectedDataFormMsg) !== -1) {
+                // the UI have been updated by RadDataForm itself to notify the user about form errors
+                return
+            } else if (reason.indexOf("FirebaseAuthUserCollisionException") !== -1) {
+                msg = "User with the same email already exists. " +
+                    "Possibly you've already registered or you've signed up via Facebook?"
+            } else {
+                msg = "Failed to register you "
+            }
+            dialogs.alert(msg)
+        });
 
 }
 
-export let withFb = onFbLoginBtnPressed;
+export function withFb() {
+    model.activity = true;
+
+    authWithFacebook().then(redirectToViewAfterLogin, (err) => {
+        model.activity = false;
+        dialogs.alert("Failed to register you :(")
+
+
+    })
+}
 
 export function goToLogin() {
     navigateTo("auth/login/login-view")
 }
 
-
-class SignUpViewModel extends Observable {
-
-    public user;
-    @ObservableProperty()
-    public activity: boolean;
-
-    constructor() {
-
-        super()
-        this.activity = false;
-        this.user = User.emptyUser()
-    }
-
-
-    get metadata() {
-        let metadata = generateEmailPasswordMetadata();
-        console.log("props len is  " + metadata.propertyAnnotations.length)
-        let currencyMetadata = metadataForCurrency({
-            index: metadata.propertyAnnotations.length,
-            name: propertyOf<IUser>('preferredCurrency'),
-            displayName: "Preferred currency"
-        });
-        metadata.propertyAnnotations.push(currencyMetadata);
-        return metadata
-    }
-}

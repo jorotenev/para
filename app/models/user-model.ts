@@ -52,27 +52,10 @@ export class User implements IUser {
         this._password = pwd;
     }
 
-    public login() {
-    };
-
-    public register(): Promise<void> {
+    public register(): Promise<string> {
         const that = this;
-        return new Promise<void>(function (resolve, reject) {
-            firebase.createUser({
-                email: that.email,
-                password: that.password
-            }).then(
-                function (result) {
-                    console.log(`user created; uid= ${result.key}`)
+        return new Promise<string>(function (resolve, reject) {
 
-                    setUserFirebaseUID(result.key)
-                    resolve()
-                },
-                function (errorMessage) {
-                    console.error("registering failed" + errorMessage);
-                    reject(errorMessage)
-                }
-            );
         })
     };
 
