@@ -50,6 +50,7 @@ export function setFirebaseAuthToken(token) {
 export const viewAfterLogIn = 'expense/list/list';
 export const viewLogIn = 'auth/login/login-view';
 export const userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
+export const apiVersion = 'v1';
 export const apiAddress = "http://10.0.2.2:5000/"; //TODO hack
 export const userFirebaseUID = getString(userFirebaseUIDKey, null);
 export const firebaseAuthToken = getString(firebaseAuthTokenKey, null);

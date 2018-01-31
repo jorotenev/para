@@ -235,7 +235,7 @@ describe("Test of the API facade's makeRequest", function () {
 
     });
 
-    fit("request headers include auth token", function (done) {
+    it("request headers include auth token", function (done) {
         const that = this;
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
         Utils.makeRequest('whatev').then(() => {

@@ -1,12 +1,16 @@
 import * as _http from 'http';
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
-import {apiAddress} from "~/app_config";
+import {apiAddress, apiVersion} from "~/app_config";
 import * as u from 'underscore';
 import {HttpResponse} from "tns-core-modules/http";
 import * as _firebase from "nativescript-plugin-firebase"
-
+// easier mocking
 export let firebase = _firebase;
 export let http = _http;
+
+export enum SortByOptions {
+    date_descending
+}
 
 export interface IExpenseDatabaseFacade {
     /**
@@ -27,12 +31,12 @@ export interface IExpenseDatabaseFacade {
 
     get_single(id: ExpenseIdType): Promise<IExpense>
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]>
+    get_list(startFromId: ExpenseIdType, batchSize: number, sortBy: SortByOptions): Promise<IExpense[]>
 
 }
 
 
-export const EXPENSES_API_ENDPOINT = apiAddress + 'expenses_api/';
+export const EXPENSES_API_ENDPOINT = `${apiAddress}expenses_api/${apiVersion}/`;
 
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
@@ -78,7 +82,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
+    get_list(startFromId: ExpenseIdType, batchSize: number, sortBy: SortByOptions = SortByOptions.date_descending): Promise<IExpense[]> {
         let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
             startFromId: startFromId,
             batchSize: batchSize
