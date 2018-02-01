@@ -19,7 +19,7 @@ export interface ResponseError {
 }
 
 export class Utils {
-    static readonly tokenHeader = "x-firebase-auth-token"
+    static readonly tokenHeader = "x-firebase-auth-token";
 
     static makeRequest(url: string, method = "GET", payload = null, timeout = 3000): Promise<any> {
         console.log(`[${method}::${url}] payload=${JSON.stringify(payload)}`);

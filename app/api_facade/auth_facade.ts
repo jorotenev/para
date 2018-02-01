@@ -10,8 +10,8 @@ interface IAuthFacade {
 export class AuthFacade implements IAuthFacade {
     static readonly POSTRegisterEndpoint = `${AUTH_API_ENDPOINT}register`;
 
-    register(): void {
-        Utils.makeRequest(AuthFacade.POSTRegisterEndpoint, 'POST')
+    register(): Promise<void> {
+        return Utils.makeRequest(AuthFacade.POSTRegisterEndpoint, 'POST')
     }
 
 }
