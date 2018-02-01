@@ -6,7 +6,7 @@ import * as http from "http";
 import {apiAddress} from "~/app_config";
 import {ExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {IExpense} from "~/models/expense";
-import {testListExpenses} from "~/tests/test_db_facade/test_db_facade";
+import {testListExpenses} from "./test_api_facade";
 
 function apiIsUP(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
