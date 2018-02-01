@@ -1,5 +1,5 @@
 import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense, Expense} from '~/models/expense'
+import {IExpense, Expense, dummyExpense} from '~/models/expense'
 import {currentTimeUTC, readableTimestamp} from '~/utils/time'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {ExpenseConstructor} from "~/models/expense";
@@ -24,8 +24,8 @@ export class ListExpenseModel extends Observable {
     }
 
 
-    public loadMoreItems(ev) {
-        this.loader.loadMoreItems(ev);
+    public loadMoreItems(ev): Promise<boolean> {
+        return this.loader.loadMoreItems(ev);
     }
 
 
@@ -41,7 +41,7 @@ export interface IExpensesListManager {
     initList();
 
     // called when the user has reached the end of the loaded items
-    loadMoreItems(ev): void;
+    loadMoreItems(ev): Promise<boolean>;
 
     // add an expense to the list
     addExpense(exp: ExpenseConstructor): boolean
@@ -62,7 +62,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
 
     abstract initList()
 
-    abstract loadMoreItems(ev): void
+    abstract loadMoreItems(ev): Promise<boolean>
 
     public get expensesIds(): number[] {
         return this.expenses.map((exp: IExpense) => exp.id)
@@ -73,7 +73,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
     }
 
     public get isEmpty(): boolean {
-        return this._expenses.length === 0
+        return this.expenses.length === 0
     }
 
     public addExpense(expense: IExpense): boolean {
@@ -96,12 +96,13 @@ abstract class ExpensesListManager implements IExpensesListManager {
 class ExpensesHandler extends ExpensesListManager {
 
 
-    public loadMoreItems(ev: any): void {
+    public loadMoreItems(ev: any): Promise<boolean> {
         // TODO call the server to fetch
         this.ensureExpensesIsNotEmpty();
 
         const currentMaxId = Math.max(...this.expensesIds);
         const IdsRangeToFetch: tuple = [currentMaxId + 1, currentMaxId + 1 + this.numItemsToFetch];
+        return Promise.reject(true)
     }
 
     private fetchExpenses(range: tuple) {
@@ -125,54 +126,43 @@ class ExpensesHandler extends ExpensesListManager {
 class DummyExpensesList extends ExpensesListManager {
 
     public initList() {
-        //this.dummyExpenses()
+        this.dummyExpenses()
     }
 
-    public loadMoreItems(ev: any) {
-        this.ensureExpensesIsNotEmpty();
+    public loadMoreItems(ev: any): Promise<boolean> {
+        let that = this
+        return new Promise(function (resolve, reject) {
+            try {
+                that.ensureExpensesIsNotEmpty();
 
-        console.log('loading more items');
+                console.log('loading more items');
 
-        let oldestID = Math.max(...this.expensesIds);
+                let oldestID = Math.max(...that.expensesIds);
 
-        if (oldestID !== this.expenses.getItem(this.expenses.length - 1).id) {
-            console.error("Last item doesn't have the highest id.")
-        }
-        // add ten more items
-        for (let i of u.range(oldestID + 1, oldestID + this.numItemsToFetch)) {
-            this.dummyAdd(i)
-        }
+                if (oldestID !== that.expenses.getItem(that.expenses.length - 1).id) {
+                    console.error("Last item doesn't have the highest id.")
+                }
+
+                if (oldestID > 50) {
+                    resolve(true)
+                    return
+                }
+                // add ten more items
+                for (let i of u.range(oldestID + 1, oldestID + that.numItemsToFetch)) {
+                    that.addExpense(dummyExpense(i))
+                }
+                resolve(true)
+            } catch (err) {
+                reject(err)
+            }
+        })
     }
 
     public dummyExpenses(): void {
         for (let i of u.range(1, 2)) {
-            this.dummyAdd(i);
+            let exp = dummyExpense(i);
+            this.addExpense(exp)
         }
-    }
-
-    /**
-     * fake GETing an item from the server; add it to the observable array.
-     * @param id
-     */
-    private dummyAdd(id: number) {
-
-        if (id > 55) {
-            // the "server" doesn't have more than 55 items
-            return;
-        }
-        let e: IExpense = <ExpenseConstructor> {
-            id: null,
-            amount: u.sample(u.range(0, 100)),
-            currency: 'EUR',
-            name: `expense: #${id}`,
-            timestamp_utc: currentTimeUTC(),
-            tags: [],
-        };
-
-        let exp = new Expense(e);
-        exp.id = id; // HACK id is not part of the constructor
-
-        let isExpensesAdded = this.addExpense(exp);
     }
 
 

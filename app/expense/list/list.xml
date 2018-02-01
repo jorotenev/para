@@ -2,6 +2,7 @@
       xmlns:sd="nativescript-pro-ui/sidedrawer"
       xmlns:drawer="components/drawer"
       xmlns:action="components/para-action-bar"
+      xmlns:lv="nativescript-pro-ui/listview"
 
 >
     <action:para-action-bar title="All expenses"></action:para-action-bar>
@@ -14,11 +15,13 @@
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
             <GridLayout rows="*">
-                <ListView visibility="{{isEmpty ? 'collapsed' : 'visible'}}" row="0" items="{{ expenses }}"
-                          id="expenses-list" loadMoreItems="loadMoreItems"
-                          itemTap="onTap">
-                    <ListView.itemTemplate>
-                        <DockLayout stretchLastChild="false" class='expense' height="200">
+                <lv:RadListView visibility="{{expenses.length ?  'visible' : 'collapsed'}}" row="0" id="expenses-list"
+                                items="{{ expenses }}"
+                                loadOnDemandMode="Auto"
+                                loadMoreDataRequested="loadMoreItems"
+                                itemTap="onTap">
+                    <lv:RadListView.itemTemplate>
+                        <DockLayout stretchLastChild="false" class='expense' height="100">
 
                             <StackLayout dock="left" orientation="vertical" style.verticalAlignment="center">
                                 <Label text='{{name}}' class='expense-name'/>
@@ -26,10 +29,12 @@
                             </StackLayout>
                             <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}'/>
                         </DockLayout>
-                    </ListView.itemTemplate>
-                </ListView>
-                <StackLayout style='margin-top:10;' visibility="{{isEmpty ? 'visible' : 'collapsed'}}" row="0"
+                    </lv:RadListView.itemTemplate>
+                </lv:RadListView>
+
+                <StackLayout visibility="{{expenses.length ?'collapsed' : 'visible'}}" row="0"
                              class="text-center">
+
                     <Label class="h3 font-awesome" text="&#xf165; You don't have any expenses yet" textWrap="true"/>
                     <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
                 </StackLayout>

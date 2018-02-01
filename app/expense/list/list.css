@@ -1,13 +1,14 @@
 #empty-list {
 }
-#top-section-list-expenses{
+
+#top-section-list-expenses {
     border-bottom-color: black;
     border-bottom-width: 1;
 }
 
-#expenses-list > .expense {
+#expenses-list .expense {
     min-height: 100;
-    margin-top: 3;
+    /*margin-top: 3;*/
 
     border-color: lightgray;
     border-width: 2;
@@ -16,6 +17,10 @@
     padding-right: 5;
 
     background-color: #f8f8f8;
+}
+
+.expense {
+    padding-left: 10;
 }
 
 .expense-name {

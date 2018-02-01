@@ -1,5 +1,6 @@
 import {userPreferredCurrency} from "~/app_config";
 import {currentTimeUTC} from "~/utils/time";
+import * as underscore from "underscore"
 
 export type ExpenseIdType = number;
 
@@ -18,6 +19,20 @@ export interface ExpenseConstructor {
 export interface IExpense extends ExpenseConstructor {
 }
 
+export function dummyExpense(id: number) {
+
+
+    let e: IExpense = <ExpenseConstructor> {
+        id: id,
+        amount: underscore.sample(underscore.range(0, 100)),
+        currency: 'EUR',
+        name: `expense: #${id}`,
+        timestamp_utc: currentTimeUTC(),
+        tags: [],
+    };
+
+    return new Expense(e);
+}
 
 export class Expense implements IExpense {
 
