@@ -82,7 +82,15 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
             {
                 name: 'timestamp_utc',
                 ignore: true,
-                hide: true
+            },
+            {
+                name: 'timestamp_utc_updated',
+                ignore: true
+            },
+            {
+                name: 'timestamp_utc_created',
+                ignore: true,
+
             }
         ] // << propertyAnnotations
 

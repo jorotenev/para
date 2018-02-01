@@ -10,7 +10,9 @@ export let ten_expenses: IExpense[] = [
             "work",
             "sport"
         ],
-        "timestamp_utc": "2017-10-29T09:09:21.853071"
+        "timestamp_utc": "2017-10-29T09:09:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:09:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:09:21.853071",
     },
     {
         "id": 2,
@@ -20,7 +22,9 @@ export let ten_expenses: IExpense[] = [
         "tags": [
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:10:21.853071"
+        "timestamp_utc": "2017-10-29T09:10:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:10:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:10:21.853071",
     },
     {
         "id": 3,
@@ -32,7 +36,9 @@ export let ten_expenses: IExpense[] = [
             "work",
             "home"
         ],
-        "timestamp_utc": "2017-10-29T09:11:21.853071"
+        "timestamp_utc": "2017-10-29T09:11:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:11:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:11:21.853071",
     },
     {
         "id": 4,
@@ -44,7 +50,9 @@ export let ten_expenses: IExpense[] = [
             "sport",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:12:21.853071"
+        "timestamp_utc": "2017-10-29T09:12:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:12:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:12:21.853071",
     },
     {
         "id": 5,
@@ -56,7 +64,9 @@ export let ten_expenses: IExpense[] = [
             "home",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:13:21.853071"
+        "timestamp_utc": "2017-10-29T09:13:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:13:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:13:21.853071",
     },
     {
         "id": 6,
@@ -66,7 +76,9 @@ export let ten_expenses: IExpense[] = [
         "tags": [
             "work"
         ],
-        "timestamp_utc": "2017-10-29T09:14:21.853071"
+        "timestamp_utc": "2017-10-29T09:14:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:14:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:14:21.853071",
     },
     {
         "id": 7,
@@ -78,7 +90,9 @@ export let ten_expenses: IExpense[] = [
             "home",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:15:21.853071"
+        "timestamp_utc": "2017-10-29T09:15:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:15:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:15:21.853071",
     },
     {
         "id": 8,
@@ -86,7 +100,9 @@ export let ten_expenses: IExpense[] = [
         "amount": 132,
         "currency": "EUR",
         "tags": [],
-        "timestamp_utc": "2017-10-29T09:16:21.853071"
+        "timestamp_utc": "2017-10-29T09:16:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:16:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:16:21.853071",
     },
     {
         "id": 9,
@@ -97,7 +113,9 @@ export let ten_expenses: IExpense[] = [
             "vacation",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:17:21.853071"
+        "timestamp_utc": "2017-10-29T09:17:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:17:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:17:21.853071",
     },
     {
         "id": 10,
@@ -109,6 +127,8 @@ export let ten_expenses: IExpense[] = [
             "vacation",
             "work"
         ],
-        "timestamp_utc": "2017-10-29T09:18:21.853071"
+        "timestamp_utc": "2017-10-29T09:18:21.853071",
+        "timestamp_utc_created": "2017-10-29T09:18:21.853071",
+        "timestamp_utc_updated": "2017-10-29T09:18:21.853071",
     }
 ];

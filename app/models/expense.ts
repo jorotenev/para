@@ -14,6 +14,8 @@ export interface ExpenseConstructor {
     tags: string[];
 
     timestamp_utc: string;
+    timestamp_utc_created: string;
+    timestamp_utc_updated?: string;
 }
 
 export interface IExpense extends ExpenseConstructor {
@@ -28,6 +30,7 @@ export function dummyExpense(id: number) {
         currency: 'EUR',
         name: `expense: #${id}`,
         timestamp_utc: currentTimeUTC(),
+        timestamp_utc_created: currentTimeUTC(),
         tags: [],
     };
 
@@ -42,7 +45,15 @@ export class Expense implements IExpense {
 
     public name: string;
     public tags: string[];
+
+    // the timedata the user has entered himself
     public timestamp_utc: string;
+
+    // when the expense was originally created
+    public timestamp_utc_created: string;
+
+    // when the expense was most recently edited
+    public timestamp_utc_updated: string;
 
     // TODO `recurring` flag + date
 
@@ -52,9 +63,11 @@ export class Expense implements IExpense {
         this.amount = obj.amount;
         this.currency = obj.currency;
 
-        this.name = obj.name
-        this.tags = obj.tags
-        this.timestamp_utc = obj.timestamp_utc
+        this.name = obj.name;
+        this.tags = obj.tags;
+        this.timestamp_utc = obj.timestamp_utc;
+        this.timestamp_utc_updated = obj.timestamp_utc_updated || obj.timestamp_utc
+        this.timestamp_utc_created = obj.timestamp_utc_created || obj.timestamp_utc
     }
 
     public static createEmptyExpense(): IExpense {
@@ -64,8 +77,9 @@ export class Expense implements IExpense {
             currency: userPreferredCurrency,
             name: null,
             tags: [],
-            timestamp_utc: currentTimeUTC()
-
+            timestamp_utc: currentTimeUTC(),
+            timestamp_utc_created: currentTimeUTC(),
+            timestamp_utc_updated: currentTimeUTC(),
         }
     }
 }

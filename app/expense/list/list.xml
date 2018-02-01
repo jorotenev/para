@@ -19,7 +19,10 @@
                                 items="{{ expenses }}"
                                 loadOnDemandMode="Auto"
                                 loadMoreDataRequested="loadMoreItems"
-                                itemTap="onTap">
+                                itemTap="onTap"
+                                pullToRefresh="true"
+                                pullToRefreshInitiated="onPullToRefreshInitiated"
+                >
                     <lv:RadListView.itemTemplate>
                         <DockLayout stretchLastChild="false" class='expense' height="100">
 

@@ -25,7 +25,7 @@ export function loadMoreItems(ev: EventData): void {
     // https://github.com/NativeScript/NativeScript/issues/4931
     const fireEventAfter = 200; //ms
     setTimeout(() => {
-        listModel.loadMoreItems(ev).then(()=>{
+        listModel.loadMoreItems(ev).then(() => {
             console.log("Finished");
             listView.notifyLoadOnDemandFinished()
         }, (err) => {
@@ -53,5 +53,17 @@ export function goToAddExpense() {
 }
 
 export function onPullToRefreshInitiated() {
+    /**
+     * TODO
+     * on refresh:
+     *  - gather the ids of the expenses in the current list and when they were updated //todo
+     *  - send them to the api
+     *    - the api will return to arrays - 1) objects that have been updated (have newer `updated_at`)
+     *      2) objects that have newer IDs than the newest in the list
+     * */
     console.log("onPullToRefreshInitiated")
+    setTimeout(() => {
+        console.log('listView.notifyPullToRefreshFinished finished')
+        listView.notifyPullToRefreshFinished()
+    }, 2000)
 }
