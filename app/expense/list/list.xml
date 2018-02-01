@@ -14,9 +14,8 @@
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
             <GridLayout rows="*">
-
-
-                <ListView row="0" items="{{ stuffs.expenses }}" id="expenses-list" loadMoreItems="loadMoreItems"
+                <ListView visibility="{{isEmpty ? 'collapsed' : 'visible'}}" row="0" items="{{ expenses }}"
+                          id="expenses-list" loadMoreItems="loadMoreItems"
                           itemTap="onTap">
                     <ListView.itemTemplate>
                         <DockLayout stretchLastChild="false" class='expense' height="200">
@@ -29,6 +28,11 @@
                         </DockLayout>
                     </ListView.itemTemplate>
                 </ListView>
+                <StackLayout style='margin-top:10;' visibility="{{isEmpty ? 'visible' : 'collapsed'}}" row="0"
+                             class="text-center">
+                    <Label class="h3 font-awesome" text="&#xf165; You don't have any expenses yet" textWrap="true"/>
+                    <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
+                </StackLayout>
             </GridLayout>
         </sd:RadSideDrawer.mainContent>
     </sd:RadSideDrawer>

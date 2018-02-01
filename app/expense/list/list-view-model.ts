@@ -72,6 +72,10 @@ abstract class ExpensesListManager implements IExpensesListManager {
         return this._expenses
     }
 
+    public get isEmpty(): boolean {
+        return this._expenses.length === 0
+    }
+
     public addExpense(expense: IExpense): boolean {
         if (this.expensesIds.indexOf(expense.id) !== -1) {
             console.log(`Expense with id ${expense.id} already is in the expenses list`);
@@ -121,7 +125,7 @@ class ExpensesHandler extends ExpensesListManager {
 class DummyExpensesList extends ExpensesListManager {
 
     public initList() {
-        this.dummyExpenses()
+        //this.dummyExpenses()
     }
 
     public loadMoreItems(ev: any) {

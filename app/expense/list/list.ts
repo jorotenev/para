@@ -11,10 +11,8 @@ let page: Page;
 
 export function navigatingTo(args: EventData) {
     page = <Page>args.object;
-    page.bindingContext = {
-        filter_by: ['Amount', "Date"],
-        stuffs: listModel
-    };
+    page.bindingContext = listModel
+
 }
 
 export function loadMoreItems(ev: EventData): void {
@@ -35,4 +33,9 @@ export function onTap(ev: ItemEventData): void {
         'moduleName': 'expense/single/single',
         'context': {'expense': expense}
     })
+}
+
+
+export function goToAddExpense(){
+    navigateTo('expense/add/add-expense')
 }
