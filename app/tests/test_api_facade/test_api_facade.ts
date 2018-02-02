@@ -214,9 +214,47 @@ describe("Test of the API facade's makeRequest", function () {
 
     });
     it("POSTing data via the makeRequest will call http.request with correct params", function (done) {
-        fail("not implemented");
-        done()
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+        const url = "fake url";
+        const post_data = {
+            lunch: 'meatballs'
+        };
+        Utils.makeRequest(url, "POST", post_data).then(() => {
+                try {
+                    let call = expect(this.mockedHTTP).toHaveBeenCalledTimes(1)
+                    let optionsArg = this.mockedHTTP.calls.argsFor(0)[0]; // the first arg for the first call
+
+                    expect(optionsArg.hasOwnProperty('content')).toBe(true);
+                    expect(optionsArg.content).toBe(JSON.stringify(post_data));
+                    done()
+                } catch (error) {
+                    fail(error)
+                }
+            }, (err) => {
+                fail(err);
+                done()
+            }
+        )
     });
+    it("POSTing empty payload is fine", function (done) {
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+        // it's ok to post without any payload.
+        Utils.makeRequest("asd", "POST").then(done, fail)
+    });
+
+    it("POSTing invalid type fails", function (done) {
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+        Utils.makeRequest('asd', "POST", () => {
+        }).then(fail, (err) => {
+            try {
+                console.log(err.msg)
+                expect(err.msg.indexOf("Invalid JSON passed. Result of stringify") !== -1).toBe(true);
+                done()
+            } catch (e) {
+                fail(e)
+            }
+        })
+    })
 
     it("if the auth token can't be obtained, " +
         "no request is made and the promise is rejected with a suitable msg", function (done) {

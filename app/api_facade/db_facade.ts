@@ -61,8 +61,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
     private send(exp, url, method): Promise<IExpense> {
         return new Promise<IExpense>(function (resolve, reject) {
-            let json = JSON.stringify(exp);
-            Utils.makeRequest(url, method, json).then(resolve, (err: RawResponseError) => reject({
+            Utils.makeRequest(url, method, exp).then(resolve, (err: RawResponseError) => reject({
                 raw: err,
                 reason: err.msg // TODO more informative message.
             }))

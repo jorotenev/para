@@ -18,11 +18,17 @@ export interface ResponseError {
     readonly raw?: RawResponseError
 }
 
+
 export class Utils {
     static readonly tokenHeader = "x-firebase-auth-token";
 
-    static makeRequest(url: string, method = "GET", payload = null, timeout = 3000): Promise<any> {
-        console.log(`[${method}::${url}] payload=${JSON.stringify(payload)}`);
+    static makeRequest(url: string, method = "GET", payload: any = null, timeout = 3000): Promise<any> {
+        let jsonPayload = null;
+        try {
+            jsonPayload = this.validateAndStringifyPayload(payload)
+        } catch (err) {
+            return Promise.reject({msg: err.message})
+        }
 
         return new Promise<any>(function (resolve, reject) {
             firebase.getAuthToken({})
@@ -32,7 +38,7 @@ export class Utils {
                             method: method,
                             timeout: timeout,
                             headers: [{[Utils.tokenHeader]: token}],
-                            content: payload,
+                            content: jsonPayload,
                         }
                     )
                 }, (() => {
@@ -51,8 +57,8 @@ export class Utils {
                             //TODO get the error msg the server returned
                             const errMsg = "Status code is " + response.statusCode + ` [${method}:${url}]`;
                             let error: RawResponseError = {
-                                "msg": errMsg,
-                                "statusCode": response.statusCode
+                                msg: errMsg,
+                                statusCode: response.statusCode
                             };
                             reject(error);
                         }
@@ -63,10 +69,25 @@ export class Utils {
                     }
 
                     console.error(err);
-                    let error: RawResponseError = {"msg": err};
+                    let error: RawResponseError = {msg: err};
                     reject(error)
                 })
         })
     }
 
+    private static validateAndStringifyPayload(payload: object): string {
+        if (payload === null) {
+            return null
+        }
+        try {
+            let stringified = JSON.stringify(payload);
+            if (typeof stringified !== 'string') {
+                throw new Error("Result of stringify is " + typeof stringified)
+            }
+            return stringified
+        } catch (err) {
+            throw new Error("Invalid JSON passed. " + err.message)
+        }
+    }
 }
+
