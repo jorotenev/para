@@ -82,7 +82,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         }
         const id = exp.id;
         const url = ExpenseDatabaseFacade.DELETERemoveEndpoint({id: id});
-        return Utils.makeRequest(url, HTTPMethod.DELETE, {id: id});
+
+        return Utils.makeRequest(url, HTTPMethod.DELETE, {id: id}).catch(err => {
+            throw {reason: err.msg, raw: err}
+        });
 
     }
 

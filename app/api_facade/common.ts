@@ -51,18 +51,20 @@ export class Utils {
                 }))
                 .then(
                     function (response: HttpResponse) {
+                        let json = null;
+                        try {
+                            json = response.content.toJSON();
+                        } catch (err) {
+                            reject({reason: "Can't decode received JSON"})
+                        }
+
                         if (response.statusCode < 300) { // todo check how redirects are handled
-                            try {
-                                let json = response.content.toJSON();
-                                resolve(json);
-                            } catch (err) {
-                                reject("Can't decode received JSON")
-                            }
+                            resolve(json)
                         } else {
-                            //TODO get the error msg the server returned
-                            const errMsg = "Status code is " + response.statusCode + ` [${method}:${url}]`;
+                            const genericMsg = "Status code is " + response.statusCode + ` [${method}:${url}]`;
+                            let errorMsg = Utils.extractErrorMsg(json) || genericMsg;
                             let error: RawResponseError = {
-                                msg: errMsg,
+                                msg: errorMsg,
                                 statusCode: response.statusCode
                             };
                             reject(error);
@@ -78,6 +80,10 @@ export class Utils {
                     reject(error)
                 })
         })
+    }
+
+    private static extractErrorMsg(payload): string | null {
+        return (payload && payload.error) ? payload.error : null
     }
 
     private static validateAndStringifyPayload(payload: object): string {

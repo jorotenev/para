@@ -3,6 +3,7 @@ import {ten_expenses} from './sample_responses';
 import {Expense, IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
 import {firebase, http, RawResponseError, ResponseError, Utils} from "~/api_facade/common";
+import {DataStore} from "~/expense_datastore/datastore";
 import objectContaining = jasmine.objectContaining;
 
 let u = require('underscore');
@@ -42,6 +43,7 @@ function fakeHTTPResponse(raw, statusCode): HttpResponse {
 
 function setUpBeforeEach(thisObject) {
     thisObject.mockedRequest = spyOn(Utils, 'makeRequest');
+    thisObject.mockedRequest.and.callThrough();
 
     thisObject.mockedFirebase = spyOn(firebase, 'getAuthToken');
     thisObject.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
@@ -226,14 +228,22 @@ describe("Testing the update() of the db facade", function () {
 describe('Testing the remove() of the db facade', function () {
     beforeEach(function () {
         setUpBeforeEach(this);
-        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
-        this.mockedHTTP = spyOn(http, 'request')
+        this.mockedRemove = spyOn(DataStore.prototype, 'remove');
+        this.mockedHTTP = spyOn(http, 'request');
+        this.mockedHTTP.and.callThrough();
+
     });
+
     afterEach(function () {
         setUpAfterEach(this);
+
+        this.mockedRemove.calls.reset();
+        this.mockedRemove.and.callThrough();
+
         this.mockedHTTP.calls.reset();
         this.mockedHTTP.and.callThrough();
     });
+
     it("trying to delete an expense without an id rejects", function (done) {
         let exp = Expense.createEmptyExpense();
         new ExpenseDatabaseFacade().remove(exp).then(fail, err => {
@@ -241,14 +251,19 @@ describe('Testing the remove() of the db facade', function () {
             done()
         })
     });
+
     it("resolves with true on API 200", function (done) {
-        this.mockedHTTP.and.returnValue(fakeHTTPResponse("{}", 200));
+
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"asd\":1}", 200)));
+
         new ExpenseDatabaseFacade().remove(ten_expenses[0]).then(done, fail)
     });
+
     it("rejects when the API returns 404 with a reason", function (done) {
-        this.mockedHTTP.and.returnValue(fakeHTTPResponse("{error:\"some reason\"}", 404));
+
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"error\":\"some reason\"}", 404)));
         new ExpenseDatabaseFacade().remove(ten_expenses[0]).then(fail, err => {
-            expect(err.reason.indexOf("some reason") !== -1).toBe(true)
+            expect(err.reason.indexOf("some reason") !== -1).toBe(true);
             done()
         })
 
@@ -260,6 +275,7 @@ describe("Test of the Utils.makeRequest()", function () {
     beforeEach(function () {
 
         this.mockedHTTP = spyOn(http, 'request');
+        this.mockedHTTP.and.callThrough();
         this.mockedFirebase = spyOn(firebase, "getAuthToken");
         this.mockedFirebase.and.returnValue(Promise.resolve('fake token'))
 
@@ -273,7 +289,7 @@ describe("Test of the Utils.makeRequest()", function () {
     });
 
     it("the api returning a 500 leads to a rejection", function (done) {
-        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("", 500)));
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 500)));
 
 
         Utils.makeRequest("http://wonderland:5000/api/test-500").then(function () {
@@ -301,10 +317,12 @@ describe("Test of the Utils.makeRequest()", function () {
     });
     it("POSTing data via the makeRequest will call http.request with correct params", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
+
         const url = "fake url";
         const post_data = {
             lunch: 'meatballs'
         };
+
         Utils.makeRequest(url, HTTPMethod.POST, post_data).then(() => {
                 try {
                     let call = expect(this.mockedHTTP).toHaveBeenCalledTimes(1)
@@ -333,14 +351,13 @@ describe("Test of the Utils.makeRequest()", function () {
         Utils.makeRequest('asd', HTTPMethod.POST, () => {
         }).then(fail, (err) => {
             try {
-                console.log(err.msg)
                 expect(err.msg.indexOf("Invalid JSON passed. Result of stringify") !== -1).toBe(true);
                 done()
             } catch (e) {
                 fail(e)
             }
         })
-    })
+    });
 
     it("if the auth token can't be obtained, " +
         "no request is made and the promise is rejected with a suitable msg", function (done) {
