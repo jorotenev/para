@@ -1,6 +1,10 @@
-import {firebase, http} from "~/api_facade/db_facade";
 import {HttpResponse} from "tns-core-modules/http";
-import {apiAddress, apiVersion} from "~/app_config";
+import * as _http from 'http';
+import * as _firebase from "nativescript-plugin-firebase";
+
+// easier mocking
+export let firebase = _firebase;
+export let http = _http;
 
 /**
  * returned by the makeRequest. contains information as returned by the server

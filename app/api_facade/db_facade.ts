@@ -1,19 +1,10 @@
-import * as _http from 'http';
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {apiAddress, apiVersion} from "~/app_config";
 import * as u from 'underscore';
-import * as _firebase from "nativescript-plugin-firebase"
 import {RawResponseError, ResponseError, Utils} from "./common";
-// easier mocking
-export let firebase = _firebase;
-export let http = _http;
 
 
 export const EXPENSES_API_ENDPOINT = `${apiAddress}expenses_api/${apiVersion}/`;
-
-export enum SortByOptions {
-    date_descending
-}
 
 
 export interface IExpenseDatabaseFacade {
@@ -31,11 +22,11 @@ export interface IExpenseDatabaseFacade {
      */
     update(exp: IExpense): Promise<IExpense>
 
-    remove(exp: IExpense): Promise<boolean>
+    remove(exp: IExpense): Promise<void>
 
     get_single(id: ExpenseIdType): Promise<IExpense>
 
-    get_list(startFromId: ExpenseIdType, batchSize: number, sortBy: SortByOptions): Promise<IExpense[]>
+    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]>
 
 }
 
@@ -52,10 +43,20 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         if (exp.id) {
             return Promise.reject({reason: "invalid state. can't persist an expense with an id."})
         }
-        return this.send(exp, ExpenseDatabaseFacade.POSTPersistEndpoint, "POST")
+        return this.send(exp, ExpenseDatabaseFacade.POSTPersistEndpoint, "POST").then(persisted => {
+            if (!persisted.id) {
+                throw <ResponseError> {reason: "Invalid state. Server returned an expense with a null id after persisting"}
+            }
+            return persisted
+        }, err => {
+            throw err
+        })
     }
 
     update(exp: IExpense): Promise<IExpense> {
+        if (!exp.id) {
+            return Promise.reject(<ResponseError>{reason: "Can't update an expense which doesn't have an ID"})
+        }
         return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, 'PUT')
     }
 
@@ -68,7 +69,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         });
     }
 
-    remove(exp: IExpense): Promise<boolean> {
+    remove(exp: IExpense): Promise<void> {
+        if (!exp.id) {
+            return Promise.reject(<ResponseError>{reason: "Can't delete an expense without an id"})
+        }
         return undefined;
     }
 
@@ -83,7 +87,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
 
-    get_list(startFromId: ExpenseIdType, batchSize: number, sortBy: SortByOptions = SortByOptions.date_descending): Promise<IExpense[]> {
+    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
         let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
             startFromId: startFromId,
             batchSize: batchSize

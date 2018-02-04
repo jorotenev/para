@@ -1,12 +1,9 @@
-import {
-    ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT,
-} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT} from "~/api_facade/db_facade";
 import {ten_expenses} from './sample_responses';
-import {http, firebase} from "~/api_facade/db_facade"
-import {IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
+import {firebase, http, RawResponseError, ResponseError, Utils} from "~/api_facade/common";
 import objectContaining = jasmine.objectContaining;
-import {RawResponseError, ResponseError, Utils} from "~/api_facade/common";
 
 let u = require('underscore');
 
@@ -59,7 +56,7 @@ function setUpAfterEach(thisObject) {
 
 }
 
-describe("Testing the get_expenses_list of  db facade", () => {
+describe("Testing the get_expenses_list() of  db facade", () => {
 
     beforeAll(function () {
         this.startFromId = 1;
@@ -123,7 +120,7 @@ describe("Testing the get_expenses_list of  db facade", () => {
 
 });
 
-describe("Testing the get_single of the db facade", function () {
+describe("Testing the get_single() of the db facade", function () {
     beforeEach(function () {
         setUpBeforeEach(this);
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
@@ -168,8 +165,97 @@ describe("Testing the get_single of the db facade", function () {
         })
 });
 
+describe('Testing the persist() of the db facade', function () {
+    beforeEach(function () {
+        setUpBeforeEach(this);
+        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
+    });
+    afterEach(function () {
+        setUpAfterEach(this)
+    });
+    it("persist() resovles if the server returns a valid expense", function (done) {
+        let unsaved = {...ten_expenses[0], id: null};
+        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
 
-describe("Test of the API facade's makeRequest", function () {
+        new ExpenseDatabaseFacade().persist(unsaved).then(persisted => {
+            expect(ten_expenses[0]).toEqual(persisted);
+            done()
+        }, fail)
+    });
+    it("persist() rejects if the server returns a persisted expense with a null id", function (done) {
+        let badResponse = {...ten_expenses[0], id: null};
+        this.mockedRequest.and.returnValue(Promise.resolve(badResponse));
+        new ExpenseDatabaseFacade().persist(Expense.createEmptyExpense()).then(fail, err => {
+            expect(err.reason.indexOf('Server returned an expense with a null id after persisting') !== -1).toBe(true);
+            done()
+        })
+    })
+    it("persist() rejects if an expense with a non-null id is passed", function (done) {
+        let expWithId = ten_expenses[0]
+        new ExpenseDatabaseFacade().persist(expWithId).then(fail, (err) => {
+            expect(err.reason.indexOf("with an id") !== -1).toBe(true)
+            done()
+        })
+    })
+});
+
+describe("Testing the update() of the db facade", function () {
+    beforeEach(function () {
+        setUpBeforeEach(this);
+        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
+    });
+    afterEach(function () {
+        setUpAfterEach(this)
+    });
+    it("resolves with the expense that was received from makeRequest", function (done) {
+        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
+        new ExpenseDatabaseFacade().update(ten_expenses[0]).then(updated => {
+            expect(updated).toEqual(ten_expenses[0]);
+            done()
+        })
+    });
+    it("can't update an expense which doesn't have an id", function (done) {
+        let nonIDExpense = Expense.createEmptyExpense();
+        new ExpenseDatabaseFacade().update(nonIDExpense).then(fail, err => {
+            expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true);
+            done()
+        })
+    })
+});
+
+describe('Testing the remove() of the db facade', function () {
+    beforeEach(function () {
+        setUpBeforeEach(this);
+        this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
+        this.mockedHTTP = spyOn(http, 'request')
+    });
+    afterEach(function () {
+        setUpAfterEach(this);
+        this.mockedHTTP.calls.reset();
+        this.mockedHTTP.and.callThrough();
+    });
+    it("trying to delete an expense without an id rejects", function (done) {
+        let exp = Expense.createEmptyExpense();
+        new ExpenseDatabaseFacade().remove(exp).then(fail, err => {
+            expect(err.reason.indexOf("Can't delete an expense without an id") !== -1).toBe(true);
+            done()
+        })
+    });
+    it("resolves with true on API 200", function (done) {
+        this.mockedHTTP.and.returnValue(fakeHTTPResponse("{}", 200));
+        new ExpenseDatabaseFacade().remove(ten_expenses[0]).then(done, fail)
+    });
+    it("rejects when the API returns 404 with a reason", function (done) {
+        this.mockedHTTP.and.returnValue(fakeHTTPResponse("{error:\"some reason\"}", 404));
+        new ExpenseDatabaseFacade().remove(ten_expenses[0]).then(fail, err => {
+            expect(err.reason.indexOf("some reason") !== -1).toBe(true)
+            done()
+        })
+
+    });
+});
+
+describe("Test of the Utils.makeRequest()", function () {
 
     beforeEach(function () {
 
@@ -292,18 +378,3 @@ describe("Test of the API facade's makeRequest", function () {
     });
 });
 
-describe("testing", function () {
-    beforeEach(function () {
-        this.mockedRequest = spyOn(Utils, "makeRequest")
-    });
-    xit("asd", function (done) {
-
-        this.mockedRequest.and.returnValue(Promise.resolve(2));
-
-        this.mockedRequest("url").then(function (d) {
-            expect(d).toBe(2);
-            done();
-        });
-        done()
-    })
-});
