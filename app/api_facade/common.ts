@@ -1,6 +1,7 @@
 import {HttpResponse} from "tns-core-modules/http";
 import * as _http from 'http';
 import * as _firebase from "nativescript-plugin-firebase";
+import {HTTPMethod} from "~/api_facade/db_facade";
 
 // easier mocking
 export let firebase = _firebase;
@@ -26,7 +27,7 @@ export interface ResponseError {
 export class Utils {
     static readonly tokenHeader = "x-firebase-auth-token";
 
-    static makeRequest(url: string, method = "GET", payload: any = null, timeout = 3000): Promise<any> {
+    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout = 3000): Promise<any> {
         let jsonPayload = null;
         try {
             jsonPayload = this.validateAndStringifyPayload(payload)

@@ -1,4 +1,4 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, HTTPMethod} from "~/api_facade/db_facade";
 import {ten_expenses} from './sample_responses';
 import {Expense, IExpense} from "~/models/expense";
 import {HttpResponse} from "tns-core-modules/http";
@@ -305,7 +305,7 @@ describe("Test of the Utils.makeRequest()", function () {
         const post_data = {
             lunch: 'meatballs'
         };
-        Utils.makeRequest(url, "POST", post_data).then(() => {
+        Utils.makeRequest(url, HTTPMethod.POST, post_data).then(() => {
                 try {
                     let call = expect(this.mockedHTTP).toHaveBeenCalledTimes(1)
                     let optionsArg = this.mockedHTTP.calls.argsFor(0)[0]; // the first arg for the first call
@@ -325,12 +325,12 @@ describe("Test of the Utils.makeRequest()", function () {
     it("POSTing empty payload is fine", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
         // it's ok to post without any payload.
-        Utils.makeRequest("asd", "POST").then(done, fail)
+        Utils.makeRequest("asd", HTTPMethod.POST).then(done, fail)
     });
 
     it("POSTing invalid type fails", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 200)))
-        Utils.makeRequest('asd', "POST", () => {
+        Utils.makeRequest('asd', HTTPMethod.POST, () => {
         }).then(fail, (err) => {
             try {
                 console.log(err.msg)

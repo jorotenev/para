@@ -6,6 +6,12 @@ import {RawResponseError, ResponseError, Utils} from "./common";
 
 export const EXPENSES_API_ENDPOINT = `${apiAddress}expenses_api/${apiVersion}/`;
 
+export enum HTTPMethod {
+    POST = "POST",
+    DELETE = "DELETE",
+    GET = "GET",
+    PUT = "PUT"
+}
 
 export interface IExpenseDatabaseFacade {
     /**
@@ -37,13 +43,14 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
+    static readonly DELETERemoveEndpoint = u.template(`${EXPENSES_API_ENDPOINT}remove/<%= id %>`);
 
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
             return Promise.reject({reason: "invalid state. can't persist an expense with an id."})
         }
-        return this.send(exp, ExpenseDatabaseFacade.POSTPersistEndpoint, "POST").then(persisted => {
+        return this.send(exp, ExpenseDatabaseFacade.POSTPersistEndpoint, HTTPMethod.POST).then(persisted => {
             if (!persisted.id) {
                 throw <ResponseError> {reason: "Invalid state. Server returned an expense with a null id after persisting"}
             }
@@ -57,10 +64,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         if (!exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which doesn't have an ID"})
         }
-        return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, 'PUT')
+        return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
     }
 
-    private send(exp, url, method): Promise<IExpense> {
+    private send(exp: IExpense, url: string, method: HTTPMethod): Promise<IExpense> {
         return new Promise<IExpense>(function (resolve, reject) {
             Utils.makeRequest(url, method, exp).then(resolve, (err: RawResponseError) => reject({
                 raw: err,
@@ -73,7 +80,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         if (!exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't delete an expense without an id"})
         }
-        return undefined;
+        const id = exp.id;
+        const url = ExpenseDatabaseFacade.DELETERemoveEndpoint({id: id});
+        return Utils.makeRequest(url, HTTPMethod.DELETE, {id: id});
+
     }
 
 
