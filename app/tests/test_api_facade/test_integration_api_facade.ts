@@ -6,7 +6,7 @@ import * as http from "http";
 import {apiAddress} from "~/app_config";
 import {ExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {IExpense} from "~/models/expense";
-import {testListExpenses} from "./test_api_facade";
+import {mockFirebaseAfterEach, mockFirebaseBeforeEach, testListExpenses} from "./test_api_facade";
 
 function apiIsUP(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -51,6 +51,12 @@ describe("Integration test of the API facade for get_list", () => {
     beforeAll(function (done) {
         setupTest(this, done)
     });
+    beforeEach(function () {
+        mockFirebaseBeforeEach.call(this)
+    });
+    afterEach(function () {
+        mockFirebaseAfterEach.call(this)
+    });
 
 
     it("should return correct list of expenses when the facade is working", function () {
@@ -61,8 +67,8 @@ describe("Integration test of the API facade for get_list", () => {
         facade.get_list(1, 10).then((expenses: IExpense[]) => {
             testListExpenses(expenses, 1, 10)
         }, (err) => {
-            let e = "The API should have returned a list of expenses";
-            fail(e);
+            err.testMsg = "The API should have returned a list of expenses";
+            fail(err);
         })
     });
 
