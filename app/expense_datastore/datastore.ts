@@ -104,6 +104,12 @@ export class DataStore implements IDataStore {
         }
         this.expenses.push(exp)
 
+        // TODO ensure expenses are sorted
+        if (this.expenses.length > 1 && this.expenses.getItem(0).id < this.expenses.getItem(1).id) {
+            console.error("fucked up, duct-taping"); //todo send this to an online log repository
+            this.expenses.sort((a, b) => b.id - a.id)
+        }
+
     }
 
     private expenseIsManaged(exp: IExpense): boolean {
