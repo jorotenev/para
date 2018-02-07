@@ -200,10 +200,10 @@ describe('testing the persist() method of the DataStore', function () {
 
                     expect(ExpenseDatabaseFacade.prototype.persist).toHaveBeenCalledWith(exp);
                     expect(dataStore.expenses.length).toBe(1);
-                    expect(dataStore.expenses[0]).toEqual(persistedExp);
+                    expect(dataStore.expenses.getItem(0)).toEqual(persistedExp);
                     done()
                 }, fail
-            )
+            );
         });
 
     it('if persist() of the api facade rejects, then no expenses are added in the proxy',
@@ -245,8 +245,8 @@ describe('testing the update() method of the DataStore', function () {
 
     it("update()ing an expense via the proxy will update the object held by the proxy with the resolved value " +
         "that the api returned", function (done) {
-        let toBeUpdated = {...exp};
-        let newAmount = exp.amount + 1;
+        let toBeUpdated = {...persisted, amount: 1};
+        let newAmount = persisted.amount + 1;
         let updated = {...toBeUpdated, amount: newAmount};
         this.mockedUpdate.and.returnValue(Promise.resolve(updated));
 
@@ -257,7 +257,7 @@ describe('testing the update() method of the DataStore', function () {
         dataStore.update(toBeUpdated).then((updatedFromApi) => {
             expect(updatedFromApi).toEqual(updated);
             expect(dataStore.expenses.length).toBe(1);
-            expect(dataStore.expenses[0].amount).toBe(newAmount);
+            expect(dataStore.expenses.getItem(0).amount).toBe(newAmount);
             done()
         }, fail)
     });
@@ -305,6 +305,7 @@ describe("testing the remove() methods of the DataStore", function () {
 });
 
 describe('testing the get_single() method of the DataStore', function () {
+
     beforeEach(function () {
         this.mockedGetSingle = <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_single');
         this.mockedGetSingle.and.callThrough();
@@ -313,14 +314,43 @@ describe('testing the get_single() method of the DataStore', function () {
         this.mockedGetSingle.calls.reset();
         this.mockedGetSingle.and.callThrough();
     });
-    it("invoking get_single doesn't change the number of expenses in the datastore", function (done) {
-        this.mockedGetSingle.and.returnValue(Promise.resolve(ten_expenses[0]));
+    it("invoking get_single() doesn't change the contents of DataStore.expenses", function (done) {
+
+        this.mockedGetSingle.and.returnValue(Promise.resolve(persisted));
 
         let dataStore = new DataStore();
-        dataStore.get_single(1).then(exp => {
-            expect(dataStore.expenses.length).toBe(0);
+        dataStore.addExpense(persisted);
+        dataStore.get_single(persisted.id).then(e => {
+            expect(dataStore.expenses.indexOf(persisted)).toEqual(0);
+            expect(dataStore.expenses.length).toEqual(1);
             done()
         }, fail)
     });
 
 });
+
+describe('testing the get_list() method of the DataStore', function () {
+    beforeEach(function () {
+        this.mockedGetList = <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_list');
+        this.mockedGetList.and.callThrough();
+    });
+
+    afterEach(function () {
+        this.mockedGetList.calls.reset();
+        this.mockedGetList.and.callThrough();
+    });
+
+    it("invoking get_list doesn't change the contents of DataStore.expenses", function (done) {
+        let dataStore = new DataStore();
+        dataStore.addExpense(exp);
+        this.mockedGetList.and.returnValue(Promise.resolve({...exp, id: 2}));
+
+        dataStore.get_list(2, 1).then((_) => {
+            expect(dataStore.expenses.indexOf(exp)).toEqual(0);
+            expect(dataStore.expenses.length).toEqual(1);
+            done();
+        }, fail)
+    });
+});
+
+

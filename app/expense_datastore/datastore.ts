@@ -1,23 +1,31 @@
 import {ExpenseIdType, IExpense} from "~/models/expense";
 import {ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
+import {ObservableArray} from "tns-core-modules/data/observable-array";
+import "~/utils/add/ObservableArrayfindIndex"; // imported for its side effects
 //easier mocking
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
 
-export class DataStore implements IExpenseDatabaseFacade {
-    public readonly expenses: IExpense[];
+export interface IDataStore extends IExpenseDatabaseFacade {
+    expenses: ObservableArray<IExpense>
+
+    addExpense(exp: IExpense)
+}
+
+export class DataStore implements IDataStore {
+    public readonly expenses: ObservableArray<IExpense>;
     private readonly proxyTarget: IExpenseDatabaseFacade;
 
     constructor() {
-        this.expenses = [];
+        this.expenses = new ObservableArray([]);
         this.proxyTarget = new ExpenseDatabaseFacade()
     }
 
 
     persist(exp: IExpense): Promise<IExpense> {
         return this.proxyTarget.persist(exp).then((persisted) => {
-            // todo ensure no expense with this id exists in this.expenses
             this.addExpense(persisted);
+            // todo ensure no expense with this id exists in this.expenses
 
             return persisted
         }, (err) => {
@@ -26,14 +34,13 @@ export class DataStore implements IExpenseDatabaseFacade {
     }
 
     update(exp: IExpense): Promise<IExpense> {
-        let indexOfUpdated = this.expenses.findIndex((e) => e.id === exp.id);
         if (!this.expenseIsManaged(exp)) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which is not in the datastore"})
         }
 
         return this.proxyTarget.update(exp).then((updated) => {
             // update the object of this datastore with the value resolved from the api
-            let indexOfUpdated = this.expenses.findIndex((e) => e.id === updated.id);
+            let indexOfUpdated = this.indexOfExpense(updated);
             if (indexOfUpdated !== -1) {
                 this.expenses[indexOfUpdated] = updated
             } else {
@@ -72,7 +79,6 @@ export class DataStore implements IExpenseDatabaseFacade {
     }
 
     public addExpense(exp: IExpense) {
-        let indexOfExpenseWithSameID = this.expenses.findIndex(e => e.id === exp.id);
         if (this.expenseIsManaged(exp)) {
             throw <ResponseError> {'reason': "Invalid application state. Expenses with the same id = " + exp.id}
         }
