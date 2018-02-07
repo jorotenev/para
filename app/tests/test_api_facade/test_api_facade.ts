@@ -17,22 +17,27 @@ export function testListExpenses(expenses: IExpense[], startFromId: number, batc
     expect(expenses.length).toBe(batchSize);
 }
 
-
-function setUpBeforeEach(thisObject) {
-    thisObject.mockedRequest = spyOn(Utils, 'makeRequest');
-    thisObject.mockedRequest.and.callThrough();
-
-    thisObject.mockedFirebase = spyOn(firebase, 'getAuthToken');
-    thisObject.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
+export function mockFirebaseBeforeEach() {
+    this.mockedFirebase = spyOn(firebase, 'getAuthToken');
+    this.mockedFirebase.and.returnValue(Promise.resolve('some fake auth token'))
 }
 
-function setUpAfterEach(thisObject) {
-    thisObject.mockedRequest.calls.reset();
-    thisObject.mockedRequest.and.callThrough();
+export function mockFirebaseAfterEach() {
+    this.mockedFirebase.calls.reset();
+    this.mockedFirebase.and.callThrough();
+}
 
-    thisObject.mockedFirebase.calls.reset();
-    thisObject.mockedFirebase.and.callThrough();
+function setUpBeforeEach() {
+    this.mockedRequest = spyOn(Utils, 'makeRequest');
+    this.mockedRequest.and.callThrough();
 
+    mockFirebaseBeforeEach.call(this)
+}
+
+function setUpAfterEach() {
+    this.mockedRequest.calls.reset();
+    this.mockedRequest.and.callThrough();
+    mockFirebaseAfterEach.call(this)
 }
 
 describe("Testing the get_expenses_list() of  db facade", () => {
@@ -51,10 +56,10 @@ describe("Testing the get_expenses_list() of  db facade", () => {
     });
 
     beforeEach(function () {
-        setUpBeforeEach(this)
+        setUpBeforeEach.call(this)
     });
     afterEach(function () {
-        setUpAfterEach(this)
+        setUpAfterEach.call(this)
     });
 
     it("api/get_expenses_list - requesting a list, returns a valid list", function (done) {
@@ -101,11 +106,11 @@ describe("Testing the get_expenses_list() of  db facade", () => {
 
 describe("Testing the get_single() of the db facade", function () {
     beforeEach(function () {
-        setUpBeforeEach(this);
+        setUpBeforeEach.call(this);
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
     });
     afterEach(function () {
-        setUpAfterEach(this)
+        setUpAfterEach.call(this)
     });
 
 
@@ -146,11 +151,11 @@ describe("Testing the get_single() of the db facade", function () {
 
 describe('Testing the persist() of the db facade', function () {
     beforeEach(function () {
-        setUpBeforeEach(this);
+        setUpBeforeEach.call(this);
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
     });
     afterEach(function () {
-        setUpAfterEach(this)
+        setUpAfterEach.call(this)
     });
     it("persist() resovles if the server returns a valid expense", function (done) {
         let unsaved = {...ten_expenses[0], id: null};
@@ -180,11 +185,11 @@ describe('Testing the persist() of the db facade', function () {
 
 describe("Testing the update() of the db facade", function () {
     beforeEach(function () {
-        setUpBeforeEach(this);
+        setUpBeforeEach.call(this);
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
     });
     afterEach(function () {
-        setUpAfterEach(this)
+        setUpAfterEach.call(this)
     });
     it("resolves with the expense that was received from makeRequest", function (done) {
         this.mockedRequest.and.returnValue(Promise.resolve(ten_expenses[0]));
@@ -204,7 +209,7 @@ describe("Testing the update() of the db facade", function () {
 
 describe('Testing the remove() of the db facade', function () {
     beforeEach(function () {
-        setUpBeforeEach(this);
+        setUpBeforeEach.call(this);
         this.mockedRemove = spyOn(DataStore.prototype, 'remove');
         this.mockedHTTP = spyOn(http, 'request');
         this.mockedHTTP.and.callThrough();
@@ -212,7 +217,7 @@ describe('Testing the remove() of the db facade', function () {
     });
 
     afterEach(function () {
-        setUpAfterEach(this);
+        setUpAfterEach.call(this);
 
         this.mockedRemove.calls.reset();
         this.mockedRemove.and.callThrough();
