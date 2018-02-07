@@ -102,7 +102,7 @@ export class DataStore implements IDataStore {
         if (this.expenseIsManaged(exp)) {
             throw <ResponseError> {'reason': "Invalid application state. Expenses with the same id = " + exp.id}
         }
-        this.expenses.unshift(exp)
+        this.expenses.push(exp)
 
     }
 

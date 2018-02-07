@@ -104,19 +104,21 @@ class ExpensesHandler extends ExpensesListManager {
         if (this.isEmpty()) {
             return Promise.reject("not initialized")
         }
-        const startFromID = Math.max(...this.expensesIds) + 1;
+        const startFromID = Math.min(...this.expensesIds) - 1;
 
-        return this.fetchItems(startFromID)
-
+        return this.fetchItems(startFromID).then(() => {
+                return
+            }
+        )
     }
 
-    private fetchItems(startFrom: number | null): Promise<void> {
+    private fetchItems(startFrom: number | null): Promise<IExpense[]> {
         return this.datastore.get_list(startFrom, this.batchSize)
             .then(list => {
                 list.forEach(exp => {
                     this.datastore.addExpense(exp);
                 });
-                return
+                return list
             }, err => {
                 throw err
             })
@@ -124,8 +126,9 @@ class ExpensesHandler extends ExpensesListManager {
 
     initList() {
         // TODO load initial batch
-        this.fetchItems(null).then(() => {
-            console.log("ListViewModel's datastore is initialised!")
+        this.fetchItems(null).then((expenses) => {
+            console.dir(expenses)
+            console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`)
         }, err => {
             console.error("Couldn't initialise the datastore of the ListViewModel");
             console.dir(err);
