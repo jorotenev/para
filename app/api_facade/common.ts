@@ -55,11 +55,13 @@ export class Utils {
                         try {
                             json = response.content.toJSON();
                         } catch (err) {
-                            reject({reason: "Can't decode received JSON"})
+                            reject({msg: "Can't decode received JSON", statusCode: response.statusCode});
+                            return
                         }
 
                         if (response.statusCode < 300) { // todo check how redirects are handled
-                            resolve(json)
+                            resolve(json);
+                            return
                         } else {
                             const genericMsg = "Status code is " + response.statusCode + ` [${method}:${url}]`;
                             let errorMsg = Utils.extractErrorMsg(json) || genericMsg;
@@ -68,6 +70,7 @@ export class Utils {
                                 statusCode: response.statusCode
                             };
                             reject(error);
+                            return
                         }
                     })
                 .catch((err) => {
