@@ -3,6 +3,7 @@ import {Page} from "tns-core-modules/ui/page";
 import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {Expense, IExpense} from "~/models/expense";
+import {navigateTo} from "~/utils/nav";
 
 
 let page: Page;
@@ -24,11 +25,11 @@ export function navigatingTo(args: EventData) {
         mode: ExpenseFormMode.new,
         expense: expense,
         onSuccessfulOperation: (newExpense: IExpense) => {
-            console.log("created a new expense with id " + newExpense.id)
-            // navigateTo('expense/list/list');
+            console.log("created a new expense with id " + newExpense.id);
+            navigateTo('expense/add/add-expense');
         }
     });
-    viewModel.navigationBtnType = navigationBtnType
+    viewModel.navigationBtnType = navigationBtnType;
     page.bindingContext = viewModel
 
 
