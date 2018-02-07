@@ -16,7 +16,7 @@
     "nativescript-pro-ui": "^3.1.4",
     "nativescript-theme-core": "~1.0.2",
     "nativescript-unit-test-runner": "^0.3.4",
-    "tns-core-modules": "^3.3.0",
+    "tns-core-modules": "^3.4.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
@@ -29,8 +29,7 @@
     "karma-jasmine": "^1.1.1",
     "karma-nativescript-launcher": "^0.4.0",
     "lazy": "1.0.11",
-    "nativescript-dev-typescript": "~0.5.0",
+    "nativescript-dev-typescript": "~0.6.0",
     "typescript": "~2.6.2"
-
   }
 }
