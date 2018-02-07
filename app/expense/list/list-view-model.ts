@@ -53,13 +53,11 @@ export interface IExpensesListManager {
 
 abstract class ExpensesListManager implements IExpensesListManager {
     protected datastore: IDataStore;
-    private _expenses: ExpensesList;
     // How many items to fetch from the server in response to the loadMoreItems event
     batchSize: number = 10;
 
 
     constructor(expenses: ExpensesList, datastore: IDataStore) {
-        this._expenses = expenses;
         this.datastore = datastore;
         this.initList()
 
@@ -74,7 +72,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
     }
 
     public get expenses() {
-        return this._expenses
+        return this.datastore.expenses
     }
 
     public isEmpty(): boolean {
@@ -126,10 +124,10 @@ class ExpensesHandler extends ExpensesListManager {
 
     initList() {
         // TODO load initial batch
-        this.fetchItems(null).then(()=>{
+        this.fetchItems(null).then(() => {
             console.log("ListViewModel's datastore is initialised!")
-        }, err=>{
-            console.error("Couldn't initialise the datastore of the ListViewModel")
+        }, err => {
+            console.error("Couldn't initialise the datastore of the ListViewModel");
             console.dir(err);
         })
     }
