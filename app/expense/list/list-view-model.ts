@@ -18,10 +18,10 @@ export class ListExpenseModel extends Observable {
 
     constructor() {
         super();
-        this.datastore = new DataStore();
-        this.loader = new ExpensesHandler(this.expenses, this.datastore); //TODO
-
+        this.datastore = DataStore.getInstance();
         this.expenses = this.datastore.expenses;
+
+        this.loader = new ExpensesHandler(this.expenses, this.datastore); //TODO
 
     }
 

@@ -1,3 +1,13 @@
+/**
+ * Proxy of the API facade.
+ * Instance of the DataStore holds a mirror of a subset of the expenses on the backend.
+ * CRUD operations pass through the datastore en route to the API facade(IExpenseDatabaseFacade).
+ * This way there's a centralised, stateful, repository of expenses locally on the phone.
+ * add/updating/deleting an expense via the UI will alter the state of the datastore.
+ *
+ * When a call is made to the datastore, the call will firs be forwarded to the API facade.
+ * Only then the result will be used to alter (if needed) the state of the DataStore.
+ */
 import {ExpenseIdType, IExpense} from "~/models/expense";
 import {ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
@@ -16,9 +26,19 @@ export class DataStore implements IDataStore {
     public readonly expenses: ObservableArray<IExpense>;
     private readonly proxyTarget: IExpenseDatabaseFacade;
 
-    constructor() {
+    static _instance: DataStore;
+
+    private constructor() {
         this.expenses = new ObservableArray([]);
         this.proxyTarget = new ExpenseDatabaseFacade()
+    }
+
+    // DataStore is a singleton
+    public static getInstance(): DataStore {
+        if (!DataStore._instance) {
+            DataStore._instance = new DataStore()
+        }
+        return DataStore._instance
     }
 
 

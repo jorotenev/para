@@ -12,6 +12,11 @@ import * as u from "underscore";
 const exp = Expense.createEmptyExpense();
 const persisted = {...exp, id: 1};
 
+function cleanDataStore() {
+    DataStore._instance = null;
+    return DataStore.getInstance()
+}
+
 describe("For all methods of the DataStore", function () {
     /**
      * create a dict where the keys are the method names of a IExpenseDatabaseFacade
@@ -81,7 +86,7 @@ describe("For all methods of the DataStore", function () {
             let failMsg = [];
 
             Object.keys(mocks).forEach((methodName) => {
-                let dataStore = new DataStore();
+                let dataStore = cleanDataStore();
                 try {
                     mocks[methodName].call(dataStore).then(fail, err => {
                         if (err.reason === 'some reason') {
@@ -110,7 +115,7 @@ describe("For all methods of the DataStore", function () {
             // call the datastore's methods
             Object.keys(mocks).forEach(methodName => {
                 mocks[methodName].mock.and.returnValue(Promise.resolve(mocks[methodName].apiResolvesWith));
-                mocks[methodName].call(new DataStore())
+                mocks[methodName].call(cleanDataStore())
             });
 
             // verify that the datastore has called the API with the same argument
@@ -139,7 +144,7 @@ describe("For all methods of the DataStore", function () {
             // call the API method and increment a counter if the call resolved with the expected value
             Object.keys(mocks).forEach(methodName => {
                 try {
-                    mocks[methodName].call(new DataStore()).then((value => {
+                    mocks[methodName].call(cleanDataStore()).then((value => {
                         let expected = mocks[methodName].apiResolvesWith;
                         if (u.isEqual(value, expected)) {
                             numSuccessful++;
@@ -182,7 +187,7 @@ describe('testing the persist() method of the DataStore', function () {
     it('calling persist() of the proxy will return a promise that will be resolved' +
         'with the same object as the one that the API\'s persist() has resolved with', function (done) {
         this.mockedPersist.and.returnValue(Promise.resolve(persisted));
-        let dataStore = new DataStore();
+        let dataStore = cleanDataStore();
         dataStore.persist(exp).then(persistedExp => {
             expect(persistedExp).toEqual(persisted);
             done()
@@ -194,7 +199,7 @@ describe('testing the persist() method of the DataStore', function () {
         function (done) {
             this.mockedPersist.and.returnValue(Promise.resolve(persisted));
 
-            let dataStore = new DataStore();
+            let dataStore = cleanDataStore();
             dataStore.persist(exp).then((persistedExp) => {
                     expect(persistedExp).toEqual(persisted);
 
@@ -209,7 +214,7 @@ describe('testing the persist() method of the DataStore', function () {
     it('if persist() of the api facade rejects, then no expenses are added in the proxy',
         function (done) {
             this.mockedPersist.and.returnValue(Promise.reject(<ResponseError>{reason: "whatever", raw: null}));
-            let dataStore = new DataStore();
+            let dataStore = cleanDataStore();
 
             dataStore.persist(exp).then(fail, (_) => {
                 expect(dataStore.expenses.length).toBe(0);
@@ -218,7 +223,7 @@ describe('testing the persist() method of the DataStore', function () {
 
         });
     it("if we try to persist an expense, and there's already an expense with a null id, we get an error", function (done) {
-        let dataStore = new DataStore();
+        let dataStore = cleanDataStore();
         // both have null ids. here the call to APIs.persist() also returns an expense with
         // null id which shouldn't be possible, what's important is that both expenses have the same id
         let firstExpense = {...exp};
@@ -250,7 +255,7 @@ describe('testing the update() method of the DataStore', function () {
         let updated = {...toBeUpdated, amount: newAmount};
         this.mockedUpdate.and.returnValue(Promise.resolve(updated));
 
-        let dataStore = new DataStore();
+        let dataStore = cleanDataStore();
         dataStore.addExpense(toBeUpdated); // doesn't use the api; adds an expense internally to the datastore
         expect(dataStore.expenses.length).toBe(1);
 
@@ -263,7 +268,7 @@ describe('testing the update() method of the DataStore', function () {
     });
     it("if trying to update an expense that's not in the datastore, " +
         "we get a rejected promise with a suitable msg", function (done) {
-        new DataStore().update(ten_expenses[0]).then(fail, err => {
+        cleanDataStore().update(ten_expenses[0]).then(fail, err => {
             expect(err.reason.indexOf("not in the datastore") !== -1).toBe(true)
             done()
         })
@@ -282,7 +287,7 @@ describe("testing the remove() methods of the DataStore", function () {
         this.mockedRemove.and.callThrough();
     });
     it("rejects if there's not expense with this id", function (done) {
-        new DataStore().remove(ten_expenses[0]).then(fail, err => {
+        cleanDataStore().remove(ten_expenses[0]).then(fail, err => {
             expect(err.reason.indexOf("No such expense in the DataStore") !== -1).toBe(true);
             done();
         })
@@ -290,7 +295,7 @@ describe("testing the remove() methods of the DataStore", function () {
     it("if the api facade resolves, then the remove() of the datastore also resolves and also removes the" +
         "expense from its list", function (done) {
         this.mockedRemove.and.returnValue(Promise.resolve());
-        let datastore = new DataStore();
+        let datastore = cleanDataStore();
         datastore.addExpense(persisted);
         expect(datastore.expenses.length).toBe(1);
 
@@ -318,7 +323,7 @@ describe('testing the get_single() method of the DataStore', function () {
 
         this.mockedGetSingle.and.returnValue(Promise.resolve(persisted));
 
-        let dataStore = new DataStore();
+        let dataStore = cleanDataStore();
         dataStore.addExpense(persisted);
         dataStore.get_single(persisted.id).then(e => {
             expect(dataStore.expenses.indexOf(persisted)).toEqual(0);
@@ -341,7 +346,7 @@ describe('testing the get_list() method of the DataStore', function () {
     });
 
     it("invoking get_list doesn't change the contents of DataStore.expenses", function (done) {
-        let dataStore = new DataStore();
+        let dataStore = cleanDataStore();
         dataStore.addExpense(exp);
         this.mockedGetList.and.returnValue(Promise.resolve({...exp, id: 2}));
 
