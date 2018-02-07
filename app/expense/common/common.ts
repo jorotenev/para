@@ -2,12 +2,13 @@ import {Expense, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
-import {ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
+import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";
 import {getJSONForm} from "./form_properties_json"
+import {DataStore} from "~/expense_datastore/datastore";
 import moment = require("moment");
 
 export const group_1 = " ";
@@ -149,7 +150,9 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         }
 
         toggleActivityIndicator(this.activityIndicator, true);
-        let facade: IExpenseDatabaseFacade = new ExpenseDatabaseFacade();
+        console.log(`about to ${this.mode}...`);
+        console.dir(committedExpense);
+        let facade: IExpenseDatabaseFacade = DataStore.getInstance();
         let apiMethod = {
             [ExpenseFormMode.new]: () => facade.persist(committedExpense),
             [ExpenseFormMode.update]: () => facade.update(committedExpense),
@@ -174,6 +177,9 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
     private convertForForm(expense: IExpense) {
         let copy: any = {...expense};
+
+        console.log("original timestamp " + copy.timestamp_utc)
+        console.log(moment(copy.timestamp_utc).format());
         copy.date = moment(copy.timestamp_utc).valueOf();
         copy.time = moment(copy.timestamp_utc).valueOf();
 
@@ -182,6 +188,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
         return copy;
     }
+
 
     private convertFromForm(e: any): IExpense {
         let exp: IExpense = {...e};
@@ -226,8 +233,8 @@ export class Constructor {
 
 
 export enum ExpenseFormMode {
-    new,
-    update
+    new = 'new',
+    update = 'update'
 }
 
 function validate(dataform: RadDataForm) {
