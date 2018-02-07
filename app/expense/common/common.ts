@@ -1,4 +1,4 @@
-import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
@@ -7,14 +7,14 @@ import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";
-import moment = require("moment");
 import {getJSONForm} from "./form_properties_json"
+import moment = require("moment");
 
 export const group_1 = " ";
 export const group_2 = "Extra";
 export const group_3 = "   ";
 
-const dateFormat: string = "YYYY-MM-D";
+const dateFormat: string = "YYYY-MM-DD";
 const timeFormat: string = "HH:mm";
 
 
@@ -51,7 +51,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     private readonly dataform: RadDataForm;
     private readonly page: Page;
 
-    private onSuccessfulOperation: (IExpense) => void
+    private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
         this._expense = options.expense;
@@ -120,7 +120,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
                     console.error("couldnt validated/commit")
                 }
             }, (err) => {
-                console.log('error')
+                console.dir(err)
             })
         } else {
             console.log("didn't pass manual validation")
@@ -137,7 +137,9 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
             committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject))
         } catch (err) {
             console.error(err);
-            dialogs.alert({title: `Couldn't ${verb} the expense`});
+            dialogs.alert(`Couldn't ${verb} the expense`);
+            toggleActivityIndicator(that.activityIndicator, false);
+
             return;
         }
 
@@ -174,6 +176,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         let copy: any = {...expense};
         copy.date = moment(copy.timestamp_utc).valueOf();
         copy.time = moment(copy.timestamp_utc).valueOf();
+
         copy.tags = copy.tags.join(",");
         delete copy.timestamp_utc;
 
@@ -181,28 +184,22 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     }
 
     private convertFromForm(e: any): IExpense {
-        try {
-            let temp: IExpense = {...e};
-            temp.amount = !!temp.amount ? temp.amount : 0;
-            temp.tags = e.tags.split(",").map((tag) => tag.trim());
+        let exp: IExpense = {...e};
+        exp.amount = !!exp.amount ? exp.amount : 0;
+        exp.tags = e.tags.split(",").map((tag) => tag.trim());
 
-            temp.timestamp_utc = this.extractTimestampUTC(e);
+        exp.timestamp_utc = this.extractTimestampUTC(e);
 
-            let prepared: ExpenseConstructor = temp;
-            let expense: IExpense = new Expense(prepared);
-            return expense
-        } catch (err) {
-            console.log('couldn\'t convert ' + err);
-            return null;
-        }
+        return new Expense(exp)
     }
 
     private extractTimestampUTC(e: any) {
-        let timeStr = moment(e.time).format(timeFormat)
-        let dateStr = moment(e.date).format(dateFormat)
+        let timeStr = moment(e.time).format(timeFormat);
+        let dateStr = moment(e.date).format(dateFormat);
         let subMinuteSymbols = moment(this.initialTimestampUTC).format("ss.SSS")
         let localTimeStr = `${dateStr}T${timeStr}:${subMinuteSymbols}`;
         let dateTimeUTC = moment(localTimeStr).utc();
+        console.log(localTimeStr)
         if (dateTimeUTC.isValid()) {
             return dateTimeUTC.format()
         } else {
