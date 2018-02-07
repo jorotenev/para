@@ -5,5 +5,5 @@ export function currentTimeUTC(skipMilliseconds=false): string {
 }
 
 export function readableTimestamp(timestamp_utc: string): string {
-    return moment.utc(timestamp_utc).calendar()
+    return moment(timestamp_utc).calendar()
 }
