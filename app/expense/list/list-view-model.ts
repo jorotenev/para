@@ -1,9 +1,7 @@
-import {Observable, PropertyChangeData} from "tns-core-modules/data/observable";
-import {IExpense, Expense, dummyExpense} from '~/models/expense'
-import {currentTimeUTC, readableTimestamp} from '~/utils/time'
+import {Observable} from "tns-core-modules/data/observable";
+import {ExpenseConstructor, IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-import {ExpenseConstructor} from "~/models/expense";
-import {tuple} from "~/types";
+import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 
 let dialogs = require("ui/dialogs");
 let http = require('http');
@@ -14,17 +12,21 @@ type ExpensesList = ObservableArray<IExpense>;
 
 export class ListExpenseModel extends Observable {
     public expenses: ExpensesList;
+
     private loader: IExpensesListManager;
+    private datastore: IDataStore;
 
     constructor() {
         super();
-        this.expenses = new ObservableArray([]);
+        this.datastore = new DataStore();
+        this.loader = new ExpensesHandler(this.expenses, this.datastore); //TODO
 
-        this.loader = new DummyExpensesList(this.expenses); //TODO
+        this.expenses = this.datastore.expenses;
+
     }
 
 
-    public loadMoreItems(ev): Promise<boolean> {
+    public loadMoreItems(ev): Promise<void> {
         return this.loader.loadMoreItems(ev);
     }
 
@@ -35,13 +37,14 @@ export class ListExpenseModel extends Observable {
 }
 
 export interface IExpensesListManager {
+
     expenses: ExpensesList;
 
     // loads the initial batch of items
     initList();
 
     // called when the user has reached the end of the loaded items
-    loadMoreItems(ev): Promise<boolean>;
+    loadMoreItems(ev): Promise<void>;
 
     // add an expense to the list
     addExpense(exp: ExpenseConstructor): boolean
@@ -49,20 +52,22 @@ export interface IExpensesListManager {
 }
 
 abstract class ExpensesListManager implements IExpensesListManager {
-
-    _expenses: ExpensesList;
+    protected datastore: IDataStore;
+    private _expenses: ExpensesList;
     // How many items to fetch from the server in response to the loadMoreItems event
-    numItemsToFetch: number = 10;
+    batchSize: number = 10;
 
 
-    constructor(expenses: ExpensesList) {
+    constructor(expenses: ExpensesList, datastore: IDataStore) {
         this._expenses = expenses;
+        this.datastore = datastore;
         this.initList()
+
     }
 
     abstract initList()
 
-    abstract loadMoreItems(ev): Promise<boolean>
+    abstract loadMoreItems(ev): Promise<void>
 
     public get expensesIds(): number[] {
         return this.expenses.map((exp: IExpense) => exp.id)
@@ -72,7 +77,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
         return this._expenses
     }
 
-    public get isEmpty(): boolean {
+    public isEmpty(): boolean {
         return this.expenses.length === 0
     }
 
@@ -96,76 +101,42 @@ abstract class ExpensesListManager implements IExpensesListManager {
 class ExpensesHandler extends ExpensesListManager {
 
 
-    public loadMoreItems(ev: any): Promise<boolean> {
+    public loadMoreItems(ev: any): Promise<void> {
         // TODO call the server to fetch
-        this.ensureExpensesIsNotEmpty();
+        if (this.isEmpty()) {
+            return Promise.reject("not initialized")
+        }
+        const startFromID = Math.max(...this.expensesIds) + 1;
 
-        const currentMaxId = Math.max(...this.expensesIds);
-        const IdsRangeToFetch: tuple = [currentMaxId + 1, currentMaxId + 1 + this.numItemsToFetch];
-        return Promise.reject(true)
+        return this.fetchItems(startFromID)
+
     }
 
-    private fetchExpenses(range: tuple) {
-        const url = "INVALID URL";
-        http.getJSON(url).then(
-            (json) => {
-                console.log(json);
-            }, (err) => {
-                console.error(err)
+    private fetchItems(startFrom: number | null): Promise<void> {
+        return this.datastore.get_list(startFrom, this.batchSize)
+            .then(list => {
+                list.forEach(exp => {
+                    this.datastore.addExpense(exp);
+                });
+                return
+            }, err => {
+                throw err
             })
     }
 
     initList() {
         // TODO load initial batch
-        console.log('initialising the list')
-    }
-
-
-}
-
-class DummyExpensesList extends ExpensesListManager {
-
-    public initList() {
-        this.dummyExpenses()
-    }
-
-    public loadMoreItems(ev: any): Promise<boolean> {
-        let that = this
-        return new Promise(function (resolve, reject) {
-            try {
-                that.ensureExpensesIsNotEmpty();
-
-                console.log('loading more items');
-
-                let oldestID = Math.max(...that.expensesIds);
-
-                if (oldestID !== that.expenses.getItem(that.expenses.length - 1).id) {
-                    console.error("Last item doesn't have the highest id.")
-                }
-
-                if (oldestID > 50) {
-                    resolve(true)
-                    return
-                }
-                // add ten more items
-                for (let i of u.range(oldestID + 1, oldestID + that.numItemsToFetch)) {
-                    that.addExpense(dummyExpense(i))
-                }
-                resolve(true)
-            } catch (err) {
-                reject(err)
-            }
+        this.fetchItems(null).then(()=>{
+            console.log("ListViewModel's datastore is initialised!")
+        }, err=>{
+            console.error("Couldn't initialise the datastore of the ListViewModel")
+            console.dir(err);
         })
     }
 
-    public dummyExpenses(): void {
-        for (let i of u.range(1, 2)) {
-            let exp = dummyExpense(i);
-            this.addExpense(exp)
-        }
-    }
-
 
 }
+
+
 
 
