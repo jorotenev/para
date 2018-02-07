@@ -116,7 +116,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
                 }
             }, function (err) {
                 let error: ResponseError = {
-                    "reason": `Can't get expenses: ${err.message} `,
+                    "reason": `Can't get expenses: ${err.msg} `,
                     "raw": err
                 };
                 reject(error)
