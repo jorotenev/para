@@ -143,7 +143,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
             return;
         }
 
-        if (this.objectHash === hashCode(JSON.stringify(committedExpense))) {
+        if (this.objectHash === hashCode(JSON.stringify(committedExpense))) { //todo that's broken
             console.log("committed object is the same as the initial one. idling");
             return;
         }
