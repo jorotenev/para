@@ -131,13 +131,16 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
         return Utils.makeRequest(url, HTTPMethod.GET, request)
             .then((response: SyncResponse) => {
-                if (validateSyncResponse(response)) {
-                    return response
-                } else {
-                    throw <ResponseError>{
-                        reason: "Server didn't return valid SyncResponse"
+                try {
+                    validateSyncResponse(response)
+                } catch (err) {
+                    console.error("SyncResponse is invalid. " + err.message);
+                    console.dir(response);
+                    throw <ResponseError> {
+                        reason: "Server didn't return a valid SyncResponse. " + err.message
                     }
                 }
+                return response
             }, err => {
                 throw err
             })
@@ -152,25 +155,38 @@ export interface SyncResponse {
 }
 
 export type SyncRequest = { id: ExpenseIdType, updated_at: string }[]
-// export interface SyncRequest {
-//     items: { id: ExpenseIdType, updated_at: string }[]
-// }
 
 
 function validateSyncResponse(response: any) { // todo make it more robust
-    let hasProperties = response.hasOwnProperty("to_add")
-        && response.hasOwnProperty('to_update')
-        && response.hasOwnProperty('to_remove');
-    if (!hasProperties) {
-        return false
-    }
-    if (!u.isArray(response['to_add'])) {
-        return false
-    }
-    if (!u.isArray(response['to_update'])) {
-        return false
-    }
-    return u.isArray(response['to_delete']);
 
+    const expectedObjectKeys = ['to_update', 'to_add', 'to_remove'];
+    const getID = {
+        'to_update': (val) => val.id,
+        'to_add': (val) => val.id,
+        'to_remove': (val) => val
+    }
+    let hasAllProperties = expectedObjectKeys.every((key) => response.hasOwnProperty(key));
+
+    if (!hasAllProperties) {
+        throw new Error("response contains only " + Object.keys(response) + " as keys")
+    }
+    let allAreArrays = expectedObjectKeys.every((key) => u.isArray(response[key]));
+
+    if (!allAreArrays) {
+        throw new Error("the values of all keys must be arrays")
+    }
+
+    let ids = {};
+    const err = new Error("id appears in more than one section of the response");
+
+    expectedObjectKeys.forEach(key => {
+        response[key].forEach(exp => {
+            let id = getID[key](exp)
+            if (ids.hasOwnProperty(id)) {
+                throw err
+            }
+            ids[id] = null
+        })
+    })
 
 }
