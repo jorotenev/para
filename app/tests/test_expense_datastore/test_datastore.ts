@@ -1,7 +1,7 @@
 import {DataStore, ExpenseDatabaseFacade} from "~/expense_datastore/datastore"
 import {Expense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
-import {ten_expenses} from "~/tests/test_api_facade/sample_responses";
+import {SINGLE_EXPENSE} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
 
 /**
@@ -268,7 +268,8 @@ describe('testing the update() method of the DataStore', function () {
     });
     it("if trying to update an expense that's not in the datastore, " +
         "we get a rejected promise with a suitable msg", function (done) {
-        cleanDataStore().update(ten_expenses[0]).then(fail, err => {
+        let expense = new Expense(SINGLE_EXPENSE);
+        cleanDataStore().update(expense).then(fail, err => {
             expect(err.reason.indexOf("not in the datastore") !== -1).toBe(true)
             done()
         })
@@ -287,7 +288,8 @@ describe("testing the remove() methods of the DataStore", function () {
         this.mockedRemove.and.callThrough();
     });
     it("rejects if there's not expense with this id", function (done) {
-        cleanDataStore().remove(ten_expenses[0]).then(fail, err => {
+
+        cleanDataStore().remove(new Expense(SINGLE_EXPENSE)).then(fail, err => {
             expect(err.reason.indexOf("No such expense in the DataStore") !== -1).toBe(true);
             done();
         })

@@ -1,6 +1,7 @@
-import {IExpense} from "~/models/expense";
+import {Expense, ExpenseConstructor} from "~/models/expense";
 
-export let ten_expenses: IExpense[] = [
+
+export let ten_expenses: ExpenseConstructor[] = [
     {
         "id": 1,
         "name": "server id 1",
@@ -132,3 +133,4 @@ export let ten_expenses: IExpense[] = [
         "timestamp_utc_updated": "2017-10-29T09:18:21.853071",
     }
 ];
+export const SINGLE_EXPENSE : ExpenseConstructor= Object.freeze(new Expense(ten_expenses[0]));
