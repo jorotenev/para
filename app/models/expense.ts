@@ -45,7 +45,14 @@ export class Expense implements IExpense {
     }
 
     public static comparator(a: IExpense, b: IExpense): COMPARE_RESULT {
-        return a.id - b.id
+        let result = a.id - b.id;
+        if (result > 0) {
+            return COMPARE_RESULT.LARGER
+        } else if (result < 0) {
+            return COMPARE_RESULT.SMALLER
+        } else {
+            return COMPARE_RESULT.EQUAL
+        }
     }
 
     public id: ExpenseIdType;
