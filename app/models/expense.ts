@@ -1,6 +1,7 @@
 import {userPreferredCurrency} from "~/app_config";
 import {currentTimeUTC} from "~/utils/time";
 import * as underscore from "underscore"
+import {COMPARE_RESULT} from "~/utils/misc";
 
 export type ExpenseIdType = number;
 
@@ -19,7 +20,7 @@ export interface ExpenseConstructor {
 }
 
 export interface IExpense extends ExpenseConstructor {
-    compare: (b: IExpense) => number
+    compare: (b: IExpense) => COMPARE_RESULT
 }
 
 export function dummyExpense(id: number) {
@@ -39,11 +40,11 @@ export function dummyExpense(id: number) {
 }
 
 export class Expense implements IExpense {
-    public compare(b: IExpense): number {
+    public compare(b: IExpense): COMPARE_RESULT {
         return Expense.comparator(this, b)// sort descendigly
     }
 
-    public static comparator(a: IExpense, b: IExpense): number {
+    public static comparator(a: IExpense, b: IExpense): COMPARE_RESULT {
         return a.id - b.id
     }
 

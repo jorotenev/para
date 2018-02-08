@@ -1,7 +1,8 @@
 import {Expense} from "~/models/expense";
 import {ten_expenses} from "~/tests/test_api_facade/sample_responses";
+import {COMPARE_RESULT} from "~/utils/misc";
 
-describe("Testing the Expense class", function () {
+fdescribe("Testing the Expense class", function () {
 
     it("sorting via the static comparator works as expected", function () {
         let first_expense = ten_expenses[0];
@@ -21,10 +22,10 @@ describe("Testing the Expense class", function () {
     it("compare via the instance method", function () {
         let first_expense = new Expense(ten_expenses[0]);
         let second_expense = new Expense(ten_expenses[1]);
-        expect(first_expense.compare(second_expense) < 0).toBe(true);
-        expect(second_expense.compare(first_expense) > 0).toBe(true);
+        expect(first_expense.compare(second_expense)).toBe(COMPARE_RESULT.SMALLER);
+        expect(second_expense.compare(first_expense)).toBe(COMPARE_RESULT.LARGER);
 
-        expect(first_expense.compare(first_expense)).toBe(0);
-        expect(second_expense.compare(second_expense)).toBe(0)
+        expect(first_expense.compare(first_expense)).toBe(COMPARE_RESULT.EQUAL);
+        expect(second_expense.compare(second_expense)).toBe(COMPARE_RESULT.EQUAL)
     });
 });

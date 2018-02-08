@@ -1,5 +1,5 @@
 import {Observable} from "tns-core-modules/data/observable";
-import {ExpenseConstructor, IExpense} from '~/models/expense'
+import {ExpenseConstructor, ExpenseIdType, IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 
@@ -67,7 +67,7 @@ abstract class ExpensesListManager implements IExpensesListManager {
 
     abstract loadMoreItems(ev): Promise<void>
 
-    public get expensesIds(): number[] {
+    public get expensesIds(): ExpenseIdType[] {
         return this.expenses.map((exp: IExpense) => exp.id)
     }
 
@@ -102,11 +102,13 @@ class ExpensesHandler extends ExpensesListManager {
     public loadMoreItems(ev: any): Promise<void> {
         // TODO call the server to fetch
         if (this.isEmpty()) {
+            console.log("Trying to loadmoreitems before there're any expenses")
             return Promise.reject("not initialized")
         }
         const startFromID = Math.min(...this.expensesIds) - 1;
 
         return this.fetchItems(startFromID).then(() => {
+                console.log("loadMoreItems promise returned")
                 return
             }
         )
@@ -118,6 +120,7 @@ class ExpensesHandler extends ExpensesListManager {
                 list.forEach(exp => {
                     this.datastore.addExpense(exp);
                 });
+                console.log(`successfully added ${list.length} expenses `)
                 return list
             }, err => {
                 throw err
@@ -126,13 +129,18 @@ class ExpensesHandler extends ExpensesListManager {
 
     initList() {
         // TODO load initial batch
-        this.fetchItems(null).then((expenses) => {
-            console.dir(expenses)
-            console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`)
-        }, err => {
-            console.error("Couldn't initialise the datastore of the ListViewModel");
-            console.dir(err);
-        })
+
+        setTimeout(() => {
+            console.log("begin initializing the array")
+            this.fetchItems(null).then((expenses) => {
+                console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`);
+                console.log("expenses size is " + this.expenses.length)
+            }, err => {
+                console.error("Couldn't initialise the datastore of the ListViewModel");
+                console.dir(err);
+            })
+        }, 1000)
+
     }
 
 
