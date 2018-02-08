@@ -9,7 +9,10 @@
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
-import {ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
+import {
+    ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade, SyncRequest,
+    SyncResponse
+} from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import "~/utils/add/ObservableArrayfindIndex"; // imported for its side effects
@@ -98,11 +101,15 @@ export class DataStore implements IDataStore {
         return this.proxyTarget.get_list.apply(this.proxyTarget, arguments);
     }
 
+    sync(request: SyncRequest): Promise<SyncResponse> {
+        return this.proxyTarget.sync(request)
+    }
+
     public addExpense(exp: IExpense) {
         if (this.expenseIsManaged(exp)) {
             throw <ResponseError> {'reason': "Invalid application state. Expenses with the same id = " + exp.id}
         }
-        this.expenses.push(exp)
+        this.expenses.push(exp);
 
         // TODO ensure expenses are sorted
         if (this.expenses.length > 1 && this.expenses.getItem(0).compare(this.expenses.getItem(1)) < 0) {  //todo assumes numerical ids
