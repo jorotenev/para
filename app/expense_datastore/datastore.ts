@@ -8,7 +8,7 @@
  * When a call is made to the datastore, the call will firs be forwarded to the API facade.
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
-import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
 import {
     ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade, SyncRequest,
     SyncResponse
@@ -22,7 +22,9 @@ export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
 export interface IDataStore extends IExpenseDatabaseFacade {
     expenses: ObservableArray<IExpense>
 
-    addExpense(exp: IExpense)
+    _addExpense(exp: IExpense)
+
+    _removeExpense(expId: ExpenseIdType)
 }
 
 export class DataStore implements IDataStore {
@@ -47,7 +49,7 @@ export class DataStore implements IDataStore {
 
     persist(exp: IExpense): Promise<IExpense> {
         return this.proxyTarget.persist(exp).then((persisted) => {
-            this.addExpense(persisted);
+            this._addExpense(persisted);
             // todo ensure no expense with this id exists in this.expenses
 
             return persisted
@@ -86,6 +88,7 @@ export class DataStore implements IDataStore {
         let index = this.indexOfExpense(exp);
         return this.proxyTarget.remove(exp)
             .then(_ => {
+                this._removeExpense(exp.id);
                 this.expenses.splice(index, 1); // delete the element at the given index
                 return Promise.resolve()
             }, err => {
@@ -102,10 +105,40 @@ export class DataStore implements IDataStore {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
-        return this.proxyTarget.sync(request)
+        return this.proxyTarget.sync(request).then((response: SyncResponse) => {
+            // remove
+            response.to_remove.forEach((id: ExpenseIdType) => {
+                try {
+                    this._removeExpense(id)
+                } catch (err) {
+                    console.error(err.message)
+                }
+            });
+
+            //update
+            response.to_update.forEach((expense: ExpenseConstructor) => {
+                let index = this.indexOfExpense(expense)
+                if (index !== -1) {
+                    this.expenses.setItem(index, new Expense(expense))
+                }
+            })
+
+            //add
+            response.to_add.forEach((expense: ExpenseConstructor) => {
+                try {
+                    this._addExpense(new Expense(expense))
+
+                } catch (err) {
+                    console.dir(err)
+                }
+            })
+            return response
+        }, err => {
+            throw err
+        })
     }
 
-    public addExpense(exp: IExpense) {
+    public _addExpense(exp: IExpense) {
         if (this.expenseIsManaged(exp)) {
             throw <ResponseError> {'reason': "Invalid application state. Expenses with the same id = " + exp.id}
         }
@@ -114,16 +147,28 @@ export class DataStore implements IDataStore {
         // TODO ensure expenses are sorted
         if (this.expenses.length > 1 && this.expenses.getItem(0).compare(this.expenses.getItem(1)) < 0) {  //todo assumes numerical ids
             console.error("fucked up, duct-taping"); //todo send this to an online log repository
-            this.expenses.sort(Expense.comparator) // todo assumes numerical ids
+            this.expenses.sort((a, b) => {
+                return -1 * Expense.comparator(a, b) // reverse the natural ordering
+            })
         }
 
+    }
+
+    public _removeExpense(arg: ExpenseIdType) {
+
+        let index = this.expenses.findIndex((e) => e.id === arg);
+        if (index === -1) {
+            throw new Error("no managed expense with such id")
+        }
+
+        this.expenses.splice(index, 1);
     }
 
     private expenseIsManaged(exp: IExpense): boolean {
         return this.indexOfExpense(exp) !== -1
     }
 
-    private indexOfExpense(exp: IExpense): number {
+    private indexOfExpense(exp: ExpenseConstructor): number {
         return this.expenses.findIndex(managed_exp => managed_exp.id === exp.id)
     }
 }
