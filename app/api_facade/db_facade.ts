@@ -1,4 +1,4 @@
-import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
 import {apiAddress, apiVersion} from "~/app_config";
 import * as u from 'underscore';
 import {RawResponseError, ResponseError, Utils} from "./common";
@@ -34,6 +34,8 @@ export interface IExpenseDatabaseFacade {
 
     get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]>
 
+    sync(request: SyncRequest): Promise<SyncResponse>
+
 }
 
 
@@ -44,7 +46,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
     static readonly DELETERemoveEndpoint = u.template(`${EXPENSES_API_ENDPOINT}remove/<%= id %>`);
-
+    static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
@@ -125,7 +127,50 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         })
     }
 
+    sync(request: SyncRequest): Promise<SyncResponse> {
+        let url = ExpenseDatabaseFacade.GETSyncEndpoint;
+        return Utils.makeRequest(url, HTTPMethod.GET, request)
+            .then((response: SyncResponse) => {
+                if (validateSyncResponse(response)) {
+                    return response
+                } else {
+                    throw <ResponseError>{
+                        reason: "Server didn't return valid SyncResponse"
+                    }
+                }
+            }, err => {
+                throw err
+            })
+    }
 
 }
 
+export interface SyncResponse {
+    to_add: ExpenseConstructor[]
+    to_update: ExpenseConstructor[]
+    to_remove: ExpenseIdType[]
+}
 
+export type SyncRequest = { id: ExpenseIdType, updated_at: string }[]
+// export interface SyncRequest {
+//     items: { id: ExpenseIdType, updated_at: string }[]
+// }
+
+
+function validateSyncResponse(response: any) { // todo make it more robust
+    let hasProperties = response.hasOwnProperty("to_add")
+        && response.hasOwnProperty('to_update')
+        && response.hasOwnProperty('to_remove');
+    if (!hasProperties) {
+        return false
+    }
+    if (!u.isArray(response['to_add'])) {
+        return false
+    }
+    if (!u.isArray(response['to_update'])) {
+        return false
+    }
+    return u.isArray(response['to_delete']);
+
+
+}
