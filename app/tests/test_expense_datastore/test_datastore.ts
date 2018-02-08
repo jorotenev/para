@@ -1,23 +1,24 @@
 import {DataStore, ExpenseDatabaseFacade} from "~/expense_datastore/datastore"
 import {Expense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
-import {SINGLE_EXPENSE} from "~/tests/test_api_facade/sample_responses";
+import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
+import {SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 
 /**
  * proxy = DataStore
  * api = ExpenseDatabaseFacade
  */
 
-const exp = Expense.createEmptyExpense();
-const persisted = {...exp, id: 1};
+const exp = Object.freeze(Expense.createEmptyExpense());
+const persisted = Object.freeze({...exp, id: 1});
 
 function cleanDataStore() {
     DataStore._instance = null;
     return DataStore.getInstance()
 }
 
-describe("For all methods of the DataStore", function () {
+fdescribe("For all methods of the DataStore", function () {
     /**
      * create a dict where the keys are the method names of a IExpenseDatabaseFacade
      * the values are objects. each object has key `mock` which is the mocked method of the facade; then
@@ -68,6 +69,14 @@ describe("For all methods of the DataStore", function () {
                     return ds.get_single.apply(ds, mocks.get_single.methodArgument)
                 }
             },
+            sync: {
+                mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync'),
+                methodArgument: [<SyncRequest>[{id: 1, updated_at: ''}]],
+                apiResolvesWith: <SyncResponse>{to_add: [], to_update: [], to_remove: []},
+                call: (ds: DataStore) => {
+                    return ds.sync.apply(ds, mocks.sync.methodArgument)
+                }
+            }
         };
         return mocks
     }
@@ -360,4 +369,101 @@ describe('testing the get_list() method of the DataStore', function () {
     });
 });
 
+fdescribe('testing the sync() method of the DataStore', function () {
+    beforeAll(function () {
+        this.request = <SyncRequest>[]
+        ten_expenses.slice(0, 3).forEach(exp => {
+            this.request.push({
+                id: exp.id,
+                updated_at: exp.timestamp_utc_updated
+            })
+        })
+    });
 
+    beforeEach(function () {
+        this.mockedSync = <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync');
+        this.mockedSync.and.callThrough();
+    });
+
+    afterEach(function () {
+        this.mockedSync.calls.reset();
+        this.mockedSync.and.callThrough();
+    });
+
+    it("items in the .to_add are added to the datastore", function (done) {
+        const sample_response: SyncResponse = {
+            to_add: [ten_expenses[4]],
+            to_remove: [],
+            to_update: [],
+        };
+        this.mockedSync.and.returnValue(Promise.resolve(sample_response));
+
+        let ds = cleanDataStore();
+        ds.sync(this.request).then((response: SyncResponse) => {
+            expect(ds.expenses.length).toBe(1);
+            expect(ds.expenses.getItem(0)).toEqual(new Expense(response.to_add[0]));
+            done()
+        }, fail)
+
+    });
+    it("items in the .to_updated result in the items being updated in the DataStore", function (done) {
+        const new_amount = SINGLE_EXPENSE.amount + 10;
+        const sample_response: SyncResponse = {
+            to_update: [{...SINGLE_EXPENSE, amount: new_amount}],
+            to_add: [],
+            to_remove: []
+        };
+
+        this.mockedSync.and.returnValue(Promise.resolve(sample_response));
+
+        let ds = cleanDataStore();
+        ds.addExpense(new Expense(SINGLE_EXPENSE));
+
+        //sanity checking
+        expect(ds.expenses.getItem(0).amount).toBe(SINGLE_EXPENSE.amount);
+
+        ds.sync(this.request).then((response: SyncResponse) => {
+            expect(ds.expenses.getItem(0).amount).toEqual(new_amount)
+        }, fail)
+    });
+
+    it('non-existing items in the datastore which we need to *update* are ignored', function (done) {
+        const new_amount = SINGLE_EXPENSE.amount + 10;
+        const sample_response: SyncResponse = {
+            to_update: [{...SINGLE_EXPENSE, amount: new_amount}, {...ten_expenses[1]}],
+            to_add: [],
+            to_remove: []
+        };
+
+        this.mockedSync.and.returnValue(Promise.resolve(sample_response));
+
+        let ds = cleanDataStore();
+        ds.addExpense(new Expense(SINGLE_EXPENSE));
+        ds.sync(this.request).then(response => {
+            expect(ds.expenses.length).toBe(1);
+            expect(ds.expenses.getItem(0).amount).toBe(new_amount);
+            expect(ds.expenses.getItem(0).id).toBe(SINGLE_EXPENSE.id);
+            done();
+        }, fail)
+    });
+    it("items which need to be removed are removed and items not managed by the datastore are ignored", function (done) {
+        const sample_response: SyncResponse = {
+            to_remove: [SINGLE_EXPENSE.id, ten_expenses[2].id],
+            to_update: [],
+            to_add: []
+        };
+        this.mockedSync.and.returnValue(Promise.resolve(sample_response));
+
+        let ds = cleanDataStore();
+        ds.addExpense(new Expense(SINGLE_EXPENSE));
+        ds.addExpense(new Expense(ten_expenses[1]));
+
+        ds.sync(this.request).then(response => {
+            expect(ds.expenses.length).toBe(1)
+
+            expect(ds.expenses.getItem(0)).toEqual(new Expense(ten_expenses[1]));
+            done()
+        }, fail)
+
+    });
+});
