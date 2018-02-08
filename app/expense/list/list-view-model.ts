@@ -118,7 +118,7 @@ class ExpensesHandler extends ExpensesListManager {
         return this.datastore.get_list(startFrom, this.batchSize)
             .then(list => {
                 list.forEach(exp => {
-                    this.datastore.addExpense(exp);
+                    this.datastore._addExpense(exp);
                 });
                 console.log(`successfully added ${list.length} expenses `)
                 return list
