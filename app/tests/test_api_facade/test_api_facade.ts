@@ -1,4 +1,4 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
 import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
@@ -256,3 +256,62 @@ describe('Testing the remove() of the db facade', function () {
     });
 });
 
+describe("test the sync() method of the API facade", function () {
+    beforeAll(function () {
+        this.request = <SyncRequest>  [
+            {
+                id: 1,
+                updated_at: ''
+            },
+            {
+                id: 2,
+                updated_at: ''
+            }
+        ];
+
+    });
+    beforeEach(function () {
+        setUpBeforeEach.call(this);
+        this.mockedSync = spyOn(ExpenseDatabaseFacade.prototype, 'sync');
+        this.mockedHTTP = spyOn(http, 'request');
+        this.mockedHTTP.and.callThrough();
+
+    });
+
+    afterEach(function () {
+        setUpAfterEach.call(this);
+
+        this.mockedSync.calls.reset();
+        this.mockedSync.and.callThrough();
+
+        this.mockedHTTP.calls.reset();
+        this.mockedHTTP.and.callThrough();
+    });
+    it("returns a valid SyncResponse", function (done) {
+        let httpResult = `
+        {
+            "to_add":[${ten_expenses[2]}],
+            "to_delete": [1],
+            "to_updated": [${ten_expenses[1]}]
+        }
+        `;
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(httpResult, 200)));
+
+        new ExpenseDatabaseFacade().sync(this.request).then((result: SyncResponse) => {
+            expect(result.to_add).toEqual([ten_expenses[2]])
+            expect(result.to_remove).toEqual([1])
+            expect(result.to_update).toEqual([ten_expenses[1]])
+            done()
+        }, fail)
+    });
+    it("rejects if the server didn't return a proper SyncResponse", function (done) {
+        let httpResult = `
+        {
+            "to_add":[${ten_expenses[2]}]
+        }
+        `;
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(httpResult, 200)))
+        new ExpenseDatabaseFacade().sync(this.request).then(fail, done)
+    });
+
+});
