@@ -19,7 +19,7 @@ export interface ExpenseConstructor {
 }
 
 export interface IExpense extends ExpenseConstructor {
-    comparator: (a: IExpense, b: IExpense) => number
+    compare: (b: IExpense) => number
 }
 
 export function dummyExpense(id: number) {
@@ -39,8 +39,12 @@ export function dummyExpense(id: number) {
 }
 
 export class Expense implements IExpense {
-    public comparator(b: IExpense): number {
-        return this.id - b.id // sort descendigly
+    public compare(b: IExpense): number {
+        return Expense.comparator(this, b)// sort descendigly
+    }
+
+    public static comparator(a: IExpense, b: IExpense): number {
+        return a.id - b.id
     }
 
     public id: ExpenseIdType;
