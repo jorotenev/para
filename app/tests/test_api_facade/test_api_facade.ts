@@ -2,7 +2,6 @@ import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, SyncRequest, SyncResponse}
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
 import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
-import {DataStore} from "~/expense_datastore/datastore";
 import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 
 
@@ -166,6 +165,7 @@ describe('Testing the persist() of the db facade', function () {
             done()
         }, fail)
     });
+
     it("persist() rejects if the server returns a persisted expense with a null id", function (done) {
         let badResponse = {...SINGLE_EXPENSE, id: null};
         this.mockedRequest.and.returnValue(Promise.resolve(badResponse));
@@ -173,7 +173,8 @@ describe('Testing the persist() of the db facade', function () {
             expect(err.reason.indexOf('Server returned an expense with a null id after persisting') !== -1).toBe(true);
             done()
         })
-    })
+    });
+
     it("persist() rejects if an expense with a non-null id is passed", function (done) {
         let expWithId = new Expense(SINGLE_EXPENSE)
         new ExpenseDatabaseFacade().persist(expWithId).then(fail, (err) => {
@@ -211,8 +212,9 @@ describe("Testing the update() of the db facade", function () {
 describe('Testing the remove() of the db facade', function () {
     beforeEach(function () {
         setUpBeforeEach.call(this);
-        this.mockedRemove = spyOn(DataStore.prototype, 'remove');
+        this.mockedRemove = spyOn(ExpenseDatabaseFacade.prototype, 'remove');
         this.mockedHTTP = spyOn(http, 'request');
+        this.mockedRemove.and.callThrough();
         this.mockedHTTP.and.callThrough();
 
     });
@@ -270,11 +272,14 @@ describe("test the sync() method of the API facade", function () {
         ];
 
     });
+
     beforeEach(function () {
         setUpBeforeEach.call(this);
         this.mockedSync = spyOn(ExpenseDatabaseFacade.prototype, 'sync');
         this.mockedHTTP = spyOn(http, 'request');
+
         this.mockedHTTP.and.callThrough();
+        this.mockedSync.and.callThrough();
 
     });
 
@@ -287,31 +292,54 @@ describe("test the sync() method of the API facade", function () {
         this.mockedHTTP.calls.reset();
         this.mockedHTTP.and.callThrough();
     });
+
     it("returns a valid SyncResponse", function (done) {
-        let httpResult = `
-        {
-            "to_add":[${ten_expenses[2]}],
-            "to_delete": [1],
-            "to_updated": [${ten_expenses[1]}]
-        }
-        `;
-        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(httpResult, 200)));
+        let expense_a = ten_expenses[0];
+        let expense_b = ten_expenses[1];
+        let expense_c = ten_expenses[2];
+        let httpResult = <SyncResponse>{
+                "to_add": [expense_a],
+                "to_remove": [expense_b.id],
+                "to_update": [expense_c]
+            }
+        ;
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(JSON.stringify(httpResult), 200)));
 
         new ExpenseDatabaseFacade().sync(this.request).then((result: SyncResponse) => {
-            expect(result.to_add).toEqual([ten_expenses[2]])
-            expect(result.to_remove).toEqual([1])
-            expect(result.to_update).toEqual([ten_expenses[1]])
+            expect(result.to_add).toEqual([expense_a]);
+            expect(result.to_remove).toEqual([expense_b.id]);
+            expect(result.to_update).toEqual([expense_c]);
             done()
         }, fail)
     });
+
     it("rejects if the server didn't return a proper SyncResponse", function (done) {
-        let httpResult = `
-        {
-            "to_add":[${ten_expenses[2]}]
-        }
-        `;
-        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(httpResult, 200)))
+        let httpResult = {
+            "to_add": [ten_expenses[2]]
+        };
+
+        this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(JSON.stringify(httpResult), 200)));
         new ExpenseDatabaseFacade().sync(this.request).then(fail, done)
     });
+
+    it("it's not valid for items/ids to appear in multiple sections of the response",
+        function (done) {
+            const response: SyncResponse = {
+                to_remove: [SINGLE_EXPENSE.id],
+                to_add: [SINGLE_EXPENSE],
+                to_update: []
+            };
+
+            this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(JSON.stringify(response), 200)));
+            console.dir(this.mockedHTTP);
+
+            let facade = new ExpenseDatabaseFacade();
+            let promise = facade.sync(this.request);
+
+            promise.then(fail, err => {
+                expect(err.reason.indexOf("id appears in more than one section of the response") !== -1).toBe(true)
+                done()
+            })
+        })
 
 });
