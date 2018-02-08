@@ -19,12 +19,13 @@ export interface ExpenseConstructor {
 }
 
 export interface IExpense extends ExpenseConstructor {
+    comparator: (a: IExpense, b: IExpense) => number
 }
 
 export function dummyExpense(id: number) {
 
 
-    let e: IExpense = <ExpenseConstructor> {
+    let e: ExpenseConstructor = <ExpenseConstructor> {
         id: id,
         amount: underscore.sample(underscore.range(0, 100)),
         currency: 'EUR',
@@ -38,6 +39,9 @@ export function dummyExpense(id: number) {
 }
 
 export class Expense implements IExpense {
+    public comparator(b: IExpense): number {
+        return this.id - b.id // sort descendigly
+    }
 
     public id: ExpenseIdType;
     public amount: number;
@@ -57,21 +61,21 @@ export class Expense implements IExpense {
 
     // TODO `recurring` flag + date
 
-    constructor(obj: ExpenseConstructor) {
+    constructor(constructorObj: ExpenseConstructor) {
 
-        this.id = obj.id;
-        this.amount = obj.amount;
-        this.currency = obj.currency;
+        this.id = constructorObj.id;
+        this.amount = constructorObj.amount;
+        this.currency = constructorObj.currency;
 
-        this.name = obj.name;
-        this.tags = obj.tags;
-        this.timestamp_utc = obj.timestamp_utc;
-        this.timestamp_utc_updated = obj.timestamp_utc_updated || obj.timestamp_utc
-        this.timestamp_utc_created = obj.timestamp_utc_created || obj.timestamp_utc
+        this.name = constructorObj.name;
+        this.tags = constructorObj.tags;
+        this.timestamp_utc = constructorObj.timestamp_utc;
+        this.timestamp_utc_updated = constructorObj.timestamp_utc_updated || constructorObj.timestamp_utc
+        this.timestamp_utc_created = constructorObj.timestamp_utc_created || constructorObj.timestamp_utc
     }
 
     public static createEmptyExpense(): IExpense {
-        return {
+        return new Expense({
             id: null,
             amount: null,
             currency: userPreferredCurrency,
@@ -80,6 +84,6 @@ export class Expense implements IExpense {
             timestamp_utc: currentTimeUTC(),
             timestamp_utc_created: currentTimeUTC(),
             timestamp_utc_updated: currentTimeUTC(),
-        }
+        })
     }
 }
