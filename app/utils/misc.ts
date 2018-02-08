@@ -38,3 +38,10 @@ export function ObservableProperty() {
 
 //https://stackoverflow.com/a/42516869/4509634
 export const propertyOf = <TObj>(name: keyof TObj) => name;
+
+
+export enum COMPARE_RESULT {
+    SMALLER = -1,
+    EQUAL = 0,
+    LARGER = 1
+}

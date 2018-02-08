@@ -8,7 +8,7 @@
  * When a call is made to the datastore, the call will firs be forwarded to the API facade.
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
-import {ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
@@ -105,9 +105,9 @@ export class DataStore implements IDataStore {
         this.expenses.push(exp)
 
         // TODO ensure expenses are sorted
-        if (this.expenses.length > 1 && this.expenses.getItem(0).id < this.expenses.getItem(1).id) {
+        if (this.expenses.length > 1 && this.expenses.getItem(0).compare(this.expenses.getItem(1)) < 0) {  //todo assumes numerical ids
             console.error("fucked up, duct-taping"); //todo send this to an online log repository
-            this.expenses.sort((a, b) => b.id - a.id)
+            this.expenses.sort(Expense.comparator) // todo assumes numerical ids
         }
 
     }
