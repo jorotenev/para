@@ -2,6 +2,8 @@ import {userPreferredCurrency} from "~/app_config";
 import {currentTimeUTC} from "~/utils/time";
 import * as underscore from "underscore"
 import {COMPARE_RESULT} from "~/utils/misc";
+import {expense_schema} from "~/models/expense_json_schema";
+import * as tv4 from "tv4"
 
 export type ExpenseIdType = number;
 
@@ -39,9 +41,20 @@ export function dummyExpense(id: number) {
     return new Expense(e);
 }
 
+
 export class Expense implements IExpense {
     public compare(b: IExpense): COMPARE_RESULT {
         return Expense.comparator(this, b)// sort descendigly
+    }
+
+    public static validate(exp): void {
+        let validationResult = tv4.validateResult(exp, expense_schema)
+        console.dir(validationResult)
+        if (!validationResult.valid) {
+            let err = validationResult.error
+            let msg = err.dataPath + ": " + err.message
+            throw msg
+        }
     }
 
     public static comparator(a: IExpense, b: IExpense): COMPARE_RESULT {

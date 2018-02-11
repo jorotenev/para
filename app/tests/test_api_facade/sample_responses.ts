@@ -1,4 +1,4 @@
-import {Expense, ExpenseConstructor} from "~/models/expense";
+import {ExpenseConstructor} from "~/models/expense";
 
 
 export let ten_expenses: ExpenseConstructor[] = [
@@ -11,9 +11,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "work",
             "sport"
         ],
-        "timestamp_utc": "2017-10-29T09:09:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:09:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:09:21.853071",
+        "timestamp_utc": "2017-10-29T09:09:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:09:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:09:21.853071Z",
     },
     {
         "id": 2,
@@ -23,9 +23,9 @@ export let ten_expenses: ExpenseConstructor[] = [
         "tags": [
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:10:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:10:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:10:21.853071",
+        "timestamp_utc": "2017-10-29T09:10:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:10:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:10:21.853071Z",
     },
     {
         "id": 3,
@@ -37,9 +37,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "work",
             "home"
         ],
-        "timestamp_utc": "2017-10-29T09:11:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:11:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:11:21.853071",
+        "timestamp_utc": "2017-10-29T09:11:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:11:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:11:21.853071Z",
     },
     {
         "id": 4,
@@ -51,9 +51,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "sport",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:12:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:12:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:12:21.853071",
+        "timestamp_utc": "2017-10-29T09:12:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:12:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:12:21.853071Z",
     },
     {
         "id": 5,
@@ -65,9 +65,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "home",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:13:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:13:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:13:21.853071",
+        "timestamp_utc": "2017-10-29T09:13:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:13:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:13:21.853071Z",
     },
     {
         "id": 6,
@@ -77,9 +77,9 @@ export let ten_expenses: ExpenseConstructor[] = [
         "tags": [
             "work"
         ],
-        "timestamp_utc": "2017-10-29T09:14:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:14:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:14:21.853071",
+        "timestamp_utc": "2017-10-29T09:14:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:14:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:14:21.853071Z",
     },
     {
         "id": 7,
@@ -91,9 +91,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "home",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:15:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:15:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:15:21.853071",
+        "timestamp_utc": "2017-10-29T09:15:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:15:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:15:21.853071Z",
     },
     {
         "id": 8,
@@ -101,9 +101,9 @@ export let ten_expenses: ExpenseConstructor[] = [
         "amount": 132,
         "currency": "EUR",
         "tags": [],
-        "timestamp_utc": "2017-10-29T09:16:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:16:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:16:21.853071",
+        "timestamp_utc": "2017-10-29T09:16:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:16:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:16:21.853071Z",
     },
     {
         "id": 9,
@@ -114,9 +114,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "vacation",
             "vacation"
         ],
-        "timestamp_utc": "2017-10-29T09:17:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:17:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:17:21.853071",
+        "timestamp_utc": "2017-10-29T09:17:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:17:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:17:21.853071Z",
     },
     {
         "id": 10,
@@ -128,9 +128,9 @@ export let ten_expenses: ExpenseConstructor[] = [
             "vacation",
             "work"
         ],
-        "timestamp_utc": "2017-10-29T09:18:21.853071",
-        "timestamp_utc_created": "2017-10-29T09:18:21.853071",
-        "timestamp_utc_updated": "2017-10-29T09:18:21.853071",
+        "timestamp_utc": "2017-10-29T09:18:21.853071Z",
+        "timestamp_utc_created": "2017-10-29T09:18:21.853071Z",
+        "timestamp_utc_updated": "2017-10-29T09:18:21.853071Z",
     }
 ];
-export const SINGLE_EXPENSE : ExpenseConstructor= Object.freeze(new Expense(ten_expenses[0]));
+export const SINGLE_EXPENSE : ExpenseConstructor= Object.freeze(ten_expenses[0]);
