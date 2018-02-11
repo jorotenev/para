@@ -31,7 +31,7 @@ describe("Testing the Expense class", function () {
     });
 });
 
-fdescribe("test the expense validator", function () {
+describe("test the expense validator", function () {
 
     it("valid expenses are valid", function () {
         let shouldntBoom = () => Expense.validate(SINGLE_EXPENSE)
