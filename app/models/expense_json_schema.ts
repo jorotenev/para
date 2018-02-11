@@ -26,5 +26,4 @@ export let expense_schema = {
         }
     },
     "required": ["id", "name", "amount", "tags", "currency", "timestamp_utc", "timestamp_utc_created", "timestamp_utc_updated"]
-
 };
