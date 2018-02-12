@@ -55,7 +55,7 @@ export function onPullToRefreshInitiated() {
      * on refresh:
      *  - gather the ids of the expenses in the current list and when they were updated //todo
      *  - send them to the api
-     *    - the api will return to arrays - 1) objects that have been updated (have newer `updated_at`)
+     *    - the api will return to arrays - 1) objects that have been updated (have newer `timestamp_utc_updated`)
      *      2) objects that have newer IDs than the newest in the list
      * */
     console.log("onPullToRefreshInitiated");

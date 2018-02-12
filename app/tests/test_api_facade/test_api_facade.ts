@@ -263,11 +263,11 @@ describe("test the sync() method of the API facade", function () {
         this.request = <SyncRequest>  [
             {
                 id: 1,
-                updated_at: ''
+                timestamp_utc_updated: ''
             },
             {
                 id: 2,
-                updated_at: ''
+                timestamp_utc_updated: ''
             }
         ];
 

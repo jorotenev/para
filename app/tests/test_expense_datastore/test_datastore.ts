@@ -71,7 +71,7 @@ describe("For all methods of the DataStore", function () {
             },
             sync: {
                 mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync'),
-                methodArgument: [<SyncRequest>[{id: 1, updated_at: ''}]],
+                methodArgument: [<SyncRequest>[{id: 1, timestamp_utc_updated: ''}]],
                 apiResolvesWith: <SyncResponse>{to_add: [], to_update: [], to_remove: []},
                 call: (ds: DataStore) => {
                     return ds.sync.apply(ds, mocks.sync.methodArgument)
@@ -375,7 +375,7 @@ describe('testing the sync() method of the DataStore', function () {
         ten_expenses.slice(0, 3).forEach(exp => {
             this.request.push({
                 id: exp.id,
-                updated_at: exp.timestamp_utc_updated
+                timestamp_utc_updated: exp.timestamp_utc_updated
             })
         })
     });

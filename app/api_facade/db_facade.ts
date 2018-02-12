@@ -154,7 +154,7 @@ export interface SyncResponse {
     to_remove: ExpenseIdType[]
 }
 
-export type SyncRequest = { id: ExpenseIdType, updated_at: string }[]
+export type SyncRequest = { id: ExpenseIdType, timestamp_utc_updated: string }[]
 
 
 function validateSyncResponse(response: any) { // todo make it more robust
