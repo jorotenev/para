@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "server id 1",
-    "amount": 12,
+    "amount": 12.5,
     "currency": "EUR",
     "tags": [
       "work",
