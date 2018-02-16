@@ -23,11 +23,20 @@ export interface ResponseError {
     readonly raw?: RawResponseError
 }
 
+interface RequestOpts {
+    url: string,
+    method?: HTTPMethod,
+    payload?:any,
+    timeout?: number
+}
+
 
 export class Utils {
     static readonly tokenHeader = "x-firebase-auth-token";
-
-    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout = 3000): Promise<any> {
+    static makeRequestOpts(opts:RequestOpts){
+        return Utils.makeRequest(opts.url, opts.method, opts.payload, opts.timeout)
+    }
+    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout : number = 3000): Promise<any> {
         let jsonPayload = null;
         try {
             jsonPayload = this.validateAndStringifyPayload(payload)
