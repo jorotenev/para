@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "0d252a9e-4cb4-4da1-b483-8d2d0c0753b4",
     "name": "server id 1",
     "amount": 12.5,
     "currency": "EUR",
@@ -13,7 +13,7 @@
     "timestamp_utc_updated": "2017-10-29T09:09:21.853071Z"
   },
   {
-    "id": 2,
+    "id": "fa8b1e8c-dfbd-4123-98fb-c0a4823ee520",
     "name": "server id 2",
     "amount": 118,
     "currency": "EUR",
@@ -25,7 +25,7 @@
     "timestamp_utc_updated": "2017-10-29T09:10:21.853071Z"
   },
   {
-    "id": 3,
+    "id": "db29ed23-a7ee-4448-96cd-ab37c7e83f57",
     "name": "server id 3",
     "amount": 159,
     "currency": "EUR",
@@ -39,7 +39,7 @@
     "timestamp_utc_updated": "2017-10-29T09:11:21.853071Z"
   },
   {
-    "id": 4,
+    "id": "1f3cb03e-f8e1-4d5c-bbde-a9ef3ea455f8",
     "name": "server id 4",
     "amount": 5,
     "currency": "EUR",
@@ -53,7 +53,7 @@
     "timestamp_utc_updated": "2017-10-29T09:12:21.853071Z"
   },
   {
-    "id": 5,
+    "id": "f97fa2ab-66be-40bd-bf7e-f1fd5eae8401",
     "name": "server id 5",
     "amount": 184,
     "currency": "EUR",
@@ -67,7 +67,7 @@
     "timestamp_utc_updated": "2017-10-29T09:13:21.853071Z"
   },
   {
-    "id": 6,
+    "id": "bd793e01-cae9-4ff8-a0fe-94acd8efcbf7",
     "name": "server id 6",
     "amount": 191,
     "currency": "EUR",
@@ -79,7 +79,7 @@
     "timestamp_utc_updated": "2017-10-29T09:14:21.853071Z"
   },
   {
-    "id": 7,
+    "id": "dff1e980-8f21-4450-a334-fa26eb6c4bd5",
     "name": "server id 7",
     "amount": 134,
     "currency": "EUR",
@@ -93,7 +93,7 @@
     "timestamp_utc_updated": "2017-10-29T09:15:21.853071Z"
   },
   {
-    "id": 8,
+    "id": "d7df5e82-c05f-426e-99b1-2153f65cf802",
     "name": "server id 8",
     "amount": 132,
     "currency": "EUR",
@@ -103,7 +103,7 @@
     "timestamp_utc_updated": "2017-10-29T09:16:21.853071Z"
   },
   {
-    "id": 9,
+    "id": "402cb195-a033-4891-8a69-b8d6e7201067",
     "name": "server id 9",
     "amount": 71,
     "currency": "EUR",
@@ -116,7 +116,7 @@
     "timestamp_utc_updated": "2017-10-29T09:17:21.853071Z"
   },
   {
-    "id": 10,
+    "id": "5501735d-99ac-41b9-9c23-1d612d22dc2a",
     "name": "server id 10",
     "amount": 95,
     "currency": "EUR",
