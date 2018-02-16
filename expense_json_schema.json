@@ -11,7 +11,7 @@
         }
     },
     "properties": {
-        "id": {"type": ["number", "null"]},
+        "id": {"type": ["string", "null"]},
         "name": {"type": "string"},
         "amount": {"type": "number"},
         "tags": {"type": "array", "items": {"type": "string"}},
