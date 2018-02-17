@@ -56,7 +56,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
-    static readonly DELETERemoveEndpoint = u.template(`${EXPENSES_API_ENDPOINT}remove/<%= id %>`);
+    static readonly DELETERemove = `${EXPENSES_API_ENDPOINT}remove`;
     static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`;
 
     persist(exp: IExpense): Promise<IExpense> {
@@ -94,9 +94,9 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
             return Promise.reject(<ResponseError>{reason: "Can't delete an expense without an id"})
         }
         const id = exp.id;
-        const url = ExpenseDatabaseFacade.DELETERemoveEndpoint({id: id});
+        const url = ExpenseDatabaseFacade.DELETERemove;
 
-        return Utils.makeRequest(url, HTTPMethod.DELETE, {id: id}).catch(err => {
+        return Utils.makeRequest(url, HTTPMethod.DELETE, exp).catch(err => {
             throw {reason: err.msg, raw: err}
         });
 
