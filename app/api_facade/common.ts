@@ -32,11 +32,12 @@ interface RequestOpts {
 
 
 export class Utils {
+    static readonly default_timeout = 3000
     static readonly tokenHeader = "x-firebase-auth-token";
     static makeRequestOpts(opts:RequestOpts){
         return Utils.makeRequest(opts.url, opts.method, opts.payload, opts.timeout)
     }
-    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout : number = 3000): Promise<any> {
+    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout : number = Utils.default_timeout): Promise<any> {
         let jsonPayload = null;
         try {
             jsonPayload = this.validateAndStringifyPayload(payload)
