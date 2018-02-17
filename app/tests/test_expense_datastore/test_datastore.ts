@@ -3,7 +3,7 @@ import {Expense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
 import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
-import {SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {GetListOpts, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 
 /**
  * proxy = DataStore
@@ -54,7 +54,7 @@ describe("For all methods of the DataStore", function () {
             },
             get_list: {
                 mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'get_list'),
-                methodArgument: [1, 1],
+                methodArgument: [<GetListOpts>{start_from: persisted, batch_size: 1}],
                 apiResolvesWith: [persisted],
                 call: (ds: DataStore) => {
                     ds._addExpense(persisted);
@@ -130,11 +130,14 @@ describe("For all methods of the DataStore", function () {
             // verify that the datastore has called the API with the same argument
             setTimeout(() => {
                 Object.keys(mocks).forEach((methodName) => {
+                    if (methodName === 'get_list') {
+                        console.dir(mocks[methodName].mock.calls.first())
+                    }
                     expect(mocks[methodName].mock).toHaveBeenCalledTimes(1);
                     expect(mocks[methodName].mock).toHaveBeenCalledWith(...mocks[methodName].methodArgument)
                 });
                 done()
-            }, 1000)
+            }, 500)
 
 
         });
@@ -360,8 +363,11 @@ describe('testing the get_list() method of the DataStore', function () {
         let dataStore = cleanDataStore();
         dataStore._addExpense(exp);
         this.mockedGetList.and.returnValue(Promise.resolve({...exp, id: 2}));
-
-        dataStore.get_list(2, 1).then((_) => {
+        let request_opts: GetListOpts = {
+            start_from: new Expense(ten_expenses[1]),
+            batch_size: 1
+        };
+        dataStore.get_list(request_opts).then((_) => {
             expect(dataStore.expenses.indexOf(exp)).toEqual(0);
             expect(dataStore.expenses.length).toEqual(1);
             done();

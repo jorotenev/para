@@ -32,21 +32,34 @@ export interface IExpenseDatabaseFacade {
 
     get_single(id: ExpenseIdType): Promise<IExpense>
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]>
+    get_list(opts: GetListOpts): Promise<IExpense[]>
 
     sync(request: SyncRequest): Promise<SyncResponse>
-
 }
 
+export enum Order {
+    asc = 'asc',
+    desc = 'desc'
+}
+
+export interface GetListOpts {
+    start_from: IExpense | null,
+    batch_size?: number
+    sort_order?: Order,
+    sort_on?: keyof IExpense
+}
 
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
-    static readonly GETListEndpointTemplate = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
+    static readonly GETListEndpointTemplate =
+        u.template(
+            `${EXPENSES_API_ENDPOINT}get_expenses_list?<%= start_from_id %>&start_from_property=<%= start_from_property %>&start_from_property_value=<%=start_from_property_value%>&order_direction=<%= order_direction %>`
+        );
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
     static readonly DELETERemoveEndpoint = u.template(`${EXPENSES_API_ENDPOINT}remove/<%= id %>`);
-    static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`
+    static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`;
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
@@ -102,12 +115,31 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
-        let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
-            startFromId: startFromId,
-            batchSize: batchSize
-        });
+    get_list(opts: GetListOpts): Promise<IExpense[]> {
+        // the app doesn't need to know what the server requries as a parameter, so here we extract
+        // whatever the server expects
 
+        let defaults = {
+            start_from: null,
+            batch_size: 10,
+            sort_order: Order.desc,
+            sort_on: 'timestamp_utc',
+        };
+
+        let options = {
+            ...defaults,
+            ...opts
+        };
+
+        let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
+            start_from_id: !!options.start_from ? options.start_from.id : null,
+            start_from_property: options.sort_on,
+            start_from_property_value: !!options.start_from ? options.start_from[options.sort_on] : null,
+
+            order_direction: Order.desc,
+            batch_size: options.batch_size,
+
+        });
         return new Promise(function (resolve, reject: (reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(function (json) {
                 try {
@@ -128,6 +160,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
+        //todo SyncRequest should contain IExpene object, and the current method extracts whatever the API expects
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
         return Utils.makeRequest(url, HTTPMethod.GET, request)
             .then((response: SyncResponse) => {

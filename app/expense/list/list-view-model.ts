@@ -2,6 +2,7 @@ import {Observable} from "tns-core-modules/data/observable";
 import {ExpenseConstructor, ExpenseIdType, IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
+import {GetListOpts} from "~/api_facade/db_facade";
 
 let dialogs = require("ui/dialogs");
 let http = require('http');
@@ -105,17 +106,22 @@ class ExpensesHandler extends ExpensesListManager {
             console.log("Trying to loadmoreitems before there're any expenses")
             return Promise.reject("not initialized")
         }
-        const startFromID = Math.min(...this.expensesIds) - 1;
-
-        return this.fetchItems(startFromID).then(() => {
+        // const startFromID = Math.min(...this.expensesIds) - 1;
+        let last = this.datastore.expenses[this.datastore.expenses.length - 1]
+        return this.fetchItems(last).then(() => {
                 console.log("loadMoreItems promise returned")
                 return
             }
         )
     }
 
-    private fetchItems(startFrom: number | null): Promise<IExpense[]> {
-        return this.datastore.get_list(startFrom, this.batchSize)
+    private fetchItems(startFrom: IExpense | null): Promise<IExpense[]> {
+        let request_opts: GetListOpts = {
+            batch_size: this.batchSize,
+            start_from: startFrom,
+        }
+
+        return this.datastore.get_list(request_opts)
             .then(list => {
                 list.forEach(exp => {
                     this.datastore._addExpense(exp);

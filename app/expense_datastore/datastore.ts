@@ -10,7 +10,9 @@
  */
 import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
 import {
-    ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade, SyncRequest,
+    ExpenseDatabaseFacade as _ExpenseDatabaseFacade,
+    IExpenseDatabaseFacade,
+    SyncRequest,
     SyncResponse
 } from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
@@ -100,7 +102,7 @@ export class DataStore implements IDataStore {
         return this.proxyTarget.get_single.apply(this.proxyTarget, arguments);
     }
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
+    get_list(request_opts): Promise<IExpense[]> {
         return this.proxyTarget.get_list.apply(this.proxyTarget, arguments);
     }
 

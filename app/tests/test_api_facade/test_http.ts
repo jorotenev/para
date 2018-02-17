@@ -117,8 +117,7 @@ describe("Test of the Utils.makeRequest()", function () {
 
     it("if the auth token can't be obtained, " +
         "no request is made and the promise is rejected with a suitable msg", function (done) {
-        this.mockedFirebase.and.callThrough();
-        this.mockedHTTP.and.callThrough();
+        this.mockedFirebase.and.returnValue(Promise.reject(''));
         const that = this;
         Utils.makeRequest('whatevs').then(function (_) {
             fail("Promise should have been rejected");
@@ -151,7 +150,7 @@ describe("Test of the Utils.makeRequest()", function () {
     });
 });
 
-fdescribe("Test the Utils.makeRequestOpts()", function() {
+describe("Test the Utils.makeRequestOpts()", function () {
     beforeAll(function () {
         this.url = 'some url'
         this.method = HTTPMethod.GET
@@ -165,9 +164,9 @@ fdescribe("Test the Utils.makeRequestOpts()", function() {
         this.mockedMakeRequest.calls.reset()
     })
 
-    it("makeRequest gets called with correct args", function(){
+    it("makeRequest gets called with correct args", function () {
         let url = 'some url'
-        Utils.makeRequestOpts({url:this.url, method:this.method, payload:this.payload, timeout:this.timeout})    
+        Utils.makeRequestOpts({url: this.url, method: this.method, payload: this.payload, timeout: this.timeout})
 
         expect(this.mockedMakeRequest.calls.count()).toBe(1)
         expect(this.mockedMakeRequest).toHaveBeenCalledWith(this.url, this.method, this.payload, this.timeout)

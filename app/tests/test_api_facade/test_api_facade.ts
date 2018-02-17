@@ -1,4 +1,4 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade, GetListOpts, Order, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
 import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
@@ -8,11 +8,15 @@ import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 let u = require('underscore');
 
 const promised_ten_results: Promise<ExpenseConstructor[]> = Promise.resolve(ten_expenses);
+const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1])
 
-
-export function testListExpenses(expenses: IExpense[], startFromId: number, batchSize: number) {
+export function testListExpenses(expenses: IExpense[], startFrom: IExpense, batchSize: number) {
     expect(typeof expenses).toBe(typeof []);
-    expect(expenses[0].id).toBe(startFromId);
+    expenses.forEach((exp) => {
+        let validateFunc = () => Expense.validate(exp)
+        expect(validateFunc).not.toThrow()
+    })
+
     expect(expenses.length).toBe(batchSize);
 }
 
@@ -42,16 +46,8 @@ function setUpAfterEach() {
 describe("Testing the get_expenses_list() of  db facade", () => {
 
     beforeAll(function () {
-        this.startFromId = 1;
-        this.batchSize = 10;
-        this.endpointURL = ExpenseDatabaseFacade.GETListEndpointTemplate({
-            startFromId: this.startFromId,
-            batchSize: this.batchSize
-        });
-
-        // sanity checking
-        expect(this.endpointURL).toBe(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=${this.startFromId}&batch_size=${this.batchSize}`);
-
+        this.batch_size = 9;
+        this.endpointURLTemplate = ExpenseDatabaseFacade.GETListEndpointTemplate;
     });
 
     beforeEach(function () {
@@ -62,21 +58,30 @@ describe("Testing the get_expenses_list() of  db facade", () => {
     });
 
     it("api/get_expenses_list - requesting a list, returns a valid list", function (done) {
-        const startFromId = this.startFromId;
-        const batchSize = this.batchSize;
-        // mock the API: set the return value of the mocked http.getJSON function
-        this.mockedRequest.and.returnValue(promised_ten_results);
-
-        // call the method that we actually test now
-        let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(startFromId, batchSize);
-        expect(this.mockedRequest.calls.first().args).toEqual([this.endpointURL]);
+        const startFrom: IExpense = <IExpense> newest_expense;
+        let two_expenses = [ten_expenses[0], ten_expenses[1]];
+        this.mockedRequest.and.returnValue(Promise.resolve(two_expenses));
+        let request_opts: GetListOpts = {
+            start_from: startFrom,
+            batch_size: this.batch_size
+        };
+        let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(request_opts);
+        expect(this.mockedRequest).toHaveBeenCalledWith(this.endpointURLTemplate({
+            start_from_id: startFrom.id,
+            start_from_property: 'timestamp_utc',
+            start_from_property_value: startFrom.timestamp_utc,
+            batchSize: this.batchSize,
+            order_direction: Order.desc
+        }));
 
 
         // the result of the tested method invocation is of correct shape
         expect(resultAsPromise && !!resultAsPromise.then && typeof resultAsPromise.then === 'function').toBe(true);
 
+        let response_size = two_expenses.length;
         resultAsPromise.then(function (payload) {
-            testListExpenses(payload, startFromId, batchSize);
+            testListExpenses(payload, startFrom, response_size);
+            //todo more tests here
             done()
         }).catch(function (err: ResponseError) {
             fail(err.reason);
@@ -89,8 +94,11 @@ describe("Testing the get_expenses_list() of  db facade", () => {
             // pretend that calling the API resulted in an error
             let error: Promise<IExpense[]> = Promise.reject(new Error("Some expected testing error"));
             this.mockedRequest.and.returnValue(error);
-
-            let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(this.startFromId, this.batchSize);
+            let request_opts: GetListOpts = {
+                start_from: new Expense(newest_expense),
+                batch_size: this.batch_size
+            };
+            let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(request_opts);
 
             resultAsPromise.then(() => {
                 fail("Promise should have been rejected.");
