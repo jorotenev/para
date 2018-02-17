@@ -127,7 +127,6 @@ describe("Test of the Utils.makeRequest()", function () {
             expect(that.mockedHTTP.calls.count()).toEqual(0);
             done();
         });
-
     });
 
     it("request headers include auth token", function (done) {

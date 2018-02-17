@@ -61,14 +61,6 @@ describe("For all methods of the DataStore", function () {
                     return ds.get_list.apply(ds, mocks.get_list.methodArgument)
                 }
             },
-            get_single: {
-                mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'get_single'),
-                methodArgument: [1],
-                apiResolvesWith: persisted,
-                call: (ds) => {
-                    return ds.get_single.apply(ds, mocks.get_single.methodArgument)
-                }
-            },
             sync: {
                 mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync'),
                 methodArgument: [<SyncRequest>[{id: 1, timestamp_utc_updated: ''}]],
@@ -321,31 +313,6 @@ describe("testing the remove() methods of the DataStore", function () {
         }, fail)
 
     })
-});
-
-describe('testing the get_single() method of the DataStore', function () {
-
-    beforeEach(function () {
-        this.mockedGetSingle = <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_single');
-        this.mockedGetSingle.and.callThrough();
-    });
-    afterEach(function () {
-        this.mockedGetSingle.calls.reset();
-        this.mockedGetSingle.and.callThrough();
-    });
-    it("invoking get_single() doesn't change the contents of DataStore.expenses", function (done) {
-
-        this.mockedGetSingle.and.returnValue(Promise.resolve(persisted));
-
-        let dataStore = cleanDataStore();
-        dataStore._addExpense(persisted);
-        dataStore.get_single(persisted.id).then(e => {
-            expect(dataStore.expenses.indexOf(persisted)).toEqual(0);
-            expect(dataStore.expenses.length).toEqual(1);
-            done()
-        }, fail)
-    });
-
 });
 
 describe('testing the get_list() method of the DataStore', function () {

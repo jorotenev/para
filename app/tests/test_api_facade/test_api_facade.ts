@@ -111,50 +111,6 @@ describe("Testing the get_expenses_list() of  db facade", () => {
 
 });
 
-describe("Testing the get_single() of the db facade", function () {
-    beforeEach(function () {
-        setUpBeforeEach.call(this);
-        this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
-    });
-    afterEach(function () {
-        setUpAfterEach.call(this)
-    });
-
-
-    it("method should return a promise", function () {
-        let expensePromise = new ExpenseDatabaseFacade().get_single(1);
-
-        expect(typeof expensePromise.then).toBe('function')
-    });
-
-    it("when the 'then' of the promise is called, it receives an Expense as a parameter",
-        function (done) {
-            new ExpenseDatabaseFacade().get_single(1).then(function (data: IExpense) {
-                    const expectedKeys = ["id", "timestamp_utc", "amount", "currency", "name", "tags"];
-
-                    let responseKeys = Object.keys(data);
-                    expect(u.intersection(expectedKeys, responseKeys)).toEqual(expectedKeys);
-                    done()
-                },
-                function () {
-                    fail("Rejected called on a promise, but expected resolved to be called");
-                    done();
-                })
-        });
-    it("the promise which get_single returns is rejected if the server doesn't return correctly",
-        function (done) {
-            this.mockedRequest.and.returnValue(Promise.reject(""));
-
-            new ExpenseDatabaseFacade().get_single(1).then(function () {
-                fail();
-                done()
-            }, function (err: ResponseError) {
-
-                expect(err.reason.indexOf("Cannot find expense with id 1") !== -1).toBe(true);
-                done()
-            })
-        })
-});
 
 describe('Testing the persist() of the db facade', function () {
     beforeEach(function () {

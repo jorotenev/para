@@ -30,8 +30,6 @@ export interface IExpenseDatabaseFacade {
 
     remove(exp: IExpense): Promise<void>
 
-    get_single(id: ExpenseIdType): Promise<IExpense>
-
     get_list(opts: GetListOpts): Promise<IExpense[]>
 
     sync(request: SyncRequest): Promise<SyncResponse>
@@ -103,17 +101,6 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         });
 
     }
-
-
-    get_single(id: ExpenseIdType): Promise<IExpense> {
-        let url = ExpenseDatabaseFacade.GETSingleEndpoint({id: id});
-        return new Promise<IExpense>(function (resolve, reject: (reason?: ResponseError) => void) {
-            Utils.makeRequest(url).then(resolve, function (err) {
-                reject({"reason": "Cannot find expense with id " + id + ". Reason: " + err, "raw": err});
-            })
-        });
-    }
-
 
     get_list(opts: GetListOpts): Promise<IExpense[]> {
         // the app doesn't need to know what the server requries as a parameter, so here we extract

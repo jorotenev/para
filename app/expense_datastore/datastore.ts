@@ -98,9 +98,6 @@ export class DataStore implements IDataStore {
             })
     }
 
-    get_single(id: ExpenseIdType): Promise<IExpense> {
-        return this.proxyTarget.get_single.apply(this.proxyTarget, arguments);
-    }
 
     get_list(request_opts): Promise<IExpense[]> {
         return this.proxyTarget.get_list.apply(this.proxyTarget, arguments);
