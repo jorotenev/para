@@ -44,7 +44,7 @@ export function dummyExpense(id: number) {
 
 export class Expense implements IExpense {
     public compare(b: IExpense): COMPARE_RESULT {
-        return Expense.comparator(this, b)// sort descendigly
+        return Expense.comparator(this, b)
     }
 
     public static validate(exp): void {
@@ -58,10 +58,9 @@ export class Expense implements IExpense {
     }
 
     public static comparator(a: IExpense, b: IExpense): COMPARE_RESULT {
-        let result = a.id - b.id;
-        if (result > 0) {
+        if (a.timestamp_utc > b.timestamp_utc) {
             return COMPARE_RESULT.LARGER
-        } else if (result < 0) {
+        } else if (b.timestamp_utc > a.timestamp_utc) {
             return COMPARE_RESULT.SMALLER
         } else {
             return COMPARE_RESULT.EQUAL

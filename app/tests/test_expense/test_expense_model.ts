@@ -5,18 +5,17 @@ import {COMPARE_RESULT} from "~/utils/misc";
 describe("Testing the Expense class", function () {
 
     it("sorting via the static comparator works as expected", function () {
-        let first_expense = ten_expenses[0];
-        let second_expense = ten_expenses[1];
-        let third_expense = ten_expenses[2];
+        let first_expense = new Expense(ten_expenses[0]);
+        let second_expense = new Expense(ten_expenses[1]);
+        let third_expense = new Expense(ten_expenses[2]);
         let expenses = [
-            new Expense(third_expense),
-            new Expense(second_expense),
-            new Expense(first_expense),
+            third_expense,
+            second_expense,
+            first_expense,
         ];
 
         expenses.sort(Expense.comparator);
-        let ids = expenses.map((e) => e.id);
-        expect(ids).toEqual([first_expense.id, second_expense.id, third_expense.id])
+        expect(expenses).toEqual([first_expense, second_expense, third_expense])
 
     });
 
