@@ -52,6 +52,6 @@
         "timestamp_utc",
         "timestamp_utc_created",
         "timestamp_utc_updated"
-    ]
+    ],
     "additionalProperties": false
 }
