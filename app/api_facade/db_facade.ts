@@ -130,7 +130,14 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         return new Promise(function (resolve, reject: (reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(function (json) {
                 try {
-                    resolve(json.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
+                    let ready: IExpense[] = json.filter(Expense.validate_bool).map(e => new Expense(e));
+
+                    if (ready.length !== json.length) {
+                        console.error("some items in the response didn't validate")
+                        //TODO log this to an exception tracker
+                    }
+
+                    resolve(ready)
                 } catch (err) {
                     let error: ResponseError = {"reason": "Can't parse JSON"};
                     reject(error)
@@ -147,9 +154,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
-        //todo SyncRequest should contain IExpene object, and the current method extracts whatever the API expects
+        let payload = request.map(e => u.pick(e, ['id', 'timestamp_utc', 'timestamp_updated_at']));
+
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
-        return Utils.makeRequest(url, HTTPMethod.GET, request)
+        return Utils.makeRequest(url, HTTPMethod.GET, payload)
             .then((response: SyncResponse) => {
                 try {
                     validateSyncResponse(response)
@@ -174,7 +182,7 @@ export interface SyncResponse {
     to_remove: ExpenseIdType[]
 }
 
-export type SyncRequest = { id: ExpenseIdType, timestamp_utc_updated: string }[]
+export type SyncRequest = ExpenseConstructor[]
 
 
 function validateSyncResponse(response: any) { // todo make it more robust

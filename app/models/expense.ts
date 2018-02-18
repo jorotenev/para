@@ -47,9 +47,18 @@ export class Expense implements IExpense {
         return Expense.comparator(this, b)
     }
 
-    public static validate(exp): void {
+    public static validate_bool(exp): boolean {
+        try {
+            Expense.validate_throw(exp)
+            return true
+        }
+        catch {
+            return false
+        }
+    }
+
+    public static validate_throw(exp): void {
         let validationResult = tv4.validateResult(exp, expense_schema)
-        console.dir(validationResult)
         if (!validationResult.valid) {
             let err = validationResult.error
             let msg = err.dataPath + ": " + err.message

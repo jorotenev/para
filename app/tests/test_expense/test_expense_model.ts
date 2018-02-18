@@ -33,7 +33,7 @@ describe("Testing the Expense class", function () {
 describe("test the expense validator", function () {
 
     it("valid expenses are valid", function () {
-        let shouldntBoom = () => Expense.validate(SINGLE_EXPENSE)
+        let shouldntBoom = () => Expense.validate_throw(SINGLE_EXPENSE)
         expect(shouldntBoom).not.toThrow()
 
     });
@@ -47,7 +47,7 @@ describe("test the expense validator", function () {
         invalidExpenses.push(copy2);
 
         invalidExpenses.forEach(exp => {
-            expect(() => Expense.validate(exp)).toThrow()
+            expect(() => Expense.validate_throw(exp)).toThrow()
         })
 
     });

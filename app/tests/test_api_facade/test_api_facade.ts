@@ -8,14 +8,15 @@ import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 let u = require('underscore');
 
 const promised_ten_results: Promise<ExpenseConstructor[]> = Promise.resolve(ten_expenses);
-const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1])
+const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1]);
 
 export function testListExpenses(expenses: IExpense[], startFrom: IExpense, batchSize: number) {
     expect(typeof expenses).toBe(typeof []);
     expenses.forEach((exp) => {
-        let validateFunc = () => Expense.validate(exp)
+
+        let validateFunc = () => Expense.validate_throw({...exp}); // copy just the `properties` of the expense
         expect(validateFunc).not.toThrow()
-    })
+    });
 
     expect(expenses.length).toBe(batchSize);
 }
@@ -53,6 +54,7 @@ describe("Testing the get_expenses_list() of  db facade", () => {
     beforeEach(function () {
         setUpBeforeEach.call(this)
     });
+
     afterEach(function () {
         setUpAfterEach.call(this)
     });
@@ -225,14 +227,8 @@ describe('Testing the remove() of the db facade', function () {
 describe("test the sync() method of the API facade", function () {
     beforeAll(function () {
         this.request = <SyncRequest>  [
-            {
-                id: 1,
-                timestamp_utc_updated: ''
-            },
-            {
-                id: 2,
-                timestamp_utc_updated: ''
-            }
+            ten_expenses[0],
+            ten_expenses[1]
         ];
 
     });
