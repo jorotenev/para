@@ -15,7 +15,7 @@
   {
     "id": "fa8b1e8c-dfbd-4123-98fb-c0a4823ee520",
     "name": "server id 2",
-    "amount": 118,
+    "amount": 118.1,
     "currency": "EUR",
     "tags": [
       "vacation"
@@ -27,7 +27,7 @@
   {
     "id": "db29ed23-a7ee-4448-96cd-ab37c7e83f57",
     "name": "server id 3",
-    "amount": 159,
+    "amount": 159.1,
     "currency": "EUR",
     "tags": [
       "vacation",
@@ -41,7 +41,7 @@
   {
     "id": "1f3cb03e-f8e1-4d5c-bbde-a9ef3ea455f8",
     "name": "server id 4",
-    "amount": 5,
+    "amount": 5.1,
     "currency": "EUR",
     "tags": [
       "vacation",
@@ -55,7 +55,7 @@
   {
     "id": "f97fa2ab-66be-40bd-bf7e-f1fd5eae8401",
     "name": "server id 5",
-    "amount": 184,
+    "amount": 184.1,
     "currency": "EUR",
     "tags": [
       "sport",
@@ -69,7 +69,7 @@
   {
     "id": "bd793e01-cae9-4ff8-a0fe-94acd8efcbf7",
     "name": "server id 6",
-    "amount": 191,
+    "amount": 191.1,
     "currency": "EUR",
     "tags": [
       "work"
@@ -81,7 +81,7 @@
   {
     "id": "dff1e980-8f21-4450-a334-fa26eb6c4bd5",
     "name": "server id 7",
-    "amount": 134,
+    "amount": 134.1,
     "currency": "EUR",
     "tags": [
       "vacation",
@@ -95,7 +95,7 @@
   {
     "id": "d7df5e82-c05f-426e-99b1-2153f65cf802",
     "name": "server id 8",
-    "amount": 132,
+    "amount": 132.1,
     "currency": "EUR",
     "tags": [],
     "timestamp_utc": "2017-10-29T09:16:21.853071Z",
@@ -105,7 +105,7 @@
   {
     "id": "402cb195-a033-4891-8a69-b8d6e7201067",
     "name": "server id 9",
-    "amount": 71,
+    "amount": 71.1,
     "currency": "EUR",
     "tags": [
       "vacation",
@@ -118,7 +118,7 @@
   {
     "id": "5501735d-99ac-41b9-9c23-1d612d22dc2a",
     "name": "server id 10",
-    "amount": 95,
+    "amount": 95.1,
     "currency": "EUR",
     "tags": [
       "vacation",
