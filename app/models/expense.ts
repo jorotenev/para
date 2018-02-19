@@ -5,7 +5,7 @@ import {COMPARE_RESULT} from "~/utils/misc";
 import {expense_schema} from "~/models/expense_json_schema";
 import * as tv4 from "tv4"
 
-export type ExpenseIdType = string;
+export type ExpenseIdType = number;
 
 
 export interface IExpense {
