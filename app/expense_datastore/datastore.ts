@@ -18,6 +18,7 @@ import {
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import "~/utils/add/ObservableArrayfindIndex"; // imported for its side effects
+import {COMPARE_RESULT} from "~/utils/misc"; // imported for its side effects
 //easier mocking
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
 
@@ -144,7 +145,7 @@ export class DataStore implements IDataStore {
         this.expenses.push(exp);
 
         // TODO ensure expenses are sorted
-        if (this.expenses.length > 1 && this.expenses.getItem(0).compare(this.expenses.getItem(1)) < 0) {  //todo assumes numerical ids
+        if (this.expenses.length > 1 && Expense.comparator(this.expenses.getItem(0), this.expenses.getItem(1)) === COMPARE_RESULT.SMALLER) {
             console.error("fucked up, duct-taping"); //todo send this to an online log repository
             this.expenses.sort((a, b) => {
                 return -1 * Expense.comparator(a, b) // reverse the natural ordering
