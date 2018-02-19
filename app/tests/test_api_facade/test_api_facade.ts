@@ -188,7 +188,14 @@ describe("Testing the update() of the db facade", function () {
 
         let oldInvalidExpense = {...SINGLE_EXPENSE, id: null};
         new ExpenseDatabaseFacade().update(SINGLE_EXPENSE, oldInvalidExpense).then(fail, err => {
-            expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true)
+            expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true);
+            done()
+        })
+    });
+    it('fails if the makeRequest rejects', function (done) {
+        this.mockedRequest.and.returnValue(Promise.reject(<ResponseError>{reason: "musaka"}));
+        new ExpenseDatabaseFacade().update(SINGLE_EXPENSE, SINGLE_EXPENSE).then(fail, err => {
+            expect(err.reason.indexOf("musaka") !== -1).toBe(true);
             done()
         })
     });

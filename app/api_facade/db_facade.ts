@@ -85,7 +85,11 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         if (!exp.id || !old_exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which doesn't have an ID"})
         }
-        return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
+        // return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
+        return Utils.makeRequest(ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT, {
+            updated: exp,
+            previous_stage: old_exp
+        })
     }
 
     private send(exp: IExpense, url: string, method: HTTPMethod): Promise<IExpense> {
