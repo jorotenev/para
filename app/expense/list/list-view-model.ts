@@ -1,5 +1,5 @@
 import {Observable} from "tns-core-modules/data/observable";
-import {ExpenseConstructor, ExpenseIdType, IExpense} from '~/models/expense'
+import {ExpenseIdType, IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 import {GetListOpts} from "~/api_facade/db_facade";
@@ -48,7 +48,7 @@ export interface IExpensesListManager {
     loadMoreItems(ev): Promise<void>;
 
     // add an expense to the list
-    addExpense(exp: ExpenseConstructor): boolean
+    addExpense(exp: IExpense): boolean
 
 }
 
@@ -107,7 +107,7 @@ class ExpensesHandler extends ExpensesListManager {
             return Promise.reject("not initialized")
         }
         // const startFromID = Math.min(...this.expensesIds) - 1;
-        let last = this.datastore.expenses[this.datastore.expenses.length - 1]
+        let last = this.datastore.expenses.getItem(this.datastore.expenses.length - 1)
         return this.fetchItems(last).then(() => {
                 console.log("loadMoreItems promise returned")
                 return

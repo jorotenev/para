@@ -1,13 +1,13 @@
 import {ExpenseDatabaseFacade, GetListOpts, Order, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
-import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
 import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 
 
 let u = require('underscore');
 
-const promised_ten_results: Promise<ExpenseConstructor[]> = Promise.resolve(ten_expenses);
+const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
 const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1]);
 
 export function testListExpenses(expenses: IExpense[], startFrom: IExpense, batchSize: number) {
@@ -97,7 +97,7 @@ describe("Testing the get_expenses_list() of  db facade", () => {
             let error: Promise<IExpense[]> = Promise.reject(new Error("Some expected testing error"));
             this.mockedRequest.and.returnValue(error);
             let request_opts: GetListOpts = {
-                start_from: new Expense(newest_expense),
+                start_from: newest_expense,
                 batch_size: this.batch_size
             };
             let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(request_opts);
@@ -123,7 +123,7 @@ describe('Testing the persist() of the db facade', function () {
         setUpAfterEach.call(this)
     });
     it("persist() resovles if the server returns a valid expense", function (done) {
-        let unsaved = new Expense({...SINGLE_EXPENSE, id: null});
+        let unsaved = {...SINGLE_EXPENSE, id: null};
         this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
 
         new ExpenseDatabaseFacade().persist(unsaved).then(persisted => {
@@ -135,14 +135,15 @@ describe('Testing the persist() of the db facade', function () {
     it("persist() rejects if the server returns a persisted expense with a null id", function (done) {
         let badResponse = {...SINGLE_EXPENSE, id: null};
         this.mockedRequest.and.returnValue(Promise.resolve(badResponse));
-        new ExpenseDatabaseFacade().persist(Expense.createEmptyExpense()).then(fail, err => {
+        new ExpenseDatabaseFacade().persist({...SINGLE_EXPENSE, id: null}).then(fail, err => {
+            console.dir(err)
             expect(err.reason.indexOf('Server returned an expense with a null id after persisting') !== -1).toBe(true);
             done()
         })
     });
 
     it("persist() rejects if an expense with a non-null id is passed", function (done) {
-        let expWithId = new Expense(SINGLE_EXPENSE)
+        let expWithId = {...SINGLE_EXPENSE}
         new ExpenseDatabaseFacade().persist(expWithId).then(fail, (err) => {
             expect(err.reason.indexOf("with an id") !== -1).toBe(true)
             done()
@@ -214,7 +215,7 @@ describe('Testing the remove() of the db facade', function () {
     });
 
     it("trying to delete an expense without an id rejects", function (done) {
-        let exp = Expense.createEmptyExpense();
+        let exp = {...SINGLE_EXPENSE, id: null};
         new ExpenseDatabaseFacade().remove(exp).then(fail, err => {
             expect(err.reason.indexOf("Can't delete an expense without an id") !== -1).toBe(true);
             done()
@@ -226,12 +227,12 @@ describe('Testing the remove() of the db facade', function () {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"asd\":1}", 200)));
 
 
-        let expense = new Expense(SINGLE_EXPENSE);
+        let expense = {...SINGLE_EXPENSE};
         new ExpenseDatabaseFacade().remove(expense).then(done, fail)
     });
 
     it("rejects when the API returns 404 with a reason", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE);
+        let expense = {...SINGLE_EXPENSE};
 
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"error\":\"some reason\"}", 404)));
         new ExpenseDatabaseFacade().remove(expense).then(fail, err => {

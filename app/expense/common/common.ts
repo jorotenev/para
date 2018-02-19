@@ -78,7 +78,6 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
         this.objectHash = hashCode(JSON.stringify(this.expense));
         this.initialTimestampUTC = this.expense.timestamp_utc;
-
         this.expense = this.convertForForm(this.expense);
 
     }
@@ -201,7 +200,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
         exp.timestamp_utc = this.extractTimestampUTC(e);
 
-        return new Expense(exp)
+        return exp
     }
 
     private extractTimestampUTC(e: any) {

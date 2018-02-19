@@ -1,4 +1,4 @@
-import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {apiAddress, apiVersion} from "~/app_config";
 import * as u from 'underscore';
 import {RawResponseError, ResponseError, Utils} from "./common";
@@ -22,7 +22,6 @@ export interface IExpenseDatabaseFacade {
     persist(exp: IExpense): Promise<IExpense>
 
     /**
-     * use the id of an expense; sync the version on the backend with `exp`
      * @param {IExpense} exp - the updated expense
      * @param {IExpense} old_exp - the previous version of `exp`
      * @returns {Promise<IExpense>}
@@ -139,7 +138,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         return new Promise(function (resolve, reject: (reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(function (json) {
                 try {
-                    let ready: IExpense[] = json.filter(Expense.validate_bool).map(e => new Expense(e));
+                    let ready: IExpense[] = json.filter(Expense.validate_bool);
 
                     if (ready.length !== json.length) {
                         console.error("some items in the response didn't validate")
@@ -186,12 +185,12 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 }
 
 export interface SyncResponse {
-    to_add: ExpenseConstructor[]
-    to_update: ExpenseConstructor[]
+    to_add: IExpense[]
+    to_update: IExpense[]
     to_remove: ExpenseIdType[]
 }
 
-export type SyncRequest = ExpenseConstructor[]
+export type SyncRequest = IExpense[]
 
 
 function validateSyncResponse(response: any) { // todo make it more robust

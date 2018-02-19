@@ -1,5 +1,5 @@
 import {DataStore, ExpenseDatabaseFacade} from "~/expense_datastore/datastore"
-import {Expense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
 import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
@@ -255,6 +255,7 @@ describe('testing the update() method of the DataStore', function () {
     it("update()ing an expense via the proxy will update the object held by the proxy with the resolved value " +
         "that the api returned", function (done) {
         let toBeUpdated = {...persisted, amount: 1};
+
         let newAmount = persisted.amount + 1;
         let updated = {...toBeUpdated, amount: newAmount};
         this.mockedUpdate.and.returnValue(Promise.resolve(updated));
@@ -267,6 +268,7 @@ describe('testing the update() method of the DataStore', function () {
             expect(updatedFromApi).toEqual(updated);
             expect(dataStore.expenses.length).toBe(1);
             let ds_exp = dataStore.expenses.getItem(0);
+
             expect(ds_exp.amount).toBe(newAmount);
             done()
         }, fail)
@@ -294,7 +296,7 @@ describe("testing the remove() methods of the DataStore", function () {
     });
     it("rejects if there's not expense with this id", function (done) {
 
-        cleanDataStore().remove(new Expense(SINGLE_EXPENSE)).then(fail, err => {
+        cleanDataStore().remove({...SINGLE_EXPENSE}).then(fail, err => {
             expect(err.reason.indexOf("No such expense in the DataStore") !== -1).toBe(true);
             done();
         })
@@ -332,7 +334,7 @@ describe('testing the get_list() method of the DataStore', function () {
         dataStore._addExpense(exp);
         this.mockedGetList.and.returnValue(Promise.resolve({...exp, id: 2}));
         let request_opts: GetListOpts = {
-            start_from: new Expense(ten_expenses[1]),
+            start_from: {...ten_expenses[1]},
             batch_size: 1
         };
         dataStore.get_list(request_opts).then((_) => {
@@ -370,7 +372,7 @@ describe('testing the sync() method of the DataStore', function () {
         let ds = cleanDataStore();
         ds.sync(this.request).then((response: SyncResponse) => {
             expect(ds.expenses.length).toBe(1);
-            expect(ds.expenses.getItem(0)).toEqual(new Expense(response.to_add[0]));
+            expect(ds.expenses.getItem(0)).toEqual({...response.to_add[0]});
             done()
         }, fail)
 
@@ -386,7 +388,7 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
 
         //sanity checking
         expect(ds.expenses.getItem(0).amount).toBe(SINGLE_EXPENSE.amount);
@@ -408,7 +410,7 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
         ds.sync(this.request).then(response => {
             expect(ds.expenses.length).toBe(1);
             expect(ds.expenses.getItem(0).amount).toBe(new_amount);
@@ -425,13 +427,13 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
-        ds._addExpense(new Expense(ten_expenses[1]));
+        ds._addExpense({...SINGLE_EXPENSE});
+        ds._addExpense({...ten_expenses[1]});
 
         ds.sync(this.request).then(response => {
             expect(ds.expenses.length).toBe(1);
 
-            expect(ds.expenses.getItem(0)).toEqual(new Expense(ten_expenses[1]));
+            expect(ds.expenses.getItem(0)).toEqual({...ten_expenses[1]});
             done()
         }, fail)
     });
@@ -444,17 +446,17 @@ describe("test the _addExpense of the DataStore", function () {
     it("adding through _addExpense adds it to the .expenses of the DataStore", function () {
         let ds = cleanDataStore();
         expect(ds.expenses.length).toBe(0);
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
         expect(ds.expenses.length).toBe(1);
-        expect(ds.expenses.getItem(0)).toEqual(new Expense(SINGLE_EXPENSE))
+        expect(ds.expenses.getItem(0)).toEqual({...SINGLE_EXPENSE})
     });
     it("adding an already managed expense throws an error", function () {
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
 
         try {
-            ds._addExpense(new Expense(SINGLE_EXPENSE));
+            ds._addExpense({...SINGLE_EXPENSE});
             fail()
         } catch (err) {
             expect(err.reason.indexOf("Expenses with the same id") !== -1).toBe(true);
@@ -467,9 +469,9 @@ describe("test the _addExpense of the DataStore", function () {
         let fourth = ten_expenses[3];
         let third = ten_expenses[2];
 
-        ds._addExpense(new Expense(fourth));
-        ds._addExpense(new Expense(sixth));
-        ds._addExpense(new Expense(third));
+        ds._addExpense({...fourth});
+        ds._addExpense({...sixth});
+        ds._addExpense({...third});
 
         expect(ds.expenses.map(exp => exp.id)).toEqual([sixth.id, fourth.id, third.id])
     });
@@ -479,8 +481,8 @@ describe("test the _removeExpense of the DataStore", function () {
 
     it("removes managed expenses", function () {
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(ten_expenses[0]));
-        ds._addExpense(new Expense(ten_expenses[1]));
+        ds._addExpense({...ten_expenses[0]});
+        ds._addExpense({...ten_expenses[1]});
         expect(ds.expenses.length).toBe(2);
 
         ds._removeExpense(ten_expenses[0].id);

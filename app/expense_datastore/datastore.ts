@@ -8,7 +8,7 @@
  * When a call is made to the datastore, the call will firs be forwarded to the API facade.
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
-import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {
     ExpenseDatabaseFacade as _ExpenseDatabaseFacade,
     IExpenseDatabaseFacade,
@@ -17,7 +17,7 @@ import {
 } from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-import "~/utils/add/ObservableArrayfindIndex"; // imported for its side effects
+import "~/utils/add/ObservableArrayfindIndex";
 import {COMPARE_RESULT} from "~/utils/misc"; // imported for its side effects
 //easier mocking
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
@@ -116,17 +116,17 @@ export class DataStore implements IDataStore {
             });
 
             //update
-            response.to_update.forEach((expense: ExpenseConstructor) => {
+            response.to_update.forEach((expense: IExpense) => {
                 let index = this.indexOfExpense(expense)
                 if (index !== -1) {
-                    this.expenses.setItem(index, new Expense(expense))
+                    this.expenses.setItem(index, expense)
                 }
             })
 
             //add
-            response.to_add.forEach((expense: ExpenseConstructor) => {
+            response.to_add.forEach((expense: IExpense) => {
                 try {
-                    this._addExpense(new Expense(expense))
+                    this._addExpense(expense)
 
                 } catch (err) {
                     console.dir(err)
@@ -168,7 +168,7 @@ export class DataStore implements IDataStore {
         return this.indexOfExpense(exp) !== -1
     }
 
-    private indexOfExpense(exp: ExpenseConstructor): number {
+    private indexOfExpense(exp: IExpense): number {
         return this.expenses.findIndex(managed_exp => managed_exp.id === exp.id)
     }
 }
