@@ -10,8 +10,8 @@ import {GetListOpts, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
  * api = ExpenseDatabaseFacade
  */
 
-const exp = Object.freeze(Expense.createEmptyExpense());
-const persisted = Object.freeze({...exp, id: 1});
+const exp : IExpense= Object.freeze({...SINGLE_EXPENSE, id: null});
+const persisted : IExpense = Object.freeze({...exp, id: 'asd'});
 
 function cleanDataStore() {
     DataStore._instance = null;
@@ -36,7 +36,7 @@ describe("For all methods of the DataStore", function () {
             },
             update: {
                 mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'update'),
-                methodArgument: [persisted],
+                methodArgument: [persisted, persisted],
                 apiResolvesWith: persisted,
                 call: (ds) => {
                     ds._addExpense(persisted);
@@ -263,17 +263,18 @@ describe('testing the update() method of the DataStore', function () {
         dataStore._addExpense(toBeUpdated); // doesn't use the api; adds an expense internally to the datastore
         expect(dataStore.expenses.length).toBe(1);
 
-        dataStore.update(toBeUpdated).then((updatedFromApi) => {
+        dataStore.update(updated, toBeUpdated).then((updatedFromApi) => {
             expect(updatedFromApi).toEqual(updated);
             expect(dataStore.expenses.length).toBe(1);
-            expect(dataStore.expenses.getItem(0).amount).toBe(newAmount);
+            let ds_exp = dataStore.expenses.getItem(0);
+            expect(ds_exp.amount).toBe(newAmount);
             done()
         }, fail)
     });
     it("if trying to update an expense that's not in the datastore, " +
         "we get a rejected promise with a suitable msg", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE);
-        cleanDataStore().update(expense).then(fail, err => {
+        let expense = {...SINGLE_EXPENSE};
+        cleanDataStore().update(expense, null).then(fail, err => {
             expect(err.reason.indexOf("not in the datastore") !== -1).toBe(true)
             done()
         })

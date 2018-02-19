@@ -60,12 +60,12 @@ export class DataStore implements IDataStore {
         });
     }
 
-    update(exp: IExpense): Promise<IExpense> {
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense> {
         if (!this.expenseIsManaged(exp)) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which is not in the datastore"})
         }
 
-        return this.proxyTarget.update(exp).then((updated) => {
+        return this.proxyTarget.update(exp, old_exp).then((updated) => {
             // update the object of this datastore with the value resolved from the api
             let indexOfUpdated = this.indexOfExpense(updated);
             if (indexOfUpdated !== -1) {

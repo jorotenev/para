@@ -42,6 +42,8 @@ export interface CommonExpenseViewModel {
 
 abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     private _expense: IExpense;
+
+    private readonly raw_initial_expense: IExpense;
     private readonly mode: ExpenseFormMode;
 
     private activityIndicator: ActivityIndicator;
@@ -55,11 +57,13 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
-        this._expense = options.expense;
+        this.expense = options.expense;
+        this.raw_initial_expense = options.expense;
+
         this.dataform = options.dataform;
         this.page = options.page;
         this.mode = options.mode;
-        this.onSuccessfulOperation = options.onSuccessfulOperation
+        this.onSuccessfulOperation = options.onSuccessfulOperation;
         this.activityIndicator = <ActivityIndicator> this.page.getViewById('busy-ind');
         if (!this.activityIndicator) {
             throw new Error("no activity indicator on page")
@@ -73,7 +77,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
 
         this.objectHash = hashCode(JSON.stringify(this.expense));
-        this.initialTimestampUTC = this.expense.timestamp_utc
+        this.initialTimestampUTC = this.expense.timestamp_utc;
 
         this.expense = this.convertForForm(this.expense);
 
@@ -155,7 +159,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         let facade: IExpenseDatabaseFacade = DataStore.getInstance();
         let apiMethod = {
             [ExpenseFormMode.new]: () => facade.persist(committedExpense),
-            [ExpenseFormMode.update]: () => facade.update(committedExpense),
+            [ExpenseFormMode.update]: () => facade.update(committedExpense, this.raw_initial_expense),
         }[this.mode];
 
         apiMethod().then(function (updatedExpense: IExpense) {

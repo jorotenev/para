@@ -159,20 +159,38 @@ describe("Testing the update() of the db facade", function () {
         setUpAfterEach.call(this)
     });
     it("resolves with the expense that was received from makeRequest", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE)
-        this.mockedRequest.and.returnValue(Promise.resolve(expense));
-        new ExpenseDatabaseFacade().update(expense).then(updated => {
-            expect(updated).toEqual(expense);
+        let expense = {...SINGLE_EXPENSE};
+        let updated: IExpense = {...expense}; // the server updates the ts_updated
+        this.mockedRequest.and.returnValue(Promise.resolve(updated));
+        new ExpenseDatabaseFacade().update(expense, expense).then(exp => {
+            expect(exp).toEqual(updated);
             done()
-        })
+        }, fail)
     });
     it("can't update an expense which doesn't have an id", function (done) {
-        let nonIDExpense = Expense.createEmptyExpense();
-        new ExpenseDatabaseFacade().update(nonIDExpense).then(fail, err => {
+        let nonIDExpense = {...SINGLE_EXPENSE, id: null};
+        new ExpenseDatabaseFacade().update(nonIDExpense, {...SINGLE_EXPENSE}).then(fail, err => {
             expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true);
             done()
         })
-    })
+    });
+    it('fails if the old expense is invalid', function (done) {
+        let newExpense = {...SINGLE_EXPENSE};
+        let oldInvalidExpense = {...SINGLE_EXPENSE, timestamp_utc: ''};
+
+        new ExpenseDatabaseFacade().update(newExpense, oldInvalidExpense).then(fail, err => {
+            expect(err.reason.indexOf("not a valid expense") !== -1).toBe(true);
+            done()
+        })
+    });
+    it("fails if the old expense doesn't have an id", function (done) {
+
+        let oldInvalidExpense = {...SINGLE_EXPENSE, id: null};
+        new ExpenseDatabaseFacade().update(SINGLE_EXPENSE, oldInvalidExpense).then(fail, err => {
+            expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true)
+            done()
+        })
+    });
 });
 
 describe('Testing the remove() of the db facade', function () {

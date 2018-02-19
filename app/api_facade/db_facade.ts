@@ -23,10 +23,11 @@ export interface IExpenseDatabaseFacade {
 
     /**
      * use the id of an expense; sync the version on the backend with `exp`
-     * @param {IExpense} exp
+     * @param {IExpense} exp - the updated expense
+     * @param {IExpense} old_exp - the previous version of `exp`
      * @returns {Promise<IExpense>}
      */
-    update(exp: IExpense): Promise<IExpense>
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense>
 
     remove(exp: IExpense): Promise<void>
 
@@ -73,8 +74,16 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         })
     }
 
-    update(exp: IExpense): Promise<IExpense> {
-        if (!exp.id) {
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense> {
+
+        try {
+            Expense.validate_throw(exp);
+            Expense.validate_throw(old_exp)
+        } catch (err) {
+            console.error(err);
+            return Promise.reject(<ResponseError>{reason: 'One of the arguments is not a valid expense!'})
+        }
+        if (!exp.id || !old_exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which doesn't have an ID"})
         }
         return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
