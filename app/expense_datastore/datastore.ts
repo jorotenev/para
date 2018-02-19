@@ -69,7 +69,7 @@ export class DataStore implements IDataStore {
             // update the object of this datastore with the value resolved from the api
             let indexOfUpdated = this.indexOfExpense(updated);
             if (indexOfUpdated !== -1) {
-                this.expenses[indexOfUpdated] = updated
+                this.expenses.setItem(indexOfUpdated, updated)
             } else {
                 throw <ResponseError> {
                     reason: "Invalid application state. When updating, the expense returned by the API," +
