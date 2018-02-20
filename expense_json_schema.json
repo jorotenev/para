@@ -11,7 +11,7 @@
         }
     },
     "properties": {
-        "id": {"type": ["number", "null"]},
+        "id": {"type": ["string", "null"]},
         "name": {"type": "string"},
         "amount": {"type": "number"},
         "tags": {"type": "array", "items": {"type": "string"}},
@@ -26,5 +26,6 @@
             "$ref": "#/definitions/timestamp"
         }
     },
-    "required": ["id", "name", "amount", "tags", "currency", "timestamp_utc", "timestamp_utc_created", "timestamp_utc_updated"]
+    "required": ["id", "name", "amount", "tags", "currency", "timestamp_utc", "timestamp_utc_created", "timestamp_utc_updated"],
+    "additionalProperties":false
 }
