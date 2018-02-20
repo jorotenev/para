@@ -1,17 +1,17 @@
 import {DataStore, ExpenseDatabaseFacade} from "~/expense_datastore/datastore"
-import {Expense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
 import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
-import {SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {GetListOpts, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 
 /**
  * proxy = DataStore
  * api = ExpenseDatabaseFacade
  */
 
-const exp = Object.freeze(Expense.createEmptyExpense());
-const persisted = Object.freeze({...exp, id: 1});
+const exp : IExpense= Object.freeze({...SINGLE_EXPENSE, id: null});
+const persisted : IExpense = Object.freeze({...exp, id: 'asd'});
 
 function cleanDataStore() {
     DataStore._instance = null;
@@ -36,7 +36,7 @@ describe("For all methods of the DataStore", function () {
             },
             update: {
                 mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'update'),
-                methodArgument: [persisted],
+                methodArgument: [persisted, persisted],
                 apiResolvesWith: persisted,
                 call: (ds) => {
                     ds._addExpense(persisted);
@@ -54,24 +54,16 @@ describe("For all methods of the DataStore", function () {
             },
             get_list: {
                 mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'get_list'),
-                methodArgument: [1, 1],
+                methodArgument: [<GetListOpts>{start_from: persisted, batch_size: 1}],
                 apiResolvesWith: [persisted],
                 call: (ds: DataStore) => {
                     ds._addExpense(persisted);
                     return ds.get_list.apply(ds, mocks.get_list.methodArgument)
                 }
             },
-            get_single: {
-                mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'get_single'),
-                methodArgument: [1],
-                apiResolvesWith: persisted,
-                call: (ds) => {
-                    return ds.get_single.apply(ds, mocks.get_single.methodArgument)
-                }
-            },
             sync: {
                 mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync'),
-                methodArgument: [<SyncRequest>[{id: 1, timestamp_utc_updated: ''}]],
+                methodArgument: [<SyncRequest>[ten_expenses[0]]],
                 apiResolvesWith: <SyncResponse>{to_add: [], to_update: [], to_remove: []},
                 call: (ds: DataStore) => {
                     return ds.sync.apply(ds, mocks.sync.methodArgument)
@@ -130,11 +122,14 @@ describe("For all methods of the DataStore", function () {
             // verify that the datastore has called the API with the same argument
             setTimeout(() => {
                 Object.keys(mocks).forEach((methodName) => {
+                    if (methodName === 'get_list') {
+                        console.dir(mocks[methodName].mock.calls.first())
+                    }
                     expect(mocks[methodName].mock).toHaveBeenCalledTimes(1);
                     expect(mocks[methodName].mock).toHaveBeenCalledWith(...mocks[methodName].methodArgument)
                 });
                 done()
-            }, 1000)
+            }, 500)
 
 
         });
@@ -260,6 +255,7 @@ describe('testing the update() method of the DataStore', function () {
     it("update()ing an expense via the proxy will update the object held by the proxy with the resolved value " +
         "that the api returned", function (done) {
         let toBeUpdated = {...persisted, amount: 1};
+
         let newAmount = persisted.amount + 1;
         let updated = {...toBeUpdated, amount: newAmount};
         this.mockedUpdate.and.returnValue(Promise.resolve(updated));
@@ -268,17 +264,19 @@ describe('testing the update() method of the DataStore', function () {
         dataStore._addExpense(toBeUpdated); // doesn't use the api; adds an expense internally to the datastore
         expect(dataStore.expenses.length).toBe(1);
 
-        dataStore.update(toBeUpdated).then((updatedFromApi) => {
+        dataStore.update(updated, toBeUpdated).then((updatedFromApi) => {
             expect(updatedFromApi).toEqual(updated);
             expect(dataStore.expenses.length).toBe(1);
-            expect(dataStore.expenses.getItem(0).amount).toBe(newAmount);
+            let ds_exp = dataStore.expenses.getItem(0);
+
+            expect(ds_exp.amount).toBe(newAmount);
             done()
         }, fail)
     });
     it("if trying to update an expense that's not in the datastore, " +
         "we get a rejected promise with a suitable msg", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE);
-        cleanDataStore().update(expense).then(fail, err => {
+        let expense = {...SINGLE_EXPENSE};
+        cleanDataStore().update(expense, null).then(fail, err => {
             expect(err.reason.indexOf("not in the datastore") !== -1).toBe(true)
             done()
         })
@@ -298,7 +296,7 @@ describe("testing the remove() methods of the DataStore", function () {
     });
     it("rejects if there's not expense with this id", function (done) {
 
-        cleanDataStore().remove(new Expense(SINGLE_EXPENSE)).then(fail, err => {
+        cleanDataStore().remove({...SINGLE_EXPENSE}).then(fail, err => {
             expect(err.reason.indexOf("No such expense in the DataStore") !== -1).toBe(true);
             done();
         })
@@ -320,31 +318,6 @@ describe("testing the remove() methods of the DataStore", function () {
     })
 });
 
-describe('testing the get_single() method of the DataStore', function () {
-
-    beforeEach(function () {
-        this.mockedGetSingle = <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_single');
-        this.mockedGetSingle.and.callThrough();
-    });
-    afterEach(function () {
-        this.mockedGetSingle.calls.reset();
-        this.mockedGetSingle.and.callThrough();
-    });
-    it("invoking get_single() doesn't change the contents of DataStore.expenses", function (done) {
-
-        this.mockedGetSingle.and.returnValue(Promise.resolve(persisted));
-
-        let dataStore = cleanDataStore();
-        dataStore._addExpense(persisted);
-        dataStore.get_single(persisted.id).then(e => {
-            expect(dataStore.expenses.indexOf(persisted)).toEqual(0);
-            expect(dataStore.expenses.length).toEqual(1);
-            done()
-        }, fail)
-    });
-
-});
-
 describe('testing the get_list() method of the DataStore', function () {
     beforeEach(function () {
         this.mockedGetList = <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_list');
@@ -360,8 +333,11 @@ describe('testing the get_list() method of the DataStore', function () {
         let dataStore = cleanDataStore();
         dataStore._addExpense(exp);
         this.mockedGetList.and.returnValue(Promise.resolve({...exp, id: 2}));
-
-        dataStore.get_list(2, 1).then((_) => {
+        let request_opts: GetListOpts = {
+            start_from: {...ten_expenses[1]},
+            batch_size: 1
+        };
+        dataStore.get_list(request_opts).then((_) => {
             expect(dataStore.expenses.indexOf(exp)).toEqual(0);
             expect(dataStore.expenses.length).toEqual(1);
             done();
@@ -371,13 +347,8 @@ describe('testing the get_list() method of the DataStore', function () {
 
 describe('testing the sync() method of the DataStore', function () {
     beforeAll(function () {
-        this.request = <SyncRequest>[];
-        ten_expenses.slice(0, 3).forEach(exp => {
-            this.request.push({
-                id: exp.id,
-                timestamp_utc_updated: exp.timestamp_utc_updated
-            })
-        })
+        let request: SyncRequest = ten_expenses.slice(0, 3);
+        this.request = request;
     });
 
     beforeEach(function () {
@@ -401,7 +372,7 @@ describe('testing the sync() method of the DataStore', function () {
         let ds = cleanDataStore();
         ds.sync(this.request).then((response: SyncResponse) => {
             expect(ds.expenses.length).toBe(1);
-            expect(ds.expenses.getItem(0)).toEqual(new Expense(response.to_add[0]));
+            expect(ds.expenses.getItem(0)).toEqual({...response.to_add[0]});
             done()
         }, fail)
 
@@ -417,7 +388,7 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
 
         //sanity checking
         expect(ds.expenses.getItem(0).amount).toBe(SINGLE_EXPENSE.amount);
@@ -439,7 +410,7 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
         ds.sync(this.request).then(response => {
             expect(ds.expenses.length).toBe(1);
             expect(ds.expenses.getItem(0).amount).toBe(new_amount);
@@ -456,13 +427,13 @@ describe('testing the sync() method of the DataStore', function () {
         this.mockedSync.and.returnValue(Promise.resolve(sample_response));
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
-        ds._addExpense(new Expense(ten_expenses[1]));
+        ds._addExpense({...SINGLE_EXPENSE});
+        ds._addExpense({...ten_expenses[1]});
 
         ds.sync(this.request).then(response => {
             expect(ds.expenses.length).toBe(1);
 
-            expect(ds.expenses.getItem(0)).toEqual(new Expense(ten_expenses[1]));
+            expect(ds.expenses.getItem(0)).toEqual({...ten_expenses[1]});
             done()
         }, fail)
     });
@@ -475,17 +446,17 @@ describe("test the _addExpense of the DataStore", function () {
     it("adding through _addExpense adds it to the .expenses of the DataStore", function () {
         let ds = cleanDataStore();
         expect(ds.expenses.length).toBe(0);
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
         expect(ds.expenses.length).toBe(1);
-        expect(ds.expenses.getItem(0)).toEqual(new Expense(SINGLE_EXPENSE))
+        expect(ds.expenses.getItem(0)).toEqual({...SINGLE_EXPENSE})
     });
     it("adding an already managed expense throws an error", function () {
 
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(SINGLE_EXPENSE));
+        ds._addExpense({...SINGLE_EXPENSE});
 
         try {
-            ds._addExpense(new Expense(SINGLE_EXPENSE));
+            ds._addExpense({...SINGLE_EXPENSE});
             fail()
         } catch (err) {
             expect(err.reason.indexOf("Expenses with the same id") !== -1).toBe(true);
@@ -498,9 +469,9 @@ describe("test the _addExpense of the DataStore", function () {
         let fourth = ten_expenses[3];
         let third = ten_expenses[2];
 
-        ds._addExpense(new Expense(fourth));
-        ds._addExpense(new Expense(sixth));
-        ds._addExpense(new Expense(third));
+        ds._addExpense({...fourth});
+        ds._addExpense({...sixth});
+        ds._addExpense({...third});
 
         expect(ds.expenses.map(exp => exp.id)).toEqual([sixth.id, fourth.id, third.id])
     });
@@ -510,8 +481,8 @@ describe("test the _removeExpense of the DataStore", function () {
 
     it("removes managed expenses", function () {
         let ds = cleanDataStore();
-        ds._addExpense(new Expense(ten_expenses[0]));
-        ds._addExpense(new Expense(ten_expenses[1]));
+        ds._addExpense({...ten_expenses[0]});
+        ds._addExpense({...ten_expenses[1]});
         expect(ds.expenses.length).toBe(2);
 
         ds._removeExpense(ten_expenses[0].id);

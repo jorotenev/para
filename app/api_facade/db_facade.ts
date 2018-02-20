@@ -1,4 +1,4 @@
-import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {apiAddress, apiVersion} from "~/app_config";
 import * as u from 'underscore';
 import {RawResponseError, ResponseError, Utils} from "./common";
@@ -22,31 +22,42 @@ export interface IExpenseDatabaseFacade {
     persist(exp: IExpense): Promise<IExpense>
 
     /**
-     * use the id of an expense; sync the version on the backend with `exp`
-     * @param {IExpense} exp
+     * @param {IExpense} exp - the updated expense
+     * @param {IExpense} old_exp - the previous version of `exp`
      * @returns {Promise<IExpense>}
      */
-    update(exp: IExpense): Promise<IExpense>
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense>
 
     remove(exp: IExpense): Promise<void>
 
-    get_single(id: ExpenseIdType): Promise<IExpense>
-
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]>
+    get_list(opts: GetListOpts): Promise<IExpense[]>
 
     sync(request: SyncRequest): Promise<SyncResponse>
-
 }
 
+export enum Order {
+    asc = 'asc',
+    desc = 'desc'
+}
+
+export interface GetListOpts {
+    start_from: IExpense | null,
+    batch_size?: number
+    sort_order?: Order,
+    sort_on?: keyof IExpense
+}
 
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
-    static readonly GETListEndpointTemplate = u.template(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=<%= startFromId %>&batch_size=<%= batchSize %>`);
+    static readonly GETListEndpointTemplate =
+        u.template(
+            `${EXPENSES_API_ENDPOINT}get_expenses_list?<%= start_from_id %>&start_from_property=<%= start_from_property %>&start_from_property_value=<%=start_from_property_value%>&order_direction=<%= order_direction %>`
+        );
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
-    static readonly DELETERemoveEndpoint = u.template(`${EXPENSES_API_ENDPOINT}remove/<%= id %>`);
-    static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`
+    static readonly DELETERemove = `${EXPENSES_API_ENDPOINT}remove`;
+    static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`;
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
@@ -62,11 +73,23 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         })
     }
 
-    update(exp: IExpense): Promise<IExpense> {
-        if (!exp.id) {
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense> {
+
+        try {
+            Expense.validate_throw(exp);
+            Expense.validate_throw(old_exp)
+        } catch (err) {
+            console.error(err);
+            return Promise.reject(<ResponseError>{reason: 'One of the arguments is not a valid expense!'})
+        }
+        if (!exp.id || !old_exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which doesn't have an ID"})
         }
-        return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
+        // return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
+        return Utils.makeRequest(ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT, {
+            updated: exp,
+            previous_stage: old_exp
+        })
     }
 
     private send(exp: IExpense, url: string, method: HTTPMethod): Promise<IExpense> {
@@ -83,35 +106,50 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
             return Promise.reject(<ResponseError>{reason: "Can't delete an expense without an id"})
         }
         const id = exp.id;
-        const url = ExpenseDatabaseFacade.DELETERemoveEndpoint({id: id});
+        const url = ExpenseDatabaseFacade.DELETERemove;
 
-        return Utils.makeRequest(url, HTTPMethod.DELETE, {id: id}).catch(err => {
+        return Utils.makeRequest(url, HTTPMethod.DELETE, exp).catch(err => {
             throw {reason: err.msg, raw: err}
         });
 
     }
 
+    get_list(opts: GetListOpts): Promise<IExpense[]> {
+        // the app doesn't need to know what the server requries as a parameter, so here we extract
+        // whatever the server expects
 
-    get_single(id: ExpenseIdType): Promise<IExpense> {
-        let url = ExpenseDatabaseFacade.GETSingleEndpoint({id: id});
-        return new Promise<IExpense>(function (resolve, reject: (reason?: ResponseError) => void) {
-            Utils.makeRequest(url).then(resolve, function (err) {
-                reject({"reason": "Cannot find expense with id " + id + ". Reason: " + err, "raw": err});
-            })
-        });
-    }
+        let defaults = {
+            start_from: null,
+            batch_size: 10,
+            sort_order: Order.desc,
+            sort_on: 'timestamp_utc',
+        };
 
+        let options = {
+            ...defaults,
+            ...opts
+        };
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
         let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
-            startFromId: startFromId,
-            batchSize: batchSize
-        });
+            start_from_id: !!options.start_from ? options.start_from.id : null,
+            start_from_property: options.sort_on,
+            start_from_property_value: !!options.start_from ? options.start_from[options.sort_on] : null,
 
+            order_direction: Order.desc,
+            batch_size: options.batch_size,
+
+        });
         return new Promise(function (resolve, reject: (reason?: ResponseError) => void) {
             Utils.makeRequest(url).then(function (json) {
                 try {
-                    resolve(json.map((raw) => new Expense(<IExpense> raw))) // TODO validate the response
+                    let ready: IExpense[] = json.filter(Expense.validate_bool);
+
+                    if (ready.length !== json.length) {
+                        console.error("some items in the response didn't validate")
+                        //TODO log this to an exception tracker
+                    }
+
+                    resolve(ready)
                 } catch (err) {
                     let error: ResponseError = {"reason": "Can't parse JSON"};
                     reject(error)
@@ -128,8 +166,10 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
+        let payload = request.map(e => u.pick(e, ['id', 'timestamp_utc', 'timestamp_updated_at']));
+
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
-        return Utils.makeRequest(url, HTTPMethod.GET, request)
+        return Utils.makeRequest(url, HTTPMethod.GET, payload)
             .then((response: SyncResponse) => {
                 try {
                     validateSyncResponse(response)
@@ -149,12 +189,12 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 }
 
 export interface SyncResponse {
-    to_add: ExpenseConstructor[]
-    to_update: ExpenseConstructor[]
+    to_add: IExpense[]
+    to_update: IExpense[]
     to_remove: ExpenseIdType[]
 }
 
-export type SyncRequest = { id: ExpenseIdType, timestamp_utc_updated: string }[]
+export type SyncRequest = IExpense[]
 
 
 function validateSyncResponse(response: any) { // todo make it more robust

@@ -4,9 +4,7 @@
  * */
 import * as http from "http";
 import {apiAddress} from "~/app_config";
-import {ExpenseDatabaseFacade} from "~/api_facade/db_facade";
-import {IExpense} from "~/models/expense";
-import {mockFirebaseAfterEach, mockFirebaseBeforeEach, testListExpenses} from "./test_api_facade";
+import {mockFirebaseAfterEach, mockFirebaseBeforeEach} from "./test_api_facade";
 
 function apiIsUP(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
@@ -63,35 +61,8 @@ describe("Integration test of the API facade for get_list", () => {
         if (!this.apiIsUp) {
             pending("API IS NOT UP")
         }
-        let facade = new ExpenseDatabaseFacade();
-        facade.get_list(10, 10).then((expenses: IExpense[]) => {
-            testListExpenses(expenses, 10, 10)
-        }, (err) => {
-            err.testMsg = "The API should have returned a list of expenses";
-            fail(err);
-        })
+        fail("not implemented")
     });
 
 });
 
-
-// describe("Integration test of the API facade for get_single", function () {
-//
-//     beforeAll(function (done) {
-//         setupTest(this, done);
-//     });
-//
-//     xit("should return an item for id 1", function (done) {
-//         if (!this.apiIsUp) {
-//             pending("API IS NOT UP")
-//         }
-//         new ExpenseDatabaseFacade().get_single(1).then((item) => {
-//             expect(item.id).toBe(1); //todo assumes numerical id
-//             done()
-//         }, (err) => {
-//             fail("get_single's promise was rejected: " + err);
-//         });
-//     });
-//
-// });
-//

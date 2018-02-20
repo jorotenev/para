@@ -44,7 +44,6 @@ describe("Test of the Utils.makeRequest()", function () {
         this.mockedFirebase.calls.reset();
         this.mockedFirebase.and.callThrough();
     });
-
     it("the api returning a 500 leads to a rejection", function (done) {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("[]", 500)));
 
@@ -118,8 +117,7 @@ describe("Test of the Utils.makeRequest()", function () {
 
     it("if the auth token can't be obtained, " +
         "no request is made and the promise is rejected with a suitable msg", function (done) {
-        this.mockedFirebase.and.callThrough();
-        this.mockedHTTP.and.callThrough();
+        this.mockedFirebase.and.returnValue(Promise.reject(''));
         const that = this;
         Utils.makeRequest('whatevs').then(function (_) {
             fail("Promise should have been rejected");
@@ -129,7 +127,6 @@ describe("Test of the Utils.makeRequest()", function () {
             expect(that.mockedHTTP.calls.count()).toEqual(0);
             done();
         });
-
     });
 
     it("request headers include auth token", function (done) {
@@ -150,4 +147,35 @@ describe("Test of the Utils.makeRequest()", function () {
             done();
         })
     });
+});
+
+describe("Test the Utils.makeRequestOpts()", function () {
+    beforeAll(function () {
+        this.url = 'some url'
+        this.method = HTTPMethod.GET
+        this.payload = {some: 'object'}
+        this.timeout
+    })
+    beforeEach(function () {
+        this.mockedMakeRequest = spyOn(Utils, 'makeRequest')
+    })
+    afterEach(function () {
+        this.mockedMakeRequest.calls.reset()
+    })
+
+    it("makeRequest gets called with correct args", function () {
+        let url = 'some url'
+        Utils.makeRequestOpts({url: this.url, method: this.method, payload: this.payload, timeout: this.timeout})
+
+        expect(this.mockedMakeRequest.calls.count()).toBe(1)
+        expect(this.mockedMakeRequest).toHaveBeenCalledWith(this.url, this.method, this.payload, this.timeout)
+    })
+    it("correct default are used", function () {
+        Utils.makeRequestOpts({url: this.url})
+        expect(this.mockedMakeRequest).toHaveBeenCalledWith(this.url, undefined, undefined, undefined)
+
+        this.mockedMakeRequest.calls.reset()
+        Utils.makeRequestOpts({url: this.url, payload: this.payload})
+        expect(this.mockedMakeRequest).toHaveBeenCalledWith(this.url, undefined, this.payload, undefined)
+    })
 });

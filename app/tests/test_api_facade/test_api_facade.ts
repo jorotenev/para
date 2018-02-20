@@ -1,18 +1,23 @@
-import {ExpenseDatabaseFacade, EXPENSES_API_ENDPOINT, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade, GetListOpts, Order, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
-import {Expense, ExpenseConstructor, IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
 import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 
 
 let u = require('underscore');
 
-const promised_ten_results: Promise<ExpenseConstructor[]> = Promise.resolve(ten_expenses);
+const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
+const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1]);
 
-
-export function testListExpenses(expenses: IExpense[], startFromId: number, batchSize: number) {
+export function testListExpenses(expenses: IExpense[], startFrom: IExpense, batchSize: number) {
     expect(typeof expenses).toBe(typeof []);
-    expect(expenses[0].id).toBe(startFromId);
+    expenses.forEach((exp) => {
+
+        let validateFunc = () => Expense.validate_throw({...exp}); // copy just the `properties` of the expense
+        expect(validateFunc).not.toThrow()
+    });
+
     expect(expenses.length).toBe(batchSize);
 }
 
@@ -42,41 +47,43 @@ function setUpAfterEach() {
 describe("Testing the get_expenses_list() of  db facade", () => {
 
     beforeAll(function () {
-        this.startFromId = 1;
-        this.batchSize = 10;
-        this.endpointURL = ExpenseDatabaseFacade.GETListEndpointTemplate({
-            startFromId: this.startFromId,
-            batchSize: this.batchSize
-        });
-
-        // sanity checking
-        expect(this.endpointURL).toBe(`${EXPENSES_API_ENDPOINT}get_expenses_list?start_id=${this.startFromId}&batch_size=${this.batchSize}`);
-
+        this.batch_size = 9;
+        this.endpointURLTemplate = ExpenseDatabaseFacade.GETListEndpointTemplate;
     });
 
     beforeEach(function () {
         setUpBeforeEach.call(this)
     });
+
     afterEach(function () {
         setUpAfterEach.call(this)
     });
 
     it("api/get_expenses_list - requesting a list, returns a valid list", function (done) {
-        const startFromId = this.startFromId;
-        const batchSize = this.batchSize;
-        // mock the API: set the return value of the mocked http.getJSON function
-        this.mockedRequest.and.returnValue(promised_ten_results);
-
-        // call the method that we actually test now
-        let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(startFromId, batchSize);
-        expect(this.mockedRequest.calls.first().args).toEqual([this.endpointURL]);
+        const startFrom: IExpense = <IExpense> newest_expense;
+        let two_expenses = [ten_expenses[0], ten_expenses[1]];
+        this.mockedRequest.and.returnValue(Promise.resolve(two_expenses));
+        let request_opts: GetListOpts = {
+            start_from: startFrom,
+            batch_size: this.batch_size
+        };
+        let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(request_opts);
+        expect(this.mockedRequest).toHaveBeenCalledWith(this.endpointURLTemplate({
+            start_from_id: startFrom.id,
+            start_from_property: 'timestamp_utc',
+            start_from_property_value: startFrom.timestamp_utc,
+            batchSize: this.batchSize,
+            order_direction: Order.desc
+        }));
 
 
         // the result of the tested method invocation is of correct shape
         expect(resultAsPromise && !!resultAsPromise.then && typeof resultAsPromise.then === 'function').toBe(true);
 
+        let response_size = two_expenses.length;
         resultAsPromise.then(function (payload) {
-            testListExpenses(payload, startFromId, batchSize);
+            testListExpenses(payload, startFrom, response_size);
+            //todo more tests here
             done()
         }).catch(function (err: ResponseError) {
             fail(err.reason);
@@ -89,8 +96,11 @@ describe("Testing the get_expenses_list() of  db facade", () => {
             // pretend that calling the API resulted in an error
             let error: Promise<IExpense[]> = Promise.reject(new Error("Some expected testing error"));
             this.mockedRequest.and.returnValue(error);
-
-            let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(this.startFromId, this.batchSize);
+            let request_opts: GetListOpts = {
+                start_from: newest_expense,
+                batch_size: this.batch_size
+            };
+            let resultAsPromise: Promise<IExpense[]> = new ExpenseDatabaseFacade().get_list(request_opts);
 
             resultAsPromise.then(() => {
                 fail("Promise should have been rejected.");
@@ -103,50 +113,6 @@ describe("Testing the get_expenses_list() of  db facade", () => {
 
 });
 
-describe("Testing the get_single() of the db facade", function () {
-    beforeEach(function () {
-        setUpBeforeEach.call(this);
-        this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
-    });
-    afterEach(function () {
-        setUpAfterEach.call(this)
-    });
-
-
-    it("method should return a promise", function () {
-        let expensePromise = new ExpenseDatabaseFacade().get_single(1);
-
-        expect(typeof expensePromise.then).toBe('function')
-    });
-
-    it("when the 'then' of the promise is called, it receives an Expense as a parameter",
-        function (done) {
-            new ExpenseDatabaseFacade().get_single(1).then(function (data: IExpense) {
-                    const expectedKeys = ["id", "timestamp_utc", "amount", "currency", "name", "tags"];
-
-                    let responseKeys = Object.keys(data);
-                    expect(u.intersection(expectedKeys, responseKeys)).toEqual(expectedKeys);
-                    done()
-                },
-                function () {
-                    fail("Rejected called on a promise, but expected resolved to be called");
-                    done();
-                })
-        });
-    it("the promise which get_single returns is rejected if the server doesn't return correctly",
-        function (done) {
-            this.mockedRequest.and.returnValue(Promise.reject(""));
-
-            new ExpenseDatabaseFacade().get_single(1).then(function () {
-                fail();
-                done()
-            }, function (err: ResponseError) {
-
-                expect(err.reason.indexOf("Cannot find expense with id 1") !== -1).toBe(true);
-                done()
-            })
-        })
-});
 
 describe('Testing the persist() of the db facade', function () {
     beforeEach(function () {
@@ -157,7 +123,7 @@ describe('Testing the persist() of the db facade', function () {
         setUpAfterEach.call(this)
     });
     it("persist() resovles if the server returns a valid expense", function (done) {
-        let unsaved = new Expense({...SINGLE_EXPENSE, id: null});
+        let unsaved = {...SINGLE_EXPENSE, id: null};
         this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
 
         new ExpenseDatabaseFacade().persist(unsaved).then(persisted => {
@@ -169,14 +135,15 @@ describe('Testing the persist() of the db facade', function () {
     it("persist() rejects if the server returns a persisted expense with a null id", function (done) {
         let badResponse = {...SINGLE_EXPENSE, id: null};
         this.mockedRequest.and.returnValue(Promise.resolve(badResponse));
-        new ExpenseDatabaseFacade().persist(Expense.createEmptyExpense()).then(fail, err => {
+        new ExpenseDatabaseFacade().persist({...SINGLE_EXPENSE, id: null}).then(fail, err => {
+            console.dir(err)
             expect(err.reason.indexOf('Server returned an expense with a null id after persisting') !== -1).toBe(true);
             done()
         })
     });
 
     it("persist() rejects if an expense with a non-null id is passed", function (done) {
-        let expWithId = new Expense(SINGLE_EXPENSE)
+        let expWithId = {...SINGLE_EXPENSE}
         new ExpenseDatabaseFacade().persist(expWithId).then(fail, (err) => {
             expect(err.reason.indexOf("with an id") !== -1).toBe(true)
             done()
@@ -193,20 +160,45 @@ describe("Testing the update() of the db facade", function () {
         setUpAfterEach.call(this)
     });
     it("resolves with the expense that was received from makeRequest", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE)
-        this.mockedRequest.and.returnValue(Promise.resolve(expense));
-        new ExpenseDatabaseFacade().update(expense).then(updated => {
-            expect(updated).toEqual(expense);
+        let expense = {...SINGLE_EXPENSE};
+        let updated: IExpense = {...expense}; // the server updates the ts_updated
+        this.mockedRequest.and.returnValue(Promise.resolve(updated));
+        new ExpenseDatabaseFacade().update(expense, expense).then(exp => {
+            expect(exp).toEqual(updated);
             done()
-        })
+        }, fail)
     });
     it("can't update an expense which doesn't have an id", function (done) {
-        let nonIDExpense = Expense.createEmptyExpense();
-        new ExpenseDatabaseFacade().update(nonIDExpense).then(fail, err => {
+        let nonIDExpense = {...SINGLE_EXPENSE, id: null};
+        new ExpenseDatabaseFacade().update(nonIDExpense, {...SINGLE_EXPENSE}).then(fail, err => {
             expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true);
             done()
         })
-    })
+    });
+    it('fails if the old expense is invalid', function (done) {
+        let newExpense = {...SINGLE_EXPENSE};
+        let oldInvalidExpense = {...SINGLE_EXPENSE, timestamp_utc: ''};
+
+        new ExpenseDatabaseFacade().update(newExpense, oldInvalidExpense).then(fail, err => {
+            expect(err.reason.indexOf("not a valid expense") !== -1).toBe(true);
+            done()
+        })
+    });
+    it("fails if the old expense doesn't have an id", function (done) {
+
+        let oldInvalidExpense = {...SINGLE_EXPENSE, id: null};
+        new ExpenseDatabaseFacade().update(SINGLE_EXPENSE, oldInvalidExpense).then(fail, err => {
+            expect(err.reason.indexOf("doesn't have an ID") !== -1).toBe(true);
+            done()
+        })
+    });
+    it('fails if the makeRequest rejects', function (done) {
+        this.mockedRequest.and.returnValue(Promise.reject(<ResponseError>{reason: "musaka"}));
+        new ExpenseDatabaseFacade().update(SINGLE_EXPENSE, SINGLE_EXPENSE).then(fail, err => {
+            expect(err.reason.indexOf("musaka") !== -1).toBe(true);
+            done()
+        })
+    });
 });
 
 describe('Testing the remove() of the db facade', function () {
@@ -230,7 +222,7 @@ describe('Testing the remove() of the db facade', function () {
     });
 
     it("trying to delete an expense without an id rejects", function (done) {
-        let exp = Expense.createEmptyExpense();
+        let exp = {...SINGLE_EXPENSE, id: null};
         new ExpenseDatabaseFacade().remove(exp).then(fail, err => {
             expect(err.reason.indexOf("Can't delete an expense without an id") !== -1).toBe(true);
             done()
@@ -242,12 +234,12 @@ describe('Testing the remove() of the db facade', function () {
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"asd\":1}", 200)));
 
 
-        let expense = new Expense(SINGLE_EXPENSE);
+        let expense = {...SINGLE_EXPENSE};
         new ExpenseDatabaseFacade().remove(expense).then(done, fail)
     });
 
     it("rejects when the API returns 404 with a reason", function (done) {
-        let expense = new Expense(SINGLE_EXPENSE);
+        let expense = {...SINGLE_EXPENSE};
 
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse("{\"error\":\"some reason\"}", 404)));
         new ExpenseDatabaseFacade().remove(expense).then(fail, err => {
@@ -261,14 +253,8 @@ describe('Testing the remove() of the db facade', function () {
 describe("test the sync() method of the API facade", function () {
     beforeAll(function () {
         this.request = <SyncRequest>  [
-            {
-                id: 1,
-                timestamp_utc_updated: ''
-            },
-            {
-                id: 2,
-                timestamp_utc_updated: ''
-            }
+            ten_expenses[0],
+            ten_expenses[1]
         ];
 
     });

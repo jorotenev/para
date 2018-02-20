@@ -8,14 +8,17 @@
  * When a call is made to the datastore, the call will firs be forwarded to the API facade.
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
-import {Expense, ExpenseConstructor, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {
-    ExpenseDatabaseFacade as _ExpenseDatabaseFacade, IExpenseDatabaseFacade, SyncRequest,
+    ExpenseDatabaseFacade as _ExpenseDatabaseFacade,
+    IExpenseDatabaseFacade,
+    SyncRequest,
     SyncResponse
 } from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-import "~/utils/add/ObservableArrayfindIndex"; // imported for its side effects
+import "~/utils/add/ObservableArrayfindIndex";
+import {COMPARE_RESULT} from "~/utils/misc"; // imported for its side effects
 //easier mocking
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
 
@@ -58,16 +61,16 @@ export class DataStore implements IDataStore {
         });
     }
 
-    update(exp: IExpense): Promise<IExpense> {
+    update(exp: IExpense, old_exp: IExpense): Promise<IExpense> {
         if (!this.expenseIsManaged(exp)) {
             return Promise.reject(<ResponseError>{reason: "Can't update an expense which is not in the datastore"})
         }
 
-        return this.proxyTarget.update(exp).then((updated) => {
+        return this.proxyTarget.update(exp, old_exp).then((updated) => {
             // update the object of this datastore with the value resolved from the api
             let indexOfUpdated = this.indexOfExpense(updated);
             if (indexOfUpdated !== -1) {
-                this.expenses[indexOfUpdated] = updated
+                this.expenses.setItem(indexOfUpdated, updated)
             } else {
                 throw <ResponseError> {
                     reason: "Invalid application state. When updating, the expense returned by the API," +
@@ -96,11 +99,8 @@ export class DataStore implements IDataStore {
             })
     }
 
-    get_single(id: ExpenseIdType): Promise<IExpense> {
-        return this.proxyTarget.get_single.apply(this.proxyTarget, arguments);
-    }
 
-    get_list(startFromId: ExpenseIdType, batchSize: number): Promise<IExpense[]> {
+    get_list(request_opts): Promise<IExpense[]> {
         return this.proxyTarget.get_list.apply(this.proxyTarget, arguments);
     }
 
@@ -116,17 +116,17 @@ export class DataStore implements IDataStore {
             });
 
             //update
-            response.to_update.forEach((expense: ExpenseConstructor) => {
+            response.to_update.forEach((expense: IExpense) => {
                 let index = this.indexOfExpense(expense)
                 if (index !== -1) {
-                    this.expenses.setItem(index, new Expense(expense))
+                    this.expenses.setItem(index, expense)
                 }
             })
 
             //add
-            response.to_add.forEach((expense: ExpenseConstructor) => {
+            response.to_add.forEach((expense: IExpense) => {
                 try {
-                    this._addExpense(new Expense(expense))
+                    this._addExpense(expense)
 
                 } catch (err) {
                     console.dir(err)
@@ -145,7 +145,7 @@ export class DataStore implements IDataStore {
         this.expenses.push(exp);
 
         // TODO ensure expenses are sorted
-        if (this.expenses.length > 1 && this.expenses.getItem(0).compare(this.expenses.getItem(1)) < 0) {  //todo assumes numerical ids
+        if (this.expenses.length > 1 && Expense.comparator(this.expenses.getItem(0), this.expenses.getItem(1)) === COMPARE_RESULT.SMALLER) {
             console.error("fucked up, duct-taping"); //todo send this to an online log repository
             this.expenses.sort((a, b) => {
                 return -1 * Expense.comparator(a, b) // reverse the natural ordering
@@ -168,7 +168,7 @@ export class DataStore implements IDataStore {
         return this.indexOfExpense(exp) !== -1
     }
 
-    private indexOfExpense(exp: ExpenseConstructor): number {
+    private indexOfExpense(exp: IExpense): number {
         return this.expenses.findIndex(managed_exp => managed_exp.id === exp.id)
     }
 }
