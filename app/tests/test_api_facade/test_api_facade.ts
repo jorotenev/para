@@ -3,6 +3,7 @@ import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
 import {Expense, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
 import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
+import {HttpRequestOptions} from "tns-core-modules/http";
 
 
 let u = require('underscore');
@@ -279,7 +280,7 @@ describe("test the sync() method of the API facade", function () {
         this.mockedHTTP.and.callThrough();
     });
 
-    it("returns a valid SyncResponse", function (done) {
+    fit("returns a valid SyncResponse", function (done) {
         let expense_a = ten_expenses[0];
         let expense_b = ten_expenses[1];
         let expense_c = ten_expenses[2];
@@ -295,6 +296,15 @@ describe("test the sync() method of the API facade", function () {
             expect(result.to_add).toEqual([expense_a]);
             expect(result.to_remove).toEqual([expense_b.id]);
             expect(result.to_update).toEqual([expense_c]);
+
+            expect(this.mockedHTTP).toHaveBeenCalledTimes(1);
+            let httpOpts: HttpRequestOptions = this.mockedHTTP.calls.argsFor(0)[0]; //options arg of first call
+            let expectedRequest = {
+                [this.request[0].id]: {'timestamp_utc_updated': this.request[0].timestamp_utc_updated},
+                [this.request[1].id]: {'timestamp_utc_updated': this.request[1].timestamp_utc_updated},
+            }
+            expect(httpOpts.content).toBe(JSON.stringify(expectedRequest));
+
             done()
         }, fail)
     });

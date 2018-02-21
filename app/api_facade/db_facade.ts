@@ -105,7 +105,6 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         if (!exp.id) {
             return Promise.reject(<ResponseError>{reason: "Can't delete an expense without an id"})
         }
-        const id = exp.id;
         const url = ExpenseDatabaseFacade.DELETERemove;
 
         return Utils.makeRequest(url, HTTPMethod.DELETE, exp).catch(err => {
@@ -166,7 +165,11 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
-        let payload = request.map(e => u.pick(e, ['id', 'timestamp_utc', 'timestamp_updated_at']));
+        let payload = {}
+        let attrs_to_extract: [keyof IExpense] = ['timestamp_utc_updated'];
+        request.forEach(exp => {
+            payload[exp.id] = u.pick(exp, attrs_to_extract)
+        });
 
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
         return Utils.makeRequest(url, HTTPMethod.GET, payload)
