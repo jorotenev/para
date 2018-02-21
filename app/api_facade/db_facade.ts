@@ -172,7 +172,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         });
 
         let url = ExpenseDatabaseFacade.GETSyncEndpoint;
-        return Utils.makeRequest(url, HTTPMethod.GET, payload)
+        return Utils.makeRequest(url, HTTPMethod.POST, payload)
             .then((response: SyncResponse) => {
                 try {
                     validateSyncResponse(response)
