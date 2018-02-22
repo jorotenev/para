@@ -44,7 +44,6 @@
     "amount": 5.1,
     "currency": "EUR",
     "tags": [
-      "vacation",
       "sport",
       "vacation"
     ],
@@ -85,8 +84,7 @@
     "currency": "EUR",
     "tags": [
       "vacation",
-      "home",
-      "vacation"
+      "home"
     ],
     "timestamp_utc": "2017-10-29T09:15:21.853071Z",
     "timestamp_utc_created": "2017-10-29T09:15:21.853071Z",
@@ -108,7 +106,6 @@
     "amount": 71.1,
     "currency": "EUR",
     "tags": [
-      "vacation",
       "vacation"
     ],
     "timestamp_utc": "2017-10-29T09:17:21.853071Z",
@@ -121,7 +118,6 @@
     "amount": 95.1,
     "currency": "EUR",
     "tags": [
-      "vacation",
       "vacation",
       "work"
     ],
