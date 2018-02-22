@@ -1,5 +1,5 @@
 import {Expense} from "~/models/expense";
-import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
+import {ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import {COMPARE_RESULT} from "~/utils/misc";
 
 describe("Testing the Expense class", function () {
@@ -33,26 +33,30 @@ describe("Testing the Expense class", function () {
 describe("test the expense validator", function () {
 
     it("valid expenses are valid", function () {
-        let shouldntBoom = () => Expense.validate_throw(SINGLE_EXPENSE);
-        expect(shouldntBoom).not.toThrow()
-
+        ten_expenses.forEach((exp) => {
+            expect(() => Expense.validate_throw(exp)).not.toThrow();
+        });
     });
+
     it("should throw on invalid expenses", function () {
         let invalidExpenses = [];
         // sanity checking
-        expect(() => Expense.validate_throw(SINGLE_EXPENSE)).not.toThrow();
+        ten_expenses.forEach((exp) => {
+            expect(() => Expense.validate_throw(exp)).not.toThrow();
 
-        let copy = {...SINGLE_EXPENSE};
-        delete copy.id;
-        invalidExpenses.push(copy);
-        let copy2 = {...SINGLE_EXPENSE};
-        copy2.timestamp_utc = '2017-10-29T09:18:21.853071';
-        invalidExpenses.push(copy2);
-        let copy3 = {...SINGLE_EXPENSE}
-        copy3.tags = ['a', 'a']
-        invalidExpenses.forEach(exp => {
-            expect(() => Expense.validate_throw(exp)).toThrow()
+            let copy = {...exp};
+            delete copy.id;
+            invalidExpenses.push(copy);
+            let copy2 = {...exp};
+            copy2.timestamp_utc = '2017-10-29T09:18:21.853071';
+            invalidExpenses.push(copy2);
+            let copy3 = {...exp};
+            copy3.tags = ['a', 'a'];
+            invalidExpenses.forEach(exp => {
+                expect(() => Expense.validate_throw(exp)).toThrow()
+            })
         })
+
 
     });
 });
