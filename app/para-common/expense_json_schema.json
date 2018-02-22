@@ -14,7 +14,7 @@
         "id": {"type": ["string", "null"]},
         "name": {"type": "string"},
         "amount": {"type": "number"},
-        "tags": {"type": "array", "items": {"type": "string"}},
+        "tags": {"type": "array", "maxItems":10, "uniqueItems":true, "items": {"type": "string"}},
         "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
         "timestamp_utc": {
             "$ref": "#/definitions/timestamp"
