@@ -39,13 +39,17 @@ describe("test the expense validator", function () {
     });
     it("should throw on invalid expenses", function () {
         let invalidExpenses = [];
+        // sanity checking
+        expect(() => Expense.validate_throw(SINGLE_EXPENSE)).not.toThrow();
+
         let copy = {...SINGLE_EXPENSE};
         delete copy.id;
         invalidExpenses.push(copy);
         let copy2 = {...SINGLE_EXPENSE};
         copy2.timestamp_utc = '2017-10-29T09:18:21.853071';
         invalidExpenses.push(copy2);
-
+        let copy3 = {...SINGLE_EXPENSE}
+        copy3.tags = ['a', 'a']
         invalidExpenses.forEach(exp => {
             expect(() => Expense.validate_throw(exp)).toThrow()
         })

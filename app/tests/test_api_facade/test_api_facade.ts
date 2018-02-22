@@ -280,7 +280,7 @@ describe("test the sync() method of the API facade", function () {
         this.mockedHTTP.and.callThrough();
     });
 
-    fit("returns a valid SyncResponse", function (done) {
+    it("returns a valid SyncResponse", function (done) {
         let expense_a = ten_expenses[0];
         let expense_b = ten_expenses[1];
         let expense_c = ten_expenses[2];
