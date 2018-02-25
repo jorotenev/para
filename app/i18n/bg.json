@@ -6,7 +6,13 @@
   "Don't have an account?": "Нямате акаунт?",
   "Sign up": "Създай акаунт",
   "Problem logging you in": "Имаше проблем при влизането в профила",
-  "auth_invalid_pass":"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?"
+  "auth_invalid_pass":"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?",
   "No user with the provided credentials.":"Не съществува такъв потребител.",
-  "Login error":"Проблем с влизането"
+  "Login error":"Проблем с влизането",
+  "Enter email":"Въведи мейл",
+  "Enter password":"Въведи парола",
+  "pwd_min_len_error":"Минимална дължина %s символа",
+  "Email can't be empty":"Мейлът е задължителен",
+  "field_cant_be_empty":"Полето е задължително",
+  "invalid_email":"Невалиден мейл"
 }

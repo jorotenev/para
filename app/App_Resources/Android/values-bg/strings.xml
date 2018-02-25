@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_invalid_email_Z10mV75">"Невалиден мейл"</string>
+  <string name="_field_cant_be_empty_Z1Y1KYx">"Полето е задължително"</string>
+  <string name="_Email_can_t_be_empty_Z1aBs6L">"Мейлът е задължителен"</string>
+  <string name="_pwd_min_len_error_1DlXep">"Минимална дължина %1$s символа"</string>
+  <string name="_Enter_password_Y69Dd">"Въведи парола"</string>
+  <string name="_Enter_email_i5X7b">"Въведи мейл"</string>
+  <string name="_Login_error_1LXgN1">"Проблем с влизането"</string>
+  <string name="_No_user_with_the_provided_credentials__Z2goyoU">"Не съществува такъв потребител."</string>
   <string name="_auth_invalid_pass_Z1cbWTr">"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?"</string>
   <string name="_Problem_logging_you_in_Z1yKzP1">"Имаше проблем при влизането в профила"</string>
   <string name="_Sign_up_ZD9lx4">"Създай акаунт"</string>

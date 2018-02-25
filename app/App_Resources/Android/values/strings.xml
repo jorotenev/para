@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_invalid_email_Z10mV75">"Invalid email"</string>
+  <string name="_field_cant_be_empty_Z1Y1KYx">"The field can\'t be empty"</string>
+  <string name="_pwd_min_len_error_1DlXep">"Minimum length of %1$s symbols"</string>
   <string name="_auth_invalid_pass_Z1cbWTr">"Invalid password. Maybe you entered a wrong password or you have registered with Facebook?"</string>
   <string name="_sign_in_with_fb_1vsAcR">"&amp;#xf230; Sign in with Facebook"</string>
   <string name="_app_name_1k3Sbz">"para"</string>
