@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_auth_invalid_pass_Z1cbWTr">"Invalid password. Maybe you entered a wrong password or you have registered with Facebook?"</string>
+  <string name="_sign_in_with_fb_1vsAcR">"&amp;#xf230; Sign in with Facebook"</string>
   <string name="_app_name_1k3Sbz">"para"</string>
   <string name="app_name">"para"</string>
   <string name="title_activity_kimera">"para"</string>

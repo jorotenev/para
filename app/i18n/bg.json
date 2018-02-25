@@ -1,2 +1,12 @@
 {
+  "Login":"Влез",
+  "Login with email and password": "Влезте с емайл и парола",
+  "or login via Facebook": "или чрез Facebook",
+  "sign_in_with_fb": "Влез чрез Facebook",
+  "Don't have an account?": "Нямате акаунт?",
+  "Sign up": "Създай акаунт",
+  "Problem logging you in": "Имаше проблем при влизането в профила",
+  "auth_invalid_pass":"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?"
+  "No user with the provided credentials.":"Не съществува такъв потребител.",
+  "Login error":"Проблем с влизането"
 }

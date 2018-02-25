@@ -1,3 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_auth_invalid_pass_Z1cbWTr">"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?"</string>
+  <string name="_Problem_logging_you_in_Z1yKzP1">"Имаше проблем при влизането в профила"</string>
+  <string name="_Sign_up_ZD9lx4">"Създай акаунт"</string>
+  <string name="_Don_t_have_an_account__2sWDHD">"Нямате акаунт?"</string>
+  <string name="_sign_in_with_fb_1vsAcR">"Влез чрез Facebook"</string>
+  <string name="_or_login_via_Facebook_Z2k0Ufr">"или чрез Facebook"</string>
+  <string name="_Login_with_email_and_password_2eCUSL">"Влезте с емайл и парола"</string>
+  <string name="_Login_5jeK1">"Влез"</string>
 </resources>

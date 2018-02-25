@@ -6,6 +6,7 @@ import {RadDataForm} from "nativescript-pro-ui/dataform";
 import {firebase} from "nativescript-plugin-firebase/firebase-common";
 import {authWithFacebook, redirectToViewAfterLogin} from "~/auth/common/firebase_auth";
 
+const l = require("nativescript-localize");
 const dialogs = require("ui/dialogs");
 
 let dataform: RadDataForm;
@@ -41,12 +42,11 @@ export function emailPassLoginBtnPressed() {
                     }
                     let msgToShow;
                     if (errorMessage.indexOf("FirebaseAuthInvalidUserException") !== -1) {
-                        msgToShow = "No user with the provided credentials."
+                        msgToShow = l("No user with the provided credentials.")
                     } else if (errorMessage.indexOf("FirebaseAuthInvalidCredentialsException") !== -1) {
-                        msgToShow = "Invalid password. Maybe you entered a wrong password " +
-                            "or you have registered with Facebook?"
+                        msgToShow = l('auth_invalid_pass')
                     } else {
-                        msgToShow = "Problem logging you in"
+                        msgToShow = l("Problem logging you in")
                     }
 
                     // TODO make it more informative
@@ -59,18 +59,11 @@ export function emailPassLoginBtnPressed() {
 
 export function onFbLoginBtnPressed() {
     authWithFacebook().then((result) => {
-        // todo
-        dialogs.alert({
-            title: "Login OK",
-            message: result.uid,
-            okButtonText: "Nice!"
-        });
-
     }, (err) => {
         dialogs.alert({
-            title: "Login error",
+            title: l("Login error"),
             message: err,
-            okButtonText: "OK, pity"
+            okButtonText: "Ok"
         });
     }).then(redirectToViewAfterLogin)
 }
