@@ -1,10 +1,12 @@
 ﻿// import "./_bundle-config";
 import * as app from 'application';
-import firebase = require("nativescript-plugin-firebase");
 import {readableTimestamp} from "~/utils/time";
 import {expenseAmountToString} from "~/utils/money";
 import {viewLogIn} from '~/app_config';
-import {numberConverter} from "~/utils/number"
+import {numberConverter} from "~/utils/number";
+import firebase = require("nativescript-plugin-firebase");
+
+const localize = require("nativescript-localize");
 
 firebase.init();
 
@@ -13,6 +15,7 @@ app.setResources({
     'numberConverter': numberConverter,
     'readableTimestamp': readableTimestamp,
     'expenseAmountToString': expenseAmountToString,
+    'L':localize
 });
 
 
