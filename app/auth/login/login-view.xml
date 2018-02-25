@@ -11,7 +11,7 @@
 
         ></df:RadDataForm>
 
-        <Button class="btn btn-outline" text="Login" id="submit-button" isEnabled="{{!activity}}" tap="emailPassLoginBtnPressed"/>
+        <Button class="btn btn-outline" text="{{L('Login')}}" id="submit-button" isEnabled="{{!activity}}" tap="emailPassLoginBtnPressed"/>
         <Label text="{{L('or login via Facebook')}}" class="text-center" style="margin-top:10"></Label>
 
         <Button text="{{'&#xf230; ' + L('sign_in_with_fb')}}" tap="onFbLoginBtnPressed"

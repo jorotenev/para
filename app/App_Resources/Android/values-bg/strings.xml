@@ -11,9 +11,16 @@
   <string name="_auth_invalid_pass_Z1cbWTr">"Въвели сте невалидна пароа. А може би сте се регистрирали чрез Facebook?"</string>
   <string name="_Problem_logging_you_in_Z1yKzP1">"Имаше проблем при влизането в профила"</string>
   <string name="_Sign_up_ZD9lx4">"Създай акаунт"</string>
-  <string name="_Don_t_have_an_account__2sWDHD">"Нямате акаунт?"</string>
-  <string name="_sign_in_with_fb_1vsAcR">"Влез чрез Facebook"</string>
-  <string name="_or_login_via_Facebook_Z2k0Ufr">"или чрез Facebook"</string>
-  <string name="_Login_with_email_and_password_2eCUSL">"Влезте с емайл и парола"</string>
+  <string name="_Don_t_have_an_account__2sWDHD">"Нямаш акаунт?"</string>
+  <string name="_sign_in_with_fb_1vsAcR">"Влез с Facebook"</string>
+  <string name="_or_login_via_Facebook_Z2k0Ufr">"или с Facebook"</string>
+  <string name="_Login_with_email_and_password_2eCUSL">"Влез с емайл и парола"</string>
+  <string name="_Already_have_an_account__Z2lWQ0m">"Вече имаш акаунт?"</string>
+  <string name="_Preferred_currency_Z1mGiCb">"Предпочитана валута"</string>
+  <string name="_Sign_up_with_Facebook_28XQCj">"Регистрация с Facebook"</string>
+  <string name="_signup_use_fb_ZU70Pz">"или с Facebook"</string>
+  <string name="_Create_a_new_account_Z2jgpH9">"Създай нов акаунт"</string>
+  <string name="_signup_btn_ZAQF1R">"Регистрирай се"</string>
+  <string name="_Signup_Z29l7BY">"Регистрация"</string>
   <string name="_Login_5jeK1">"Влез"</string>
 </resources>

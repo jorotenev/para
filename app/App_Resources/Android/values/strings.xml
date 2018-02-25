@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_signup_use_fb_ZU70Pz">"or use Facebook"</string>
+  <string name="_signup_btn_ZAQF1R">"Signup"</string>
   <string name="_invalid_email_Z10mV75">"Invalid email"</string>
   <string name="_field_cant_be_empty_Z1Y1KYx">"The field can\'t be empty"</string>
   <string name="_pwd_min_len_error_1DlXep">"Minimum length of %1$s symbols"</string>
