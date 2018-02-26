@@ -14,42 +14,47 @@
 
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
-
-            <GridLayout rows="*,*">
-                <StackLayout visibility="{{connectivity_issues ? 'visible':'collapse'}}" row="0">
+            <StackLayout>
+                <Label text="{{expenses.length}}"></Label>
+                <StackLayout visibility="{{connectivity_issues ? 'visible':'collapse'}}">
                     <ActivityIndicator id="con-issue-act-ind" busy="false" visibility="collapse"/>
                     <Label text="{{L('Connectivity issues with the server')}}"></Label>
                     <Button text="{{L('Try reconnecting')}}" tap="tryToReconnectToAPI"></Button>
                 </StackLayout>
+                <GridLayout rows="*">
+                    <lv:RadListView visibility="{{expenses.length ?  'visible' : 'collapse'}}" row="0"
+                                    id="expenses-list"
+                                    items="{{ expenses }}"
+                                    loadOnDemandMode="Auto"
+                                    loadMoreDataRequested="loadMoreItems"
+                                    itemTap="onTap"
+                                    pullToRefresh="true"
+                                    pullToRefreshInitiated="onPullToRefreshInitiated"
+                    >
+                        <lv:RadListView.itemTemplate>
+                            <DockLayout stretchLastChild="false" class='expense' height="100">
 
-                <lv:RadListView visibility="{{expenses.length ?  'visible' : 'collapse'}}" row="0" id="expenses-list"
-                                items="{{ expenses }}"
-                                loadOnDemandMode="Auto"
-                                loadMoreDataRequested="loadMoreItems"
-                                itemTap="onTap"
-                                pullToRefresh="true"
-                                pullToRefreshInitiated="onPullToRefreshInitiated"
-                >
-                    <lv:RadListView.itemTemplate>
-                        <DockLayout stretchLastChild="false" class='expense' height="100">
+                                <StackLayout dock="left" orientation="vertical" style.verticalAlignment="center">
+                                    <Label text='{{name}}' class='expense-name'/>
+                                    <Label text="{{timestamp_utc | readableTimestamp }}"/>
+                                </StackLayout>
+                                <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}'/>
+                            </DockLayout>
+                        </lv:RadListView.itemTemplate>
+                    </lv:RadListView>
 
-                            <StackLayout dock="left" orientation="vertical" style.verticalAlignment="center">
-                                <Label text='{{name}}' class='expense-name'/>
-                                <Label text="{{timestamp_utc | readableTimestamp }}"/>
-                            </StackLayout>
-                            <Label dock='right' class='expense-amount' text='{{$value | expenseAmountToString}}'/>
-                        </DockLayout>
-                    </lv:RadListView.itemTemplate>
-                </lv:RadListView>
+                    <StackLayout
+                            visibility="{{!connectivity_issues  && expenses.length === 0 ? 'visible' : 'collapsed'}}"
+                            row="1"
+                            class="text-center">
 
-                <StackLayout visibility="{{!connectivity_issues  && expenses.length === 0 ? 'visible' : 'collapsed'}}"
-                             row="1"
-                             class="text-center">
+                        <Label class="h3 font-awesome" text="You don't have any expenses yet" textWrap="true"/>
+                        <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
+                        <Button class="btn" text="Refresh" tap="tryToReconnectToAPI"/>
+                    </StackLayout>
+                </GridLayout>
+            </StackLayout>
 
-                    <Label class="h3 font-awesome" text="You don't have any expenses yet" textWrap="true"/>
-                    <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
-                </StackLayout>
-            </GridLayout>
         </sd:RadSideDrawer.mainContent>
     </sd:RadSideDrawer>
 </Page>

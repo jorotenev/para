@@ -8,15 +8,15 @@ import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-pro-ui/listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 
-let listModel: ListExpenseModel = new ListExpenseModel();
+let listModel: ListExpenseModel;
 let page: Page;
 let listView: RadListView;
 
 export function navigatingTo(args: EventData) {
     page = <Page>args.object;
     listView = <RadListView> page.getViewById('expenses-list');
-    page.bindingContext = listModel
-
+    page.bindingContext = listModel = new ListExpenseModel();
+    listView.refresh()
 }
 
 export function loadMoreItems(ev: EventData): void {
@@ -26,7 +26,7 @@ export function loadMoreItems(ev: EventData): void {
         listModel.loadMoreItems(ev).then(() => {
             listView.notifyLoadOnDemandFinished()
         }, (err) => {
-            console.dir(err)
+            console.dir(err);
             listView.notifyLoadOnDemandFinished();
         });
     }, fireEventAfter);
@@ -72,10 +72,15 @@ export function tryToReconnectToAPI() {
     indicator.busy = true;
     indicator.visibility = 'visible';
 
-    listModel.initItems().then(_ => {
+    listModel.initList().then(_ => {
         listModel.connectivity_issues = false;
+        console.log("refreshing list view")
+        listView.refresh();
     }, err => {
         indicator.busy = false;
-        indicator.visibility = 'collapse'
+        indicator.visibility = 'collapse';
+        console.log("refreshing list view")
+
+        listView.refresh();
     })
 }
