@@ -52,7 +52,7 @@ export class Utils {
                             url: url,
                             method: method,
                             timeout: timeout,
-                            headers: [{[Utils.tokenHeader]: token}],
+                            headers: {[Utils.tokenHeader]: token},
                             content: jsonPayload,
                         }
                     )

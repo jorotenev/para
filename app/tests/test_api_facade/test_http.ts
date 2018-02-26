@@ -137,7 +137,7 @@ describe("Test of the Utils.makeRequest()", function () {
                 expect(that.mockedHTTP.calls.count()).toBe(1);
                 let args = that.mockedHTTP.calls.argsFor(0)[0]; // the `options` argument of the first call
                 let headers = args.headers; // array of (header) objects
-                expect(headers).toContain(objectContaining({[Utils.tokenHeader]: "fake token"}));
+                expect(headers).toEqual(objectContaining({[Utils.tokenHeader]: "fake token"}));
                 done();
             } catch (err) {
                 fail(err)
@@ -154,7 +154,7 @@ describe("Test the Utils.makeRequestOpts()", function () {
         this.url = 'some url'
         this.method = HTTPMethod.GET
         this.payload = {some: 'object'}
-        this.timeout
+        this.timeout = 1000
     })
     beforeEach(function () {
         this.mockedMakeRequest = spyOn(Utils, 'makeRequest')
