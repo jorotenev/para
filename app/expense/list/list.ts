@@ -3,16 +3,16 @@ import {ItemEventData} from "tns-core-modules/ui/list-view";
 import {Page} from "tns-core-modules/ui/page";
 import {ListExpenseModel} from "./list-view-model";
 import {navigateTo} from "~/utils/nav"
-import {IExpense} from "../../models/expense";
+import {IExpense} from "~/models/expense";
 import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-pro-ui/listview";
+import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 
-let listModel = new ListExpenseModel();
+let listModel: ListExpenseModel = new ListExpenseModel();
 let page: Page;
 let listView: RadListView;
 
 export function navigatingTo(args: EventData) {
-
     page = <Page>args.object;
     listView = <RadListView> page.getViewById('expenses-list');
     page.bindingContext = listModel
@@ -63,4 +63,19 @@ export function onPullToRefreshInitiated() {
         console.log('listView.notifyPullToRefreshFinished finished');
         listView.notifyPullToRefreshFinished()
     }, 1000)
+}
+
+
+export function tryToReconnectToAPI() {
+    let indicator: ActivityIndicator = page.getViewById('con-issue-act-ind')
+
+    indicator.busy = true;
+    indicator.visibility = 'visible';
+
+    listModel.initItems().then(_ => {
+        listModel.connectivity_issues = false;
+    }, err => {
+        indicator.busy = false;
+        indicator.visibility = 'collapse'
+    })
 }

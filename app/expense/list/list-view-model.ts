@@ -3,6 +3,7 @@ import {ExpenseIdType, IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 import {GetListOpts} from "~/api_facade/db_facade";
+import {ObservableProperty} from "~/utils/misc";
 
 let dialogs = require("ui/dialogs");
 let http = require('http');
@@ -14,6 +15,8 @@ type ExpensesList = ObservableArray<IExpense>;
 export class ListExpenseModel extends Observable {
     public expenses: ExpensesList;
 
+    @ObservableProperty()
+    public connectivity_issues: boolean = false;
     private loader: IExpensesListManager;
     private datastore: IDataStore;
 
@@ -23,14 +26,22 @@ export class ListExpenseModel extends Observable {
         this.expenses = this.datastore.expenses;
 
         this.loader = new ExpensesHandler(this.expenses, this.datastore); //TODO
+        let that = this;
+        this.loader.initList().then(() => {
+        }, err => {
+            console.log("connectivity_issues = true")
+            that.connectivity_issues = true
+        })
 
     }
-
 
     public loadMoreItems(ev): Promise<void> {
         return this.loader.loadMoreItems(ev);
     }
 
+    public initItems(): Promise<IExpense[]> {
+        return this.loader.initList()
+    }
 
     public isEmpty(): boolean {
         return this.expenses.length === 0;
@@ -60,7 +71,6 @@ abstract class ExpensesListManager implements IExpensesListManager {
 
     constructor(expenses: ExpensesList, datastore: IDataStore) {
         this.datastore = datastore;
-        this.initList()
 
     }
 
@@ -119,33 +129,31 @@ class ExpensesHandler extends ExpensesListManager {
         let request_opts: GetListOpts = {
             batch_size: this.batchSize,
             start_from: startFrom,
-        }
+        };
 
         return this.datastore.get_list(request_opts)
             .then(list => {
                 list.forEach(exp => {
                     this.datastore._addExpense(exp);
                 });
-                console.log(`successfully added ${list.length} expenses `)
+                console.log(`successfully added ${list.length} expenses `);
                 return list
             }, err => {
                 throw err
             })
     }
 
-    initList() {
-        // TODO load initial batch
-
-        setTimeout(() => {
-            console.log("begin initializing the array")
-            this.fetchItems(null).then((expenses) => {
-                console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`);
-                console.log("expenses size is " + this.expenses.length)
-            }, err => {
-                console.error("Couldn't initialise the datastore of the ListViewModel");
-                console.dir(err);
-            })
-        }, 1000)
+    initList(): Promise<IExpense[]> {
+        // load initial batch
+        return this.fetchItems(null).then((expenses) => {
+            console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`);
+            console.log("expenses size is " + this.expenses.length);
+            return expenses
+        }, err => {
+            console.error("Couldn't initialise the datastore of the ListViewModel");
+            console.dir(err);
+            throw err
+        })
 
     }
 

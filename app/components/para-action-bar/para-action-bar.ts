@@ -12,7 +12,6 @@ export function onLoad(args) {
     if (actionBarTitle){
         container.getViewById('action-bar').text = actionBarTitle
     }
-    console.log("action is" + action);
     let btn = container.getViewById('nav-btn')
 
     if (action === "back") {

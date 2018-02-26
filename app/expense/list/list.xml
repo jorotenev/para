@@ -5,7 +5,7 @@
       xmlns:lv="nativescript-pro-ui/listview"
 
 >
-    <action:para-action-bar title="All expenses"></action:para-action-bar>
+    <action:para-action-bar title="{{L('All expenses')}}"></action:para-action-bar>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>
@@ -14,8 +14,15 @@
 
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
-            <GridLayout rows="*">
-                <lv:RadListView visibility="{{expenses.length ?  'visible' : 'collapsed'}}" row="0" id="expenses-list"
+
+            <GridLayout rows="*,*">
+                <StackLayout visibility="{{connectivity_issues ? 'visible':'collapse'}}" row="0">
+                    <ActivityIndicator id="con-issue-act-ind" busy="false" visibility="collapse"/>
+                    <Label text="{{L('Connectivity issues with the server')}}"></Label>
+                    <Button text="{{L('Try reconnecting')}}" tap="tryToReconnectToAPI"></Button>
+                </StackLayout>
+
+                <lv:RadListView visibility="{{expenses.length ?  'visible' : 'collapse'}}" row="0" id="expenses-list"
                                 items="{{ expenses }}"
                                 loadOnDemandMode="Auto"
                                 loadMoreDataRequested="loadMoreItems"
@@ -35,10 +42,11 @@
                     </lv:RadListView.itemTemplate>
                 </lv:RadListView>
 
-                <StackLayout visibility="{{expenses.length ?'collapsed' : 'visible'}}" row="0"
+                <StackLayout visibility="{{!connectivity_issues  && expenses.length === 0 ? 'visible' : 'collapsed'}}"
+                             row="1"
                              class="text-center">
 
-                    <Label class="h3 font-awesome" text="&#xf165; You don't have any expenses yet" textWrap="true"/>
+                    <Label class="h3 font-awesome" text="You don't have any expenses yet" textWrap="true"/>
                     <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
                 </StackLayout>
             </GridLayout>

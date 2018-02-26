@@ -21,5 +21,8 @@
   "pwd_min_len_error": "Минимална дължина %s символа",
   "Email can't be empty": "Мейлът е задължителен",
   "field_cant_be_empty": "Полето е задължително",
-  "invalid_email": "Невалиден мейл"
+  "invalid_email": "Невалиден мейл",
+  "Connectivity issues with the server":"Проблеми при свързването със сървъра",
+  "Try reconnecting":"Опитай повторно свързване",
+  "All expenses":"Всички разходи"
 }

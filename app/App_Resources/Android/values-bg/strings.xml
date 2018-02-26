@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_All_expenses_Zs9hmC">"Всички разходи"</string>
+  <string name="_Try_reconnecting_Z25mIvA">"Опитай повторно свързване"</string>
+  <string name="_Connectivity_issues_with_the_server_ZBKUdB">"Проблеми при свързването със сървъра"</string>
   <string name="_invalid_email_Z10mV75">"Невалиден мейл"</string>
   <string name="_field_cant_be_empty_Z1Y1KYx">"Полето е задължително"</string>
   <string name="_Email_can_t_be_empty_Z1aBs6L">"Мейлът е задължителен"</string>

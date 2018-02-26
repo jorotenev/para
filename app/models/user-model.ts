@@ -1,5 +1,5 @@
 import {Observable} from "data/observable";
-import {setUserFirebaseUID, userPreferredCurrency} from "~/app_config";
+import {userPreferredCurrency} from "~/app_config";
 import {firebase} from "nativescript-plugin-firebase/firebase-common";
 
 export interface IUser {
