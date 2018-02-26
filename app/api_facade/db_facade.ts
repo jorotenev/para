@@ -5,7 +5,7 @@ import {RawResponseError, ResponseError, Utils} from "./common";
 
 
 export const EXPENSES_API_ENDPOINT = `${apiAddress}expenses_api/${apiVersion}/`;
-
+console.log(`API ENDPOINT IS ${EXPENSES_API_ENDPOINT}`)
 export enum HTTPMethod {
     POST = "POST",
     DELETE = "DELETE",
@@ -51,7 +51,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
     static readonly GETListEndpointTemplate =
         u.template(
-            `${EXPENSES_API_ENDPOINT}get_expenses_list?<%= start_from_id %>&start_from_property=<%= start_from_property %>&start_from_property_value=<%=start_from_property_value%>&order_direction=<%= order_direction %>`
+            `${EXPENSES_API_ENDPOINT}get_expenses_list?start_from_id=<%= start_from_id %>&start_from_property=<%= start_from_property %>&start_from_property_value=<%=start_from_property_value%>&order_direction=<%= order_direction %>`
         );
     static readonly GETSingleEndpoint = u.template(`${EXPENSES_API_ENDPOINT}get_expense_by_id/<%= id %>`);
     static readonly POSTPersistEndpoint = `${EXPENSES_API_ENDPOINT}persist`;
@@ -130,7 +130,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         };
 
         let url = ExpenseDatabaseFacade.GETListEndpointTemplate({
-            start_from_id: !!options.start_from ? options.start_from.id : null,
+            start_from_id: options.start_from ? options.start_from.id : null,
             start_from_property: options.sort_on,
             start_from_property_value: !!options.start_from ? options.start_from[options.sort_on] : null,
 
