@@ -88,7 +88,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         // return this.send(exp, ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT)
         return Utils.makeRequest(ExpenseDatabaseFacade.PUTUpdateEndpoint, HTTPMethod.PUT, {
             updated: exp,
-            previous_stage: old_exp
+            previous_state: old_exp
         })
     }
 
