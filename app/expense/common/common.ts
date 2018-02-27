@@ -35,7 +35,7 @@ export interface CommonExpenseViewModel {
     group_2: string
     group_3: string
 
-    updatePressed(): void
+    btnPressed(): void
 
     [key: string]: any
 }
@@ -57,8 +57,8 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
-        this.expense = options.expense;
-        this.raw_initial_expense = options.expense;
+        this.expense = {...options.expense};
+        this.raw_initial_expense = {...options.expense};
 
         this.dataform = options.dataform;
         this.page = options.page;
@@ -73,7 +73,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
             throw new Error("no action btn")
         }
 
-        btn.on(Button.tapEvent, this.updatePressed, this);
+        btn.on(Button.tapEvent, this.btnPressed, this);
 
 
         this.objectHash = hashCode(JSON.stringify(this.expense));
@@ -120,7 +120,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         return getJSONForm(this.expense, this.mode)
     }
 
-    public updatePressed() {
+    public btnPressed() {
         const that = this;
         const dataform = this.dataform;
         if (validate(dataform)) { // manually validate
@@ -145,7 +145,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
         let committedExpense;
         try {
-            committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject))
+            committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject));
         } catch (err) {
             console.error(err);
             dialogs.alert(`Couldn't ${verb} the expense`);
@@ -206,7 +206,8 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         exp.tags = e.tags.split(",").map((tag) => tag.trim());
 
         exp.timestamp_utc = this.extractTimestampUTC(e);
-
+        delete exp.date
+        delete exp.time
         return exp
     }
 
@@ -216,9 +217,10 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         let subMinuteSymbols = moment(this.initialTimestampUTC).format("ss.SSS")
         let localTimeStr = `${dateStr}T${timeStr}:${subMinuteSymbols}`;
         let dateTimeUTC = moment(localTimeStr).utc();
-        console.log(localTimeStr)
+        console.log(`localTimeStr ${localTimeStr}`);
         if (dateTimeUTC.isValid()) {
-            return dateTimeUTC.format()
+            console.log(`returning ${dateTimeUTC.toISOString()}`);
+            return dateTimeUTC.toISOString()
         } else {
             throw new Error("couldn't convert to a utc timestamp")
         }
