@@ -5,7 +5,7 @@
       xmlns:action="components/para-action-bar"
       navigatingTo="navigatingTo" class="page" actionBarHidden="false">
 
-    <action:para-action-bar action="back">
+    <action:para-action-bar action="back" title="{{pageName}}">
         <ActionItem text="Delete" android.systemIcon="ic_menu_delete" android.position="actionBarIfRoom" tap="deleteExpense"></ActionItem>
     </action:para-action-bar>
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
