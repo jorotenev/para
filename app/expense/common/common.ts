@@ -90,6 +90,13 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         this._expense = _e
     }
 
+    public get pageName() {
+        return {
+            [ExpenseFormMode.new]: "Add an expense",
+            [ExpenseFormMode.update]: "Update an expense"
+        }[this.mode]
+    }
+
     public get actionBtnText() {
         return {
             [ExpenseFormMode.new]: "Add expense",
