@@ -70,7 +70,10 @@ export class DataStore implements IDataStore {
             // update the object of this datastore with the value resolved from the api
             let indexOfUpdated = this.indexOfExpense(updated);
             if (indexOfUpdated !== -1) {
-                this.expenses.setItem(indexOfUpdated, updated)
+                this.expenses.setItem(indexOfUpdated, updated);
+                if (exp.timestamp_utc !== old_exp.timestamp_utc) {
+                    this._sort()
+                }
             } else {
                 throw <ResponseError> {
                     reason: "Invalid application state. When updating, the expense returned by the API," +
@@ -144,13 +147,7 @@ export class DataStore implements IDataStore {
         }
         this.expenses.push(exp);
 
-        // TODO ensure expenses are sorted
-        if (this.expenses.length > 1 && Expense.comparator(this.expenses.getItem(0), this.expenses.getItem(1)) === COMPARE_RESULT.SMALLER) {
-            console.error("fucked up, duct-taping"); //todo send this to an online log repository
-            this.expenses.sort((a, b) => {
-                return -1 * Expense.comparator(a, b) // reverse the natural ordering
-            })
-        }
+        this._sort()
 
     }
 
@@ -170,5 +167,11 @@ export class DataStore implements IDataStore {
 
     private indexOfExpense(exp: IExpense): number {
         return this.expenses.findIndex(managed_exp => managed_exp.id === exp.id)
+    }
+
+    private _sort() {
+        this.expenses.sort((a, b) => {
+            return -1 * Expense.comparator(a, b) // reverse the natural ordering
+        })
     }
 }
