@@ -11,6 +11,7 @@ import {
 } from "application-settings";
 import {getCurrencies} from "~/utils/money";
 
+
 const currencies = getCurrencies()
 
 function validateCurrency(currency) {
@@ -35,13 +36,6 @@ export function setCurrency(currency: string): boolean {
     }
 }
 
-export function setUserFirebaseUID(uid) {
-    setString(userFirebaseUID, uid)
-}
-
-export function setFirebaseAuthToken(token) {
-    setString(firebaseAuthTokenKey, token)
-}
 
 /*
  Config values
@@ -51,7 +45,5 @@ export const viewAfterLogIn = 'expense/list/list';
 export const viewLogIn = 'auth/login/login-view';
 export const userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
 export const apiVersion = 'v1';
-export const apiAddress = "http://192.168.0.104:5000/"; //TODO hack
-export const userFirebaseUID = getString(userFirebaseUIDKey, null);
-export const firebaseAuthToken = getString(firebaseAuthTokenKey, null);
-
+export const fallback_api_endpoint = null; // todo
+export const apiAddress = "http://192.168.0.104:5000/"; //TODO hack https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/

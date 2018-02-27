@@ -1,22 +1,19 @@
-﻿// import "./_bundle-config";
-import * as app from 'application';
+﻿import * as app from 'application';
 import {readableTimestamp} from "~/utils/time";
 import {expenseAmountToString} from "~/utils/money";
-import {viewLogIn} from '~/app_config';
 import {numberConverter} from "~/utils/number";
 import firebase = require("nativescript-plugin-firebase");
+import * as app_config from "~/app_config"
 
 const localize = require("nativescript-localize");
+firebase.init()
 
-firebase.init();
-
-// https://docs.nativescript.org/core-concepts/data-binding#example-7-adding-converters-in-the-application-module-resources
 app.setResources({
     'numberConverter': numberConverter,
     'readableTimestamp': readableTimestamp,
     'expenseAmountToString': expenseAmountToString,
-    'L':localize
+    'L': localize
 });
 
 
-app.start({moduleName: viewLogIn});
+app.start({moduleName: app_config.viewLogIn});
