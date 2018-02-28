@@ -18,7 +18,7 @@ const routes = {
         deleteHistory: false,
     },
     "settings": {
-        path: "user/settings",
+        path: "settings/settings",
         backstackVisible: true,
         deleteHistory: false,
     },

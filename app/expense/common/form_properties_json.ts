@@ -4,6 +4,7 @@ import {getCurrencies} from "~/utils/money";
 
 export function metadataForCurrency(options) {
     let opts = {
+        includeGroup: true,
         groupName: "",
         index: 0,
         displayName: "",
@@ -12,8 +13,8 @@ export function metadataForCurrency(options) {
         name: 'currency',
         ...options
     };
-    return {
-        groupName: opts.groupName,
+    let res = {
+        // groupName: opts.groupName,
 
         displayName: opts.displayName,
         name: opts.name,
@@ -25,6 +26,10 @@ export function metadataForCurrency(options) {
         validators: [],
         valuesProvider: prepareCurrencyObject(getCurrencies()),
     }
+    if (opts.includeGroup){
+        res['groupName'] = opts.groupName
+    }
+    return res
 }
 
 export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {

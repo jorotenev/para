@@ -27,13 +27,9 @@ export const defaultCurrency = "EUR";
 
 validateCurrency(defaultCurrency)
 
-export function setCurrency(currency: string): boolean {
-    try {
-        validateCurrency(currency)
-        return true;
-    } catch (err) {
-        return false;
-    }
+export function setCurrency(currency: string) {
+    validateCurrency(currency)
+    setString(userPreferredCurrencyKey, currency)
 }
 
 
@@ -47,3 +43,8 @@ export const userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
 export const apiVersion = 'v1';
 export const fallback_api_endpoint = null; // todo
 export const apiAddress = "http://192.168.0.104:5000/"; //TODO hack https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+
+console.log(`userPreferredCurrency=${userPreferredCurrency}
+apiVersion=${apiVersion}
+apiAddress=${apiAddress}
+`)
