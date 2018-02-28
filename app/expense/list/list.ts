@@ -50,9 +50,8 @@ export function onTap(ev: ItemEventData): void {
     console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}, 'timestamp': ${expense.timestamp_utc}`);
 
     topmost().navigate({
-        'moduleName': 'expense/single/single',
-        'context': {'expense': expense}
-    })
+    navigateTo({path: 'expense/single/single', extraContext: {'expense': expense}})
+
 }
 
 
