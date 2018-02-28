@@ -1,5 +1,5 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd"
-      xmlns:df="nativescript-pro-ui/dataform"
+      xmlns:df="nativescript-ui-dataform"
       navigatingTo="navigatingTo" class="page" actionBarHidden="true">
 
     <StackLayout class="p-20 ">

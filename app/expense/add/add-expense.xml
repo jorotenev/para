@@ -1,6 +1,7 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd"
-      navigatingTo="navigatingTo" class="page" actionBarHidden="false"
-      xmlns:sd="nativescript-pro-ui/sidedrawer"
+      navigatingTo="navigatingTo"
+      class="page" actionBarHidden="false"
+      xmlns:sd="nativescript-ui-sidedrawer"
       xmlns:action="components/para-action-bar"
       xmlns:drawer="components/drawer"
 >

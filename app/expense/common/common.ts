@@ -3,7 +3,7 @@ import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
 import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
-import {RadDataForm} from "nativescript-pro-ui/dataform";
+import {RadDataForm} from "nativescript-ui-dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";

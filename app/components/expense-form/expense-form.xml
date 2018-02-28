@@ -1,6 +1,6 @@
 <!--When referencing the component, we follow the syntax of <namespace:component/> where namespace is the
 name we gave to the path and component is the filename (no extension) of our component XML-->
-<StackLayout loaded="loadedRad" xmlns:df="nativescript-pro-ui/dataform">
+<StackLayout loaded="loadedRad" xmlns:df="nativescript-ui-dataform">
     <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
 
     <df:RadDataForm id="expense-form"

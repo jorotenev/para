@@ -2,7 +2,7 @@ import {EventData} from 'data/observable';
 import {Page} from 'ui/page';
 import {LoginViewModel} from './login-view-model';
 import {navigateTo} from "~/utils/nav";
-import {RadDataForm} from "nativescript-pro-ui/dataform";
+import {RadDataForm} from "nativescript-ui-dataform";
 import {firebase} from "nativescript-plugin-firebase/firebase-common";
 import {authWithFacebook, redirectToViewAfterLogin} from "~/auth/common/firebase_auth";
 

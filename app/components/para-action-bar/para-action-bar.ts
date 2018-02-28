@@ -1,6 +1,6 @@
 import {EventData} from "tns-core-modules/data/observable";
 import frame = require("tns-core-modules/ui/frame");
-import {RadSideDrawer} from "nativescript-pro-ui/sidedrawer";
+import {RadSideDrawer} from "nativescript-ui-sidedrawer";
 import {Button} from "tns-core-modules/ui/button";
 
 const topmost = require("ui/frame").topmost;

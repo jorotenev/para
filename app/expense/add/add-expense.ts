@@ -1,7 +1,7 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
 import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
-import {RadDataForm} from "nativescript-pro-ui/dataform";
+import {RadDataForm} from "nativescript-ui-dataform";
 import {Expense, IExpense} from "~/models/expense";
 import {navigateTo} from "~/utils/nav";
 
@@ -9,11 +9,9 @@ import {navigateTo} from "~/utils/nav";
 let page: Page;
 
 export function navigatingTo(args: EventData) {
-    page = <Page> args.object;
-
     page = <Page>args.object;
     let comingFromDrawer: boolean = !!page.navigationContext.fromDrawer;
-    let navigationBtnType: string = comingFromDrawer ? 'back' : "drawer"
+    let navigationBtnType: string = comingFromDrawer ? "back" : "drawer";
 
     let expense: IExpense = Expense.createEmptyExpense();
     let dataform = <RadDataForm> page.getViewById('expense-form');
@@ -31,6 +29,4 @@ export function navigatingTo(args: EventData) {
     });
     viewModel.navigationBtnType = navigationBtnType;
     page.bindingContext = viewModel
-
-
 }

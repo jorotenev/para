@@ -1,7 +1,7 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
 import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
-import {RadDataForm} from "nativescript-pro-ui/dataform";
+import {RadDataForm} from "nativescript-ui-dataform";
 import * as dialogs from "ui/dialogs";
 import {DataStore} from "~/expense_datastore/datastore";
 import {navigateTo} from "~/utils/nav";

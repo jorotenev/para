@@ -1,7 +1,7 @@
 import {navigateTo} from "~/utils/nav";
 import {EventData} from "tns-core-modules/data/observable";
 import {IUser} from "~/models/user-model";
-import {RadDataForm} from "nativescript-pro-ui/dataform";
+import {RadDataForm} from "nativescript-ui-dataform";
 import {Page} from "tns-core-modules/ui/page";
 import {authWithFacebook, redirectToViewAfterLogin, registerWithPassword} from "~/auth/common/firebase_auth";
 import {SignUpViewModel} from "./signup-view-model"

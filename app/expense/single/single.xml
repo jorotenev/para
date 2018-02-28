@@ -1,6 +1,6 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd"
       xmlns:exp="components/expense-form"
-      xmlns:sd="nativescript-pro-ui/sidedrawer"
+      xmlns:sd="nativescript-ui-sidedrawer"
       xmlns:drawer="components/drawer"
       xmlns:action="components/para-action-bar"
       navigatingTo="navigatingTo" class="page" actionBarHidden="false">

@@ -29,8 +29,6 @@ export function metadataForCurrency(options) {
 
 export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
     return {
-        commitMode: "Manual",
-        validationMode: "Manual",
         propertyAnnotations: [
             {
                 groupName: group_1,
@@ -47,7 +45,16 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 hintText: '0.0',
                 index: 1,
                 columnIndex: 0,
-                editor: 'Number'
+                editor: 'Number',
+                // validators:[
+                //     {
+                //         name:"RangeValidator",
+                //         params:{
+                //             minimum:1,
+                //             maximum:10000000
+                //         }
+                //     }
+                // ]
             },
             metadataForCurrency({index: 1, columnIndex: 1, groupName: group_2}),
             {

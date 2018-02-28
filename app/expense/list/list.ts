@@ -5,7 +5,7 @@ import {ListExpenseModel} from "./list-view-model";
 import {navigateTo} from "~/utils/nav"
 import {IExpense} from "~/models/expense";
 import {topmost} from "ui/frame";
-import {RadListView} from "nativescript-pro-ui/listview";
+import {RadListView} from "nativescript-ui-listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 
 let listModel: ListExpenseModel;

@@ -1,8 +1,8 @@
 <Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo" class="page" actionBarHidden="false"
-      xmlns:sd="nativescript-pro-ui/sidedrawer"
+      xmlns:sd="nativescript-ui-sidedrawer"
       xmlns:drawer="components/drawer"
       xmlns:action="components/para-action-bar"
-      xmlns:lv="nativescript-pro-ui/listview"
+      xmlns:lv="nativescript-ui-listview"
 
 >
     <action:para-action-bar title="{{L('All expenses')}}"></action:para-action-bar>
