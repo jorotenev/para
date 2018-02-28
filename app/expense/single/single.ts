@@ -5,6 +5,7 @@ import {RadDataForm} from "nativescript-ui-dataform";
 import * as dialogs from "ui/dialogs";
 import {DataStore} from "~/expense_datastore/datastore";
 import {navigateTo} from "~/utils/nav";
+import {IExpense} from "~/models/expense";
 
 let page: Page;
 let dataform: RadDataForm;
@@ -18,7 +19,11 @@ export function navigatingTo(args: EventData) {
         page: page,
         dataform: dataform,
         mode: ExpenseFormMode.update,
-        expense: expense
+        expense: expense,
+        onSuccessfulOperation: (newExpense: IExpense) => {
+            console.log("updated expense with id " + newExpense.id);
+            navigateTo({path: 'expense/list/list', backstackVisible: false});
+        }
     })
     page.bindingContext = context
 
@@ -29,7 +34,7 @@ export function deleteExpense() {
         if (confirmed) {
             DataStore.getInstance().remove(expense).then(() => {
                 console.log("deleted")
-                navigateTo({path:"expense/list/list",clearHistory: true,fromDrawer: false})
+                navigateTo({path: "expense/list/list", clearHistory: true, fromDrawer: false})
             }, (err) => {
                 console.dir(err)
                 dialogs.alert("Couldn't delete the expense")
