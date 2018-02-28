@@ -28,6 +28,8 @@ export interface IDataStore extends IExpenseDatabaseFacade {
     _addExpense(exp: IExpense)
 
     _removeExpense(expId: ExpenseIdType)
+
+    simpleExpensesArray(): IExpense[]
 }
 
 export class DataStore implements IDataStore {
@@ -159,6 +161,10 @@ export class DataStore implements IDataStore {
         }
 
         this.expenses.splice(index, 1);
+    }
+
+    public simpleExpensesArray(): IExpense[] {
+        return this.expenses.map(e => e)
     }
 
     private expenseIsManaged(exp: IExpense): boolean {

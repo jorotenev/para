@@ -2,7 +2,7 @@ import {Observable} from "tns-core-modules/data/observable";
 import {IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
-import {GetListOpts} from "~/api_facade/db_facade";
+import {GetListOpts, SyncRequest} from "~/api_facade/db_facade";
 import {ObservableProperty} from "~/utils/misc";
 
 const dialogs = require("ui/dialogs");
@@ -32,6 +32,9 @@ export class ListExpenseModel extends Observable {
         })
     }
 
+    public pullToRefresh() {
+        return this.datastore.sync(this.datastore.simpleExpensesArray())
+    }
 
     public isEmpty(): boolean {
         return this.expenses.length === 0
@@ -75,7 +78,7 @@ export class ListExpenseModel extends Observable {
         // load initial batch
         if (this.datastore.expenses.length !== 0) {
             console.log("DataStore already has items. Skipping..")
-            return Promise.resolve(this.datastore.expenses.map(e => e))
+            return Promise.resolve(this.datastore.simpleExpensesArray())
         }
         return this.fetchItems(null).then((expenses) => {
             console.log(`ListViewModel's datastore is initialised with ${expenses.length} items!`);

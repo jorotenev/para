@@ -8,6 +8,8 @@ import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-ui-listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 
+var dialogs = require("ui/dialogs");
+
 let listModel: ListExpenseModel;
 let page: Page;
 let listView: RadListView;
@@ -48,31 +50,27 @@ export function onTap(ev: ItemEventData): void {
     let itemIndex: number = ev.index;
     let expense: IExpense = listModel.expenses.getItem(itemIndex);
     console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}, 'timestamp': ${expense.timestamp_utc}`);
-
-    topmost().navigate({
-    navigateTo({path: 'expense/single/single', extraContext: {'expense': expense}})
+    navigateTo({path: 'expense/single/single', backstackVisible: false, extraContext: {'expense': expense}})
 
 }
 
 
 export function goToAddExpense() {
-    navigateTo({path: 'expense/add/add-expense'})
+    navigateTo({path: 'expense/add/add-expense', backstackVisible: false})
 }
 
 export function onPullToRefreshInitiated() {
-    /**
-     * TODO
-     * on refresh:
-     *  - gather the ids of the expenses in the current list and when they were updated //todo
-     *  - send them to the api
-     *    - the api will return to arrays - 1) objects that have been updated (have newer `timestamp_utc_updated`)
-     *      2) objects that have newer IDs than the newest in the list
-     * */
-    console.log("onPullToRefreshInitiated");
-    setTimeout(() => {
-        console.log('listView.notifyPullToRefreshFinished finished');
+    listModel.pullToRefresh().then((succ) => {
         listView.notifyPullToRefreshFinished()
-    }, 1000)
+    }, (err) => {
+        listView.notifyPullToRefreshFinished();
+
+        dialogs.alert({
+            title: "Refresh failed",
+            message: err,
+            okButtonText: "Ok"
+        });
+    });
 }
 
 
