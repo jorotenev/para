@@ -30,6 +30,7 @@ validateCurrency(defaultCurrency)
 export function setCurrency(currency: string) {
     validateCurrency(currency)
     setString(userPreferredCurrencyKey, currency)
+    userPreferredCurrency = currency
 }
 
 
@@ -39,10 +40,11 @@ export function setCurrency(currency: string) {
 // export const viewAfterLogIn = 'expense/add/add-expense';
 export const viewAfterLogIn = 'expense/list/list';
 export const viewLogIn = 'auth/login/login-view';
-export const userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
+export let userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
 export const apiVersion = 'v1';
 export const fallback_api_endpoint = null; // todo
-export const apiAddress = "http://192.168.0.104:5000/"; //TODO hack https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+// export const apiAddress = "http://192.168.0.104:5000/"; //TODO hack https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+export const apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //TODO hack https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
 
 console.log(`userPreferredCurrency=${userPreferredCurrency}
 apiVersion=${apiVersion}
