@@ -51,6 +51,9 @@ export class DataStore implements IDataStore {
         return DataStore._instance
     }
 
+    public static resetDataStore() {
+        DataStore._instance = null;
+    }
 
     persist(exp: IExpense): Promise<IExpense> {
         return this.proxyTarget.persist(exp).then((persisted) => {
