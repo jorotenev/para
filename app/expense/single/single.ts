@@ -28,7 +28,8 @@ export function deleteExpense() {
     dialogs.confirm("Are you sure you want to delete this expense?").then((confirmed) => {
         if (confirmed) {
             DataStore.getInstance().remove(expense).then(() => {
-                navigateTo("app/expenses/list", true)
+                console.log("deleted")
+                navigateTo("expense/list/list", true, false)
             }, (err) => {
                 console.dir(err)
                 dialogs.alert("Couldn't delete the expense")
