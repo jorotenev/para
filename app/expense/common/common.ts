@@ -10,6 +10,7 @@ import {Button} from "tns-core-modules/ui/button";
 import {getJSONForm} from "./form_properties_json"
 import {DataStore} from "~/expense_datastore/datastore";
 import moment = require("moment");
+import {Observable} from "tns-core-modules/data/observable";
 
 export const group_1 = " ";
 export const group_2 = "Extra";
@@ -29,7 +30,7 @@ export function viewModelFactory(options: Constructor): CommonExpenseViewModel {
 
 export interface CommonExpenseViewModel {
     metadata: object
-    expense: IExpense
+    // expense: IExpense
     actionBtnText: string
     group_1: string
     group_2: string
@@ -40,8 +41,9 @@ export interface CommonExpenseViewModel {
     [key: string]: any
 }
 
-abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
-    private _expense: IExpense;
+abstract class _ExpenseViewModelHelper extends Observable implements CommonExpenseViewModel {
+
+    // public _expense: IExpense;
 
     private readonly raw_initial_expense: IExpense;
     private readonly mode: ExpenseFormMode;
@@ -57,9 +59,10 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
-        this.expense = {...options.expense};
-        this.raw_initial_expense = {...options.expense};
-
+        super()
+        this.set('expense', this.convertForForm(options.expense))
+        // this.expense = this.convertForForm(options.expense);
+        //
         this.dataform = options.dataform;
         this.page = options.page;
         this.mode = options.mode;
@@ -76,19 +79,18 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
         btn.on(Button.tapEvent, this.btnPressed, this);
 
 
-        this.objectHash = hashCode(JSON.stringify(this.expense));
-        this.initialTimestampUTC = this.expense.timestamp_utc;
-        this.expense = this.convertForForm(this.expense);
-
+        this.objectHash = hashCode(JSON.stringify(this.get('expense')));
+        this.initialTimestampUTC = this.get('expense').timestamp_utc;
+        this.raw_initial_expense = {...this.get('expense')};
     }
 
-    public get expense() {
-        return this._expense
-    }
-
-    public set expense(_e) {
-        this._expense = _e
-    }
+    // public get expense() {
+    //     return this._expense
+    // }
+    //
+    // public set expense(_e) {
+    //     this._expense = _e
+    // }
 
     public get pageName() {
         return {
@@ -117,24 +119,32 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
     }
 
     public get metadata() {
-        return getJSONForm(this.expense, this.mode)
+        return getJSONForm(this.get('expense'), this.mode)
     }
 
     public btnPressed() {
         const that = this;
         const dataform = this.dataform;
-        if (validate(dataform)) { // manually validate
+        if (true) {//if (validate(dataform)) { // manually validate
             dataform.validateAndCommitAll().then((ok) => { //validate via raddataform & attempt to commit
-                if (ok) {
-                    this.onSuccessfullyCommitted()
-                } else {
-                    console.error("couldnt validated/commit")
+                try {
+                    if (ok) {
+                        console.log("on succ")
+                        that.onSuccessfullyCommitted()
+                    } else {
+                        console.error("couldnt validated/commit")
+                    }
+                } catch (err) {
+
+                    console.dir(err)
+                    console.log(err)
                 }
+
             }, (err) => {
                 console.dir(err)
             })
         } else {
-            console.log("didn't pass manual validation")
+            // console.log("didn't pass manual validation")
         }
     }
 
@@ -145,7 +155,7 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
         let committedExpense;
         try {
-            committedExpense = this.convertFromForm(JSON.parse(this.dataform.editedObject));
+            committedExpense = this.convertFromForm(JSON.parse(that.dataform.editedObject));
         } catch (err) {
             console.error(err);
             dialogs.alert(`Couldn't ${verb} the expense`);
@@ -201,20 +211,26 @@ abstract class _ExpenseViewModelHelper implements CommonExpenseViewModel {
 
 
     private convertFromForm(e: any): IExpense {
-        let exp: IExpense = {...e};
-        exp.amount = !!exp.amount ? exp.amount : 0;
-        exp.tags = e.tags.split(",").map((tag) => tag.trim());
+        let exp: any = {...e};
+
+        if (exp.amount) {
+            exp.amount = exp.amount;
+        } else {
+            exp.amount = 0;
+        }
+        exp.tags = e.tags ? e.tags.split(",").map((tag) => tag.trim()) : [];
 
         exp.timestamp_utc = this.extractTimestampUTC(e);
         delete exp.date
         delete exp.time
+
         return exp
     }
 
     private extractTimestampUTC(e: any) {
         let timeStr = moment(e.time).format(timeFormat);
         let dateStr = moment(e.date).format(dateFormat);
-        let subMinuteSymbols = moment(this.initialTimestampUTC).format("ss.SSS")
+        let subMinuteSymbols = moment(this.initialTimestampUTC).format("ss.SSS");
         let localTimeStr = `${dateStr}T${timeStr}:${subMinuteSymbols}`;
         let dateTimeUTC = moment(localTimeStr).utc();
         console.log(`localTimeStr ${localTimeStr}`);
