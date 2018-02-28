@@ -15,14 +15,20 @@ export class ListExpenseModel extends Observable {
     @ObservableProperty()
     public connectivity_issues: boolean = false;
 
+    @ObservableProperty()
+    public hasItems: boolean;
+
     protected datastore: IDataStore;
     // How many items to fetch from the server in response to the loadMoreItems event
     batchSize: number = 10;
 
     constructor() {
         super();
+
         this.datastore = DataStore.getInstance();
         this.expenses = this.datastore.expenses;
+        this.hasItems = this.datastore.expenses.length > 0;
+        this.datastore.expenses.on(ObservableArray.changeEvent, this.updateExpensesSize.bind(this));
 
         let that = this;
         this.initList().then(() => {
@@ -30,6 +36,11 @@ export class ListExpenseModel extends Observable {
             console.log("connectivity_issues = true");
             that.connectivity_issues = true
         })
+    }
+
+    private updateExpensesSize() {
+        console.log("updateExpensesSize")
+        this.hasItems = this.expenses.length > 0
     }
 
     public pullToRefresh() {

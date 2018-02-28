@@ -21,17 +21,6 @@ export function navigatingTo(args: EventData) {
     page.bindingContext = listModel = new ListExpenseModel();
 }
 
-export function loaded() {
-    /**
-     * TODO. resolving https://github.com/NativeScript/NativeScript/issues/5476
-     * will remove the necessity of this hack.
-     */
-    if (flag) {
-        flag = false
-        navigateTo({path: 'expense/list/list'});
-    }
-}
-
 export function loadMoreItems(ev: EventData): void {
     // https://github.com/NativeScript/NativeScript/issues/4931
     const fireEventAfter = 100; //ms
