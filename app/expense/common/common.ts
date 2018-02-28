@@ -60,9 +60,10 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
 
     public constructor(options: Constructor) {
         super()
+        this.raw_initial_expense = {...options.expense};
+
         this.set('expense', this.convertForForm(options.expense))
-        // this.expense = this.convertForForm(options.expense);
-        //
+
         this.dataform = options.dataform;
         this.page = options.page;
         this.mode = options.mode;
@@ -81,7 +82,6 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
 
         this.objectHash = hashCode(JSON.stringify(this.get('expense')));
         this.initialTimestampUTC = this.get('expense').timestamp_utc;
-        this.raw_initial_expense = {...this.get('expense')};
     }
 
     // public get expense() {
