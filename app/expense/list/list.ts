@@ -50,7 +50,7 @@ export function onTap(ev: ItemEventData): void {
     let itemIndex: number = ev.index;
     let expense: IExpense = listModel.expenses.getItem(itemIndex);
     console.log(`onTap: {'id': ${expense.id}, 'amount': ${expense.amount}, 'timestamp': ${expense.timestamp_utc}`);
-    navigateTo({path: 'expense/single/single', backstackVisible: false, extraContext: {'expense': expense}})
+    navigateTo({path: 'expense/single/single', backstackVisible: true, extraContext: {'expense': expense}})
 
 }
 
