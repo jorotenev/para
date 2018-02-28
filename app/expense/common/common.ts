@@ -59,7 +59,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
-        super()
+        super();
         this.raw_initial_expense = {...options.expense};
 
         this.set('expense', this.convertForForm(options.expense))
@@ -150,6 +150,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
 
 
     private onSuccessfullyCommitted() {
+        console.log('onSuccessfullyCommitted')
         const that = this;
         const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode];
 
@@ -186,6 +187,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             that.onSuccessfulOperation(updatedExpense)
 
         }, function (err) {
+            console.dir(err)
             toggleActivityIndicator(that.activityIndicator, false);
             dialogs.alert({
                 title: `Couldn't ${verb} the expense`,
@@ -196,6 +198,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     }
 
     private convertForForm(expense: IExpense) {
+
         let copy: any = {...expense};
 
         console.log("original timestamp " + copy.timestamp_utc)
@@ -280,7 +283,4 @@ function validate(dataform: RadDataForm) {
         dataform.notifyValidated('amount', amountIsValid)
 
     }
-    // << validate amount
-
-    return validated;
 }

@@ -29,6 +29,8 @@ export function metadataForCurrency(options) {
 
 export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
     return {
+        // commitMode: "Manual",
+        // validationMode: "Manual",
         propertyAnnotations: [
             {
                 groupName: group_1,

@@ -185,6 +185,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
                 }
                 return response
             }, err => {
+                console.dir(err)
                 throw err
             })
     }

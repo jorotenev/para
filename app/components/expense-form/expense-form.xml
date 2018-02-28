@@ -4,10 +4,11 @@ name we gave to the path and component is the filename (no extension) of our com
     <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
 
     <df:RadDataForm id="expense-form"
-                    commitMode="Manual"
-                    validationMode="OnLostFocus"
+                    commitMode="Immediate"
+                    validationMode="Immediate"
                     source="{{expense}}"
                     metadata="{{metadata}}"
+
     >
         <df:RadDataForm.groups>
             <df:PropertyGroup collapsible="false" name="{{group_1}}" hidden="false">
