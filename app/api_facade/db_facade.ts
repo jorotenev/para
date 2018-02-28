@@ -107,7 +107,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
         }
         const url = ExpenseDatabaseFacade.DELETERemove;
 
-        return Utils.makeRequest(url, HTTPMethod.DELETE, exp).catch(err => {
+        return Utils.makeRequest(url, HTTPMethod.POST, exp).catch(err => {
             throw {reason: err.msg, raw: err}
         });
 
