@@ -11,12 +11,23 @@ import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 let listModel: ListExpenseModel;
 let page: Page;
 let listView: RadListView;
+let flag = true;
 
 export function navigatingTo(args: EventData) {
     page = <Page>args.object;
     listView = <RadListView> page.getViewById('expenses-list');
     page.bindingContext = listModel = new ListExpenseModel();
-    listView.refresh()
+}
+
+export function loaded() {
+    /**
+     * TODO. resolving https://github.com/NativeScript/NativeScript/issues/5476
+     * will remove the necessity of this hack.
+     */
+    if (flag) {
+        flag = false
+        navigateTo({path: 'expense/list/list'});
+    }
 }
 
 export function loadMoreItems(ev: EventData): void {
@@ -74,12 +85,12 @@ export function tryToReconnectToAPI() {
 
     listModel.initList().then(_ => {
         listModel.connectivity_issues = false;
-        console.log("refreshing list view")
+        console.log("refreshing list view");
         listView.refresh();
     }, err => {
         indicator.busy = false;
         indicator.visibility = 'collapse';
-        console.log("refreshing list view")
+        console.log("refreshing list view");
 
         listView.refresh();
     })
