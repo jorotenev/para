@@ -36,5 +36,5 @@ export function loginWithPassword(opts: FirebasePasswordLoginOptions): Promise<F
 export function redirectToViewAfterLogin() {
     let navTo = viewAfterLogIn;
     console.log("Navigating to " + navTo);
-    navigateTo(navTo, true);
+    navigateTo({path: navTo});
 }

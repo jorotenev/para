@@ -9,15 +9,22 @@ export function onLoaded() {
 const routes = {
     "new": {
         path: "expense/add/add-expense",
+        backstackVisible: false,
+        deleteHistory: false,
     },
     "view_all": {
         path: "expense/list/list",
+        backstackVisible: true,
+        deleteHistory: false,
     },
     "settings": {
         path: "user/settings",
+        backstackVisible: true,
+        deleteHistory: false,
     },
     "logout": {
         path: "auth/login/login-view",
+        backstackVisible: true,
         deleteHistory: true,
         promise: logout
     }
@@ -31,7 +38,16 @@ export function onTap(args: EventData) {
         console.log('no route for btn with id ' + id)
         return;
     }
-    let navigateFunc = navigateTo.bind({}, route.path, !!route.deleteHistory)
+    let opts = {
+        path: route.path,
+        clearHistory: route.deleteHistory
+    };
+
+    let navigateFunc = navigateTo.bind({}, {
+        path: route.path,
+        clearHistory: route.deleteHistory,
+        backstackVisible: route.backstackVisible
+    });
 
     let promise = route.promise;
     if (promise) {
@@ -43,6 +59,4 @@ export function onTap(args: EventData) {
         navigateFunc();
         return;
     }
-
-
 }

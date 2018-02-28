@@ -29,7 +29,7 @@ export function deleteExpense() {
         if (confirmed) {
             DataStore.getInstance().remove(expense).then(() => {
                 console.log("deleted")
-                navigateTo("expense/list/list", true, false)
+                navigateTo({path:"expense/list/list",clearHistory: true,fromDrawer: false})
             }, (err) => {
                 console.dir(err)
                 dialogs.alert("Couldn't delete the expense")

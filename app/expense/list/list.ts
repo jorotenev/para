@@ -46,7 +46,7 @@ export function onTap(ev: ItemEventData): void {
 
 
 export function goToAddExpense() {
-    navigateTo('expense/add/add-expense')
+    navigateTo({path: 'expense/add/add-expense'})
 }
 
 export function onPullToRefreshInitiated() {

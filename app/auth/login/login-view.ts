@@ -69,5 +69,5 @@ export function onFbLoginBtnPressed() {
 }
 
 export function goToSignUp() {
-    navigateTo('auth/signup/signup')
+    navigateTo({path: 'auth/signup/signup'})
 }

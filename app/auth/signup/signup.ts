@@ -75,6 +75,6 @@ export function withFb() {
 }
 
 export function goToLogin() {
-    navigateTo("auth/login/login-view")
+    navigateTo({path: "auth/login/login-view"})
 }
 
