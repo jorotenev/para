@@ -2,11 +2,17 @@
 import {readableTimestamp} from "~/utils/time";
 import {expenseAmountToString} from "~/utils/money";
 import {numberConverter} from "~/utils/number";
+import {APP_CONFIG} from "~/app_config"
+import {device} from "platform"
+import * as moment from "moment"
 import firebase = require("nativescript-plugin-firebase");
-import * as app_config from "~/app_config"
 
 const localize = require("nativescript-localize");
-firebase.init()
+
+firebase.init();
+if (device.language === 'bg') {
+    moment.locale('bg')
+}
 
 app.setResources({
     'numberConverter': numberConverter,
@@ -16,4 +22,4 @@ app.setResources({
 });
 
 
-app.start({moduleName: app_config.viewLogIn});
+app.start({moduleName: APP_CONFIG.getInstance().viewLogIn});
