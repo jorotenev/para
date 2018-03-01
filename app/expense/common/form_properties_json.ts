@@ -26,7 +26,7 @@ export function metadataForCurrency(options) {
         validators: [],
         valuesProvider: prepareCurrencyObject(getCurrencies()),
     }
-    if (opts.includeGroup){
+    if (opts.includeGroup) {
         res['groupName'] = opts.groupName
     }
     return res
@@ -52,16 +52,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 hintText: '0.0',
                 index: 1,
                 columnIndex: 0,
-                editor: 'Number',
-                // validators:[
-                //     {
-                //         name:"RangeValidator",
-                //         params:{
-                //             minimum:1,
-                //             maximum:10000000
-                //         }
-                //     }
-                // ]
+                editor: 'Number'
             },
             metadataForCurrency({index: 1, columnIndex: 1, groupName: group_2}),
             {

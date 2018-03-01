@@ -1,4 +1,4 @@
-import {Expense, IExpense} from "~/models/expense";
+import {IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
@@ -84,14 +84,6 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         this.objectHash = hashCode(JSON.stringify(this.get('expense')));
     }
 
-    // public get expense() {
-    //     return this._expense
-    // }
-    //
-    // public set expense(_e) {
-    //     this._expense = _e
-    // }
-
     public get pageName() {
         return {
             [ExpenseFormMode.new]: "Add an expense",
@@ -125,38 +117,47 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     public btnPressed() {
         const that = this;
         const dataform = this.dataform;
-        if (true) {//if (validate(dataform)) { // manually validate
+        let hackAmount = that.dataform.getPropertyByName("amount").valueCandidate; // HACK https://github.com/telerik/nativescript-ui-feedback/issues/549
+
+        if (validate(dataform)) { // custom manual validaiton
             dataform.validateAndCommitAll().then((ok) => { //validate via raddataform & attempt to commit
                 try {
                     if (ok) {
-                        console.log("on succ")
+                        if (hackAmount) {
+                            console.log("hackAmount is " + hackAmount);
+                            this.get('expense').amount = Number(String(hackAmount));
+                        } else {
+                            console.log("in else hackAmount is " + hackAmount)
+                        }
                         that.onSuccessfullyCommitted()
+
                     } else {
-                        console.error("couldnt validated/commit")
+                        console.error("couldnt validate/commit") //todo
                     }
                 } catch (err) {
-
-                    console.dir(err)
+                    // TODO
+                    console.dir(err);
                     console.log(err)
                 }
 
             }, (err) => {
+                //TODO
                 console.dir(err)
             })
         } else {
-            // console.log("didn't pass manual validation")
+            console.log("manual validation failed")
         }
     }
 
 
     private onSuccessfullyCommitted() {
-        console.log('onSuccessfullyCommitted')
+        console.log('onSuccessfullyCommitted');
         const that = this;
         const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode];
 
         let committedExpense;
         try {
-            committedExpense = this.convertFromForm(JSON.parse(that.dataform.editedObject));
+            committedExpense = this.convertFromForm(this.get("expense"));
         } catch (err) {
             console.error(err);
             dialogs.alert(`Couldn't ${verb} the expense`);
@@ -183,11 +184,11 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             that.objectHash = hashCode(JSON.stringify(updatedExpense));
 
             toggleActivityIndicator(that.activityIndicator, false);
-            console.log(`${verb} API call: ok`)
+            console.log(`${verb} API call: ok`);
             that.onSuccessfulOperation(updatedExpense)
 
         }, function (err) {
-            console.dir(err)
+            console.dir(err);
             toggleActivityIndicator(that.activityIndicator, false);
             dialogs.alert({
                 title: `Couldn't ${verb} the expense`,
@@ -255,10 +256,10 @@ class NewExpenseHelper extends _ExpenseViewModelHelper {
 }
 
 export class Constructor {
-    page: Page
-    dataform: RadDataForm
-    expense: IExpense
-    mode: ExpenseFormMode
+    page: Page;
+    dataform: RadDataForm;
+    expense: IExpense;
+    mode: ExpenseFormMode;
     onSuccessfulOperation?: (IExpense) => void = () => undefined // default implementation
 }
 
@@ -272,15 +273,19 @@ function validate(dataform: RadDataForm) {
 
     let validated = true;
     // >> validate the amount
-    let candidateAmount = dataform.getPropertyByName('amount').valueCandidate
+    let candidateAmount = dataform.getPropertyByName('amount').valueCandidate;
+    console.log("candidateAmount" + candidateAmount)
     let amountIsValid = true;
-    if (!!candidateAmount) { // if something's entered
-        if (candidateAmount < 0) {
-            dataform.getPropertyByName("amount").errorMessage = "Negative values are invalid"
-            amountIsValid = false;
-            validated = false;
+    if (candidateAmount) { // if something's entered
+        // needed because of https://github.com/telerik/nativescript-ui-feedback/issues/549
+        let cand = Number(String(candidateAmount));
+        if (cand < 0) {
+            dataform.getPropertyByName("amount").errorMessage = "Negative values are invalid";
+            validated = amountIsValid = false;
         }
         dataform.notifyValidated('amount', amountIsValid)
-
     }
+    // << validated the amount
+
+    return validated
 }
