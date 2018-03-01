@@ -217,16 +217,19 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     private convertFromForm(e: any): IExpense {
         let exp: any = {...e};
 
-        if (exp.amount) {
-            exp.amount = exp.amount;
-        } else {
+        if (!exp.amount) {
             exp.amount = 0;
         }
-        exp.tags = e.tags ? e.tags.split(",").map((tag) => tag.trim()) : [];
+
+        exp.tags = e.tags.split(",").reduce(function (previousValue, currentValue) {
+            let t = currentValue.trim();
+            if (t) previousValue.push(t);
+            return previousValue
+        }, []);
 
         exp.timestamp_utc = this.extractTimestampUTC(e);
-        delete exp.date
-        delete exp.time
+        delete exp.date;
+        delete exp.time;
 
         return exp
     }
