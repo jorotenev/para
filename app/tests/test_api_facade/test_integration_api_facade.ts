@@ -3,13 +3,13 @@
  *
  * */
 import * as http from "http";
-import {apiAddress} from "~/app_config";
+import {APP_CONFIG} from "~/app_config";
 import {mockFirebaseAfterEach, mockFirebaseBeforeEach} from "./test_api_facade";
 
 function apiIsUP(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         let apiPingResponse: Promise<string> = http.getString({
-            'url': `${apiAddress}api/ping`,
+            'url': `${APP_CONFIG.getInstance().apiAddress}api/ping`,
             'method': "GET",
             'timeout': 400
         });

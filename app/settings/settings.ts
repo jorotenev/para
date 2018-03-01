@@ -1,6 +1,5 @@
-import {EventData, Observable} from "tns-core-modules/data/observable";
-import {bindingContextProperty} from "tns-core-modules/ui/core/view-base";
-import {setCurrency, userPreferredCurrency} from "~/app_config"
+import {EventData} from "tns-core-modules/data/observable";
+import {USER_CONFIG} from "~/app_config"
 import {metadataForCurrency} from "~/expense/common/form_properties_json";
 import {RadDataForm} from "nativescript-ui-dataform";
 import * as dialogs from "ui/dialogs";
@@ -14,7 +13,7 @@ export function navigatingTo(args: EventData) {
     page = args.object;
     dataform = page.getViewById("settings-form");
     settingsData = {
-        currency: userPreferredCurrency,
+        currency: USER_CONFIG.getInstance().userPreferredCurrency,
     };
 
     page.bindingContext = {
@@ -32,7 +31,7 @@ export function saveTapped() {
     dataform.validateAndCommitAll().then((ok) => {
         if (ok) {
             try {
-                applySettings()
+                applySettings();
                 navigateTo({path: "expense/list/list"})
             } catch (err) {
                 console.dir(err);
@@ -43,7 +42,7 @@ export function saveTapped() {
 }
 
 function applySettings() {
-    setCurrency(settingsData.currency)
+    USER_CONFIG.getInstance().userPreferredCurrency = settingsData.currency
     console.log("settings applied")
     console.dir(settingsData)
 }

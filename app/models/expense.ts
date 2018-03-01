@@ -1,4 +1,4 @@
-import {userPreferredCurrency} from "~/app_config";
+import {USER_CONFIG} from "~/app_config";
 import {currentTimeUTC} from "~/utils/time";
 import * as underscore from "underscore"
 import {COMPARE_RESULT} from "~/utils/misc";
@@ -20,8 +20,6 @@ export interface IExpense {
     timestamp_utc_created: string;
     timestamp_utc_updated?: string;
 }
-
-
 
 
 export function dummyExpense(id: ExpenseIdType) {
@@ -95,7 +93,7 @@ export class Expense implements IExpense {
         return {
             id: null,
             amount: null,
-            currency: userPreferredCurrency,
+            currency: USER_CONFIG.getInstance().userPreferredCurrency,
             name: null,
             tags: [],
             timestamp_utc: currentTimeUTC(),

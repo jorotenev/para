@@ -1,10 +1,15 @@
 import {navigateTo} from "~/utils/nav";
 import {EventData} from "tns-core-modules/data/observable";
-import {IUser} from "~/models/user-model";
 import {RadDataForm} from "nativescript-ui-dataform";
 import {Page} from "tns-core-modules/ui/page";
-import {authWithFacebook, redirectToViewAfterLogin, registerWithPassword} from "~/auth/common/firebase_auth";
+import {
+    authWithFacebook,
+    refreshUserCofigAndRedirectToViewAfterLogin,
+    registerWithPassword
+} from "~/auth/common/firebase_auth";
 import {SignUpViewModel} from "./signup-view-model"
+import {USER_CONFIG} from "~/app_config";
+import {CreateUserResult} from "nativescript-plugin-firebase";
 
 var dialogs = require("ui/dialogs");
 
@@ -32,14 +37,24 @@ export function signupBtnPressed() {
                 throw new Error(rejectedDataFormMsg)
             }
         })
-        .then((formData: IUser) => {
-            return registerWithPassword({email: formData.email, password: formData.password})
+        .then((formData) => {
+            return new Promise<{ user: CreateUserResult, preferredCurrency: string }>((resolve, reject) => {
+                registerWithPassword({email: formData.email, password: formData.password}).then((user) => {
+                    resolve({
+                        user: user,
+                        preferredCurrency: formData.preferredCurrency
+                    })
+                }, reject)
+            })
         })
-        .then((createdUserInfo) => {
+        .then((obj) => {
+            let createdUserInfo: CreateUserResult = obj.user;
+            let currency = obj.preferredCurrency;
             console.log("created user:");
             console.dir(createdUserInfo);
 
-            redirectToViewAfterLogin()
+            refreshUserCofigAndRedirectToViewAfterLogin({uid: createdUserInfo.key})
+            USER_CONFIG.getInstance().userPreferredCurrency = currency
         })
         .catch((reason) => {
             if (reason instanceof Error) {
@@ -66,7 +81,7 @@ export function signupBtnPressed() {
 export function withFb() {
     model.activity = true;
 
-    authWithFacebook().then(redirectToViewAfterLogin, (err) => {
+    authWithFacebook().then(refreshUserCofigAndRedirectToViewAfterLogin, (err) => {
         model.activity = false;
         dialogs.alert("Failed to register you :(")
 

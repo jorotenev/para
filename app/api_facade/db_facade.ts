@@ -1,11 +1,13 @@
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
-import {apiAddress, apiVersion} from "~/app_config";
+import {APP_CONFIG} from "~/app_config";
 import * as u from 'underscore';
 import {RawResponseError, ResponseError, Utils} from "./common";
 
+let apiAddr = APP_CONFIG.getInstance().apiAddress;
+let apiVer = APP_CONFIG.getInstance().apiVersion;
+export const EXPENSES_API_ENDPOINT = `${apiAddr}expenses_api/${apiVer}/`;
+console.log(`API ENDPOINT IS ${EXPENSES_API_ENDPOINT}`);
 
-export const EXPENSES_API_ENDPOINT = `${apiAddress}expenses_api/${apiVersion}/`;
-console.log(`API ENDPOINT IS ${EXPENSES_API_ENDPOINT}`)
 export enum HTTPMethod {
     POST = "POST",
     DELETE = "DELETE",

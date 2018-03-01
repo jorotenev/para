@@ -1,8 +1,8 @@
 import {metadataForCurrency} from "~/expense/common/form_properties_json";
-import {ObservableProperty, propertyOf} from "~/utils/misc";
-import {IUser, User} from "~/models/user-model";
+import {ObservableProperty} from "~/utils/misc";
 import {Observable} from "tns-core-modules/data/observable";
 import {generateEmailPasswordMetadata} from "~/auth/common/common";
+import {defaultCurrency} from "~/app_config";
 
 export class SignUpViewModel extends Observable {
 
@@ -13,7 +13,7 @@ export class SignUpViewModel extends Observable {
     constructor() {
         super();
         this.activity = false;
-        this.user = User.emptyUser()
+        this.user = {email: null, password: null, preferredCurrency: defaultCurrency}
     }
 
 
@@ -22,7 +22,7 @@ export class SignUpViewModel extends Observable {
         console.log("props len is  " + metadata.propertyAnnotations.length)
         let currencyMetadata = metadataForCurrency({
             index: metadata.propertyAnnotations.length,
-            name: propertyOf<IUser>('preferredCurrency'),
+            name: 'preferredCurrency',
             displayName: "Preferred currency"
         });
         metadata.propertyAnnotations.push(currencyMetadata);
