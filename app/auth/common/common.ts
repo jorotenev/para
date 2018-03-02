@@ -1,30 +1,35 @@
 let l = require('nativescript-localize')
 
+export function emailMetadata() {
+    return {
+        name: "email",
+        displayName: "",
+        index: 0,
+        hintText: l("Enter email"),
+        editor: "Email",
+        required: true,
+        validators: [
+            {
+                name: 'EmailValidator',
+                params: {
+                    errorMessage: l("invalid_email")
+                }
+            },
+            {
+                name: "NonEmpty",
+                params:
+                    {errorMessage: l("field_cant_be_empty")}
+            }]
+    }
+}
+
 export function generateEmailPasswordMetadata() {
     return {
         commitMode: "Immediate",
         validationMode: "Immediate",
         propertyAnnotations: [
-            {
-                name: "email",
-                displayName: "",
-                index: 0,
-                hintText: l("Enter email"),
-                editor: "Email",
-                required: true,
-                validators: [
-                    {
-                        name: 'EmailValidator',
-                        params: {
-                            errorMessage: l("invalid_email")
-                        }
-                    },
-                    {
-                        name: "NonEmpty",
-                        params:
-                            {errorMessage: l("field_cant_be_empty")}
-                    }]
-            },
+            emailMetadata()
+            ,
             {
                 name: 'password',
                 index: 1,

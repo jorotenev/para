@@ -66,3 +66,8 @@ export function onFbLoginBtnPressed() {
 export function goToSignUp() {
     navigateTo({path: 'auth/signup/signup'})
 }
+export function goToRecoverPassword(){
+    console.log("recover pass")
+    navigateTo({path: 'auth/recover_password/recover_password'})
+
+}
