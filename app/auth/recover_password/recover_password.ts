@@ -22,7 +22,6 @@ export function onRecoverBtn() {
     dataForm.validateAndCommitAll().then((ok) => {
         if (!ok) return;
         let email = recoverPassVM.source_object.email;
-        console.log('email is ' + email)
         firebase.resetPassword({
             email: email
         }).then(

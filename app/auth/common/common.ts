@@ -23,6 +23,32 @@ export function emailMetadata() {
     }
 }
 
+type PasswordOpts = { name?: string, displayName?: string, index?: number, hintText?: string }
+
+export function passwordMetadata(opts: PasswordOpts) {
+    const options = {
+        name: "password",
+        displayName: "",
+        hintText: l("Enter password"),
+        index: 0,
+        ...opts
+    };
+    return {
+        name: options.name,
+        index: options.index,
+        displayName: options.displayName,
+        editor: "Password",
+        hintText: options.hintText,
+        required: true,
+        validators: [{name: "NonEmpty", params: {"errorMessage": l("field_cant_be_empty")}}, {
+            name: "MinimumLength",
+            params: {min: 5, errorMessage: l("pwd_min_len_error", 5)},
+
+        }]
+
+    }
+}
+
 export function generateEmailPasswordMetadata() {
     return {
         commitMode: "Immediate",
@@ -30,20 +56,7 @@ export function generateEmailPasswordMetadata() {
         propertyAnnotations: [
             emailMetadata()
             ,
-            {
-                name: 'password',
-                index: 1,
-                displayName: "",
-                editor: "Password",
-                hintText: l("Enter password"),
-                required: true,
-                validators: [{name: "NonEmpty", params: {"errorMessage": l("field_cant_be_empty")}}, {
-                    name: "MinimumLength",
-                    params: {min: 5, errorMessage: l("pwd_min_len_error", 5)},
-
-                }]
-
-            }
+            passwordMetadata({index: 1})
         ]
     }
 

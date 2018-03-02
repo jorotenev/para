@@ -9,27 +9,43 @@
     <action:para-action-bar action="back" title="Settings"/>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
+
         <sd:RadSideDrawer.drawerContent>
             <drawer:drawer-content></drawer:drawer-content>
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
+            <ScrollView>
+                <StackLayout>
+                    <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
+                        <Label text="Preferences" class="h1 text-center"></Label>
+                        <df:RadDataForm
+                                id="settings-form"
+                                source="{{settingsObject}}"
+                                metadata="{{settingsMetadata}}"
+                                validationMode="Immediate"
+                                commitMode="Manual"
+                        />
+                        <Button id="actionBtn" class="btn btn-primary" tap='saveSettingsTapped' text="Save"/>
+                    </StackLayout>
+                    <StackLayout visibility="{{ showChangePassword ? 'visible' :'collapse' }}">
+                        <Label text="Change password" class="h1 text-center"></Label>
 
-            <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
-                <df:RadDataForm
-                        id="settings-form"
-                        source="{{settingsData}}"
-                        metadata="{{metadata}}"
-                        validationMode="Immediate"
-                        commitMode="Manual"
-                >
+                        <df:RadDataForm
+                                id="change-password-form"
+                                source="{{changePassSourceObject}}"
+                                metadata="{{changePassMetadata}}"
+                                validationMode="Immediate"
+                                commitMode="Manual"
+                                propertyValidate="passwordValidate"
+                        />
+                        <Button id="change_pass_btn" class="btn btn-primary" tap='onChangePassBtn'
+                                text="Change password"/>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
 
-
-
-                </df:RadDataForm>
-
-                <Button id="actionBtn" class="btn btn-primary" tap='saveTapped' text="Save"/>
-            </StackLayout>
         </sd:RadSideDrawer.mainContent>
+
     </sd:RadSideDrawer>
 
 </Page>
