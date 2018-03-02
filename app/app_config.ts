@@ -41,7 +41,8 @@ export class APP_CONFIG implements _AppConfig {
     private static instance: APP_CONFIG;
 
     private constructor() {
-        this.apiAddress = "http://192.168.0.104:5000/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+        // this.apiAddress = "http://192.168.0.104:5000/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+        this.apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
         this.apiVersion = "v1";
         this.viewAfterLogIn = "expense/list/list";
         this.viewLogIn = "auth/login/login-view"
@@ -100,13 +101,3 @@ export class USER_CONFIG implements _UserConfig {
         this._userPreferredCurrency = currency
     }
 }
-
-/*
- Config values
- */
-// export const viewAfterLogIn = 'expense/add/add-expense';
-// export const viewAfterLogIn = 'expense/list/list';
-// export const viewLogIn = 'auth/login/login-view';
-// export let userPreferredCurrency = getString(userPreferredCurrencyKey, "EUR");
-// export const apiVersion = 'v1';
-// export const apiAddress = "http://192.168.0.104:5000/";
