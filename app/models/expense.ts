@@ -58,6 +58,7 @@ export class Expense implements IExpense {
             let msg = err.dataPath + ": " + err.message
             throw msg
         }
+        return exp
     }
 
     public static comparator(a: IExpense, b: IExpense): COMPARE_RESULT {

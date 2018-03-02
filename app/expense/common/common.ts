@@ -1,4 +1,4 @@
-import {IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
 import {toggleActivityIndicator} from "~/utils/ui";
@@ -117,55 +117,53 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     public btnPressed() {
         const that = this;
         const dataform = this.dataform;
-        let hackAmount = that.dataform.getPropertyByName("amount").valueCandidate; // HACK https://github.com/telerik/nativescript-ui-feedback/issues/549
+        let hackAmount = Number(String(that.dataform.getPropertyByName("amount").valueCandidate));
 
-        if (validate(dataform)) { // custom manual validaiton
-            dataform.validateAndCommitAll().then((ok) => { //validate via raddataform & attempt to commit
+        const applyHackIfOkValidation = (ok) => {
+            // HACK https://github.com/telerik/nativescript-ui-feedback/issues/549
+            console.log('hackAmount' + hackAmount)
+            if (ok) {
+                that.get('expense').amount = hackAmount ? hackAmount : 0;
+                return Promise.resolve(that.get('expense'))
+            } else {
+                return Promise.reject("Form validation failed")
+            }
+        };
+
+        // fml https://stackoverflow.com/questions/34930771/why-is-this-undefined-inside-class-method-when-using-promises
+        customFormValidation(dataform)
+            .then(dataform.validateAndCommitAll.bind(dataform))
+            .then(applyHackIfOkValidation.bind(this))
+            .then(this.convertFromForm.bind(this))
+            .then((exp) => {
                 try {
-                    if (ok) {
-                        if (hackAmount) {
-                            console.log("hackAmount is " + hackAmount);
-                            this.get('expense').amount = Number(String(hackAmount));
-                        } else {
-                            console.log("in else hackAmount is " + hackAmount)
-                        }
-                        that.onSuccessfullyCommitted()
-
-                    } else {
-                        console.error("couldnt validate/commit") //todo
-                    }
+                    return Expense.validate_throw(exp)
                 } catch (err) {
-                    // TODO
-                    console.dir(err);
-                    console.log(err)
+                    throw {
+                        showToUser: true,
+                        msg: err
+                    }
                 }
-
-            }, (err) => {
-                //TODO
-                console.dir(err)
             })
-        } else {
-            console.log("manual validation failed")
-        }
+            .then(this.onSuccessfullyCommitted.bind(this))
+            .catch(err => {
+                console.dir(err);
+                if (err.showToUser) {
+                    dialogs.alert({
+                        message: err.msg || "Failed to perform operation",
+                        title: "Failed",
+                        cancelable: true,
+                        okButtonText: "Ok"
+                    })
+                }
+                toggleActivityIndicator(that.activityIndicator, false);
+            })
     }
 
 
-    private onSuccessfullyCommitted() {
-        console.log('onSuccessfullyCommitted');
+    private onSuccessfullyCommitted(committedExpense) {
         const that = this;
         const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode];
-
-        let committedExpense;
-        try {
-            committedExpense = this.convertFromForm(this.get("expense"));
-        } catch (err) {
-            console.error(err);
-            dialogs.alert(`Couldn't ${verb} the expense`);
-            toggleActivityIndicator(that.activityIndicator, false);
-
-            return;
-        }
-
         if (this.objectHash === hashCode(JSON.stringify(committedExpense))) { //todo that's broken
             console.log("committed object is the same as the initial one. idling");
             return;
@@ -213,7 +211,6 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         return copy;
     }
 
-
     private convertFromForm(e: any): IExpense {
         let exp: any = {...e};
 
@@ -221,11 +218,15 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             exp.amount = 0;
         }
 
-        exp.tags = e.tags.split(",").reduce(function (previousValue, currentValue) {
+        // reduce to an object with keys as trimmed tags. get just they keys via Object.keys()
+        exp.tags = Object.keys(e.tags.split(",").reduce(function (previousValue, currentValue) {
             let t = currentValue.trim();
-            if (t) previousValue.push(t);
-            return previousValue
-        }, []);
+            if (t) {
+                return {...previousValue, [t]: 0}
+            } else {
+                return previousValue
+            }
+        }, {}));
 
         exp.timestamp_utc = this.extractTimestampUTC(e);
         delete exp.date;
@@ -272,23 +273,46 @@ export enum ExpenseFormMode {
     update = 'update'
 }
 
-function validate(dataform: RadDataForm) {
-
-    let validated = true;
-    // >> validate the amount
-    let candidateAmount = dataform.getPropertyByName('amount').valueCandidate;
-    console.log("candidateAmount" + candidateAmount)
-    let amountIsValid = true;
-    if (candidateAmount) { // if something's entered
-        // needed because of https://github.com/telerik/nativescript-ui-feedback/issues/549
-        let cand = Number(String(candidateAmount));
-        if (cand < 0) {
-            dataform.getPropertyByName("amount").errorMessage = "Negative values are invalid";
-            validated = amountIsValid = false;
+function customFormValidation(dataform: RadDataForm): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        let validated = true;
+        // >> validate the amount
+        let amountIsValid = true;
+        let candidateAmount = Number(String(dataform.getPropertyByName('amount').valueCandidate));
+        if (!isNaN(candidateAmount)) { // if something's entered
+            // needed because of https://github.com/telerik/nativescript-ui-feedback/issues/549
+            if (candidateAmount < 0) {
+                dataform.getPropertyByName("amount").errorMessage = "Negative values are invalid";
+                validated = amountIsValid = false;
+            }
         }
-        dataform.notifyValidated('amount', amountIsValid)
-    }
-    // << validated the amount
+        dataform.notifyValidated('amount', amountIsValid);
+        if (!validated) {
+            reject();
+            return;
+        }
+        // << validated the amount
 
-    return validated
+
+        let candidateName = dataform.getPropertyByName('name').valueCandidate;
+        let atLeastOne = validated = !!candidateName || !!candidateAmount;
+
+        ['amount', 'name'].forEach(propName => {
+            if (!atLeastOne) {
+                dataform.getPropertyByName(propName).errorMessage = "At least one of the properties is required";
+            }
+            dataform.notifyValidated(propName, atLeastOne)
+        });
+
+        if (validated) {
+            console.log("validatedddd");
+            resolve();
+            return
+        } else {
+            console.log("faileddd");
+            reject();
+            return
+        }
+    })
+
 }

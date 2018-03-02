@@ -24,7 +24,7 @@ export function navigatingTo(args: EventData) {
         expense: expense,
         onSuccessfulOperation: (newExpense: IExpense) => {
             console.log("created a new expense with id " + newExpense.id);
-            navigateTo({path: 'expense/add/add-expense', backstackVisible: false});
+            navigateTo({path: 'expense/list/list', clearHistory: true, backstackVisible: false});
         }
     });
     viewModel.navigationBtnType = navigationBtnType;

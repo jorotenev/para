@@ -39,7 +39,6 @@ export class ListExpenseModel extends Observable {
     }
 
     private updateExpensesSize() {
-        console.log("updateExpensesSize")
         this.hasItems = this.expenses.length > 0
     }
 
