@@ -6,7 +6,8 @@
       navigatingTo="navigatingTo" class="page" actionBarHidden="false">
 
     <action:para-action-bar action="back" title="{{pageName}}">
-        <ActionItem text="Delete" android.systemIcon="ic_menu_delete" android.position="actionBarIfRoom" tap="deleteExpense"></ActionItem>
+        <ActionItem text="Delete" android.systemIcon="ic_menu_delete" android.position="actionBarIfRoom"
+                    tap="deleteExpense"></ActionItem>
     </action:para-action-bar>
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>
@@ -15,13 +16,16 @@
 
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
+            <ScrollView>
 
-            <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
+                <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
 
-                <exp:expense-form/>
+                    <exp:expense-form/>
 
-                <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
-            </StackLayout>
+                    <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
+                </StackLayout>
+            </ScrollView>
+
         </sd:RadSideDrawer.mainContent>
     </sd:RadSideDrawer>
 

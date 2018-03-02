@@ -14,15 +14,16 @@
 
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
+            <ScrollView>
 
-            <StackLayout class="p-20 form" row="1" xmlns:exp="components/expense-form">
+                <StackLayout class="p-20 form" row="1" xmlns:exp="components/expense-form">
 
-                <exp:expense-form/>
+                    <exp:expense-form/>
 
-                <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
+                    <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
 
-            </StackLayout>
-
+                </StackLayout>
+            </ScrollView>
         </sd:RadSideDrawer.mainContent>
 
     </sd:RadSideDrawer>
