@@ -4,3 +4,4 @@ platforms/
 .idea/
 **/*.js
 !hooks/
+.cloud/

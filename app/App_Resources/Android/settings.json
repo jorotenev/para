@@ -1,1 +1,5 @@
-{"appId":"org.nativescript.para"}
+{
+  "appId": "org.nativescript.para",
+  "minSdkVersion": 24,
+  "targetSdkVersion": 26
+}
