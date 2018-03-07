@@ -1,6 +1,6 @@
 import {Utils} from "./common";
 import {APP_CONFIG} from "~/app_config";
-import {HTTPMethod} from "~/api_facade/db_facade";
+import {HTTPMethod} from "~/api_facade/types";
 
 let apiAddr = APP_CONFIG.getInstance().apiAddress
 let apiVer = APP_CONFIG.getInstance().apiVersion

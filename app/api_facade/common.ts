@@ -1,7 +1,7 @@
 import {HttpResponse} from "tns-core-modules/http";
 import * as _http from 'http';
 import * as _firebase from "nativescript-plugin-firebase";
-import {HTTPMethod} from "~/api_facade/db_facade";
+import {HTTPMethod} from "~/api_facade/types";
 
 // easier mocking
 export let firebase = _firebase;

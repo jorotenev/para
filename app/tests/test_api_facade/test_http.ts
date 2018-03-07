@@ -1,5 +1,5 @@
 import {firebase, http, RawResponseError, Utils} from "~/api_facade/common";
-import {HTTPMethod} from "~/api_facade/db_facade";
+import {HTTPMethod} from "~/api_facade/types";
 import {HttpResponse} from "tns-core-modules/http";
 import objectContaining = jasmine.objectContaining;
 

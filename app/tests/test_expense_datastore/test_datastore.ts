@@ -1,17 +1,20 @@
-import {DataStore, ExpenseDatabaseFacade} from "~/expense_datastore/datastore"
+import {DataStore, ExpenseDatabaseFacade, IDataStore} from "~/expense_datastore/datastore"
 import {Expense, IExpense} from "~/models/expense";
 import {ResponseError} from "~/api_facade/common";
 import {SINGLE_EXPENSE, ten_expenses} from "~/tests/test_api_facade/sample_responses";
 import * as u from "underscore";
-import {GetListOpts, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {SyncRequest, TimePeriod} from "~/api_facade/types";
+import {GetListOpts, SyncResponse} from "~/api_facade/types";
+import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
+import {currentTimeLocal} from "~/utils/time";
 
 /**
  * proxy = DataStore
  * api = ExpenseDatabaseFacade
  */
 
-const exp : IExpense= Object.freeze({...SINGLE_EXPENSE, id: null});
-const persisted : IExpense = Object.freeze({...exp, id: 'asd'});
+const exp: IExpense = Object.freeze({...SINGLE_EXPENSE, id: null});
+const persisted: IExpense = Object.freeze({...exp, id: 'asd'});
 
 function cleanDataStore() {
     DataStore._instance = null;
@@ -26,7 +29,7 @@ describe("For all methods of the DataStore", function () {
      * prepares the datastore to be called and returns a call to the corresponding datastore method
      */
     function makeMocks() {
-        let mocks = {
+        let mocks = { // todo compile-time check that all IExpenseDatabaseFacade methods are covered
             persist: {
                 mock: <any>spyOn(ExpenseDatabaseFacade.prototype, 'persist'),
                 methodArgument: [exp],
@@ -67,6 +70,14 @@ describe("For all methods of the DataStore", function () {
                 apiResolvesWith: <SyncResponse>{to_add: [], to_update: [], to_remove: []},
                 call: (ds: DataStore) => {
                     return ds.sync.apply(ds, mocks.sync.methodArgument)
+                }
+            },
+            get_statistics: {
+                mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'get_statistics'),
+                methodArgument: [<TimePeriod>{to_dt_local: currentTimeLocal(), from_dt_local: currentTimeLocal()}], // todo flaky
+                apiResolvesWith: {"BGN": 100},
+                call: (ds: DataStore) => {
+                    return ds.get_statistics.apply(ds, mocks.get_statistics.methodArgument)
                 }
             }
         };

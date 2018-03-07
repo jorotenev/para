@@ -1,12 +1,12 @@
-import {ExpenseDatabaseFacade, GetListOpts, Order, SyncRequest, SyncResponse} from "~/api_facade/db_facade";
+import {ExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {SINGLE_EXPENSE, ten_expenses} from './sample_responses';
 import {Expense, IExpense} from "~/models/expense";
 import {firebase, http, ResponseError, Utils} from "~/api_facade/common";
 import {fakeHTTPResponse} from "~/tests/test_api_facade/test_http";
 import {HttpRequestOptions} from "tns-core-modules/http";
-
-
-let u = require('underscore');
+import {GetListOpts, Order, SyncRequest, SyncResponse} from "~/api_facade/types";
+import {currentTimeLocal, localTimeToUtc, timeOperations} from "~/utils/time";
+import * as moment from "moment"
 
 const promised_ten_results: Promise<IExpense[]> = Promise.resolve(ten_expenses);
 const newest_expense = Object.freeze(ten_expenses[ten_expenses.length - 1]);
@@ -45,7 +45,18 @@ function setUpAfterEach() {
     mockFirebaseAfterEach.call(this)
 }
 
-describe("Testing the get_expenses_list() of  db facade", () => {
+/**
+ *
+ * @param mocked the mocked method
+ * @param forCall passed to the calls.argsFor of the mock
+ * @return {any}
+ */
+function getHttpOptsOfMockHTTPCall(mocked, forCall: number = 0) {
+
+    return mocked.calls.argsFor(forCall)[0]
+}
+
+describe("Testing the get_expenses_list() of the API facade", () => {
 
     beforeAll(function () {
         this.batch_size = 9;
@@ -115,7 +126,7 @@ describe("Testing the get_expenses_list() of  db facade", () => {
 });
 
 
-describe('Testing the persist() of the db facade', function () {
+describe('Testing the persist() of the API facade', function () {
     beforeEach(function () {
         setUpBeforeEach.call(this);
         this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
@@ -152,7 +163,7 @@ describe('Testing the persist() of the db facade', function () {
     })
 });
 
-describe("Testing the update() of the db facade", function () {
+describe("Testing the update() of the API facade", function () {
     beforeEach(function () {
         setUpBeforeEach.call(this);
         this.mockedRequest.and.returnValue(Promise.resolve(SINGLE_EXPENSE));
@@ -202,7 +213,7 @@ describe("Testing the update() of the db facade", function () {
     });
 });
 
-describe('Testing the remove() of the db facade', function () {
+describe('Testing the remove() of the API facade', function () {
     beforeEach(function () {
         setUpBeforeEach.call(this);
         this.mockedRemove = spyOn(ExpenseDatabaseFacade.prototype, 'remove');
@@ -298,11 +309,11 @@ describe("test the sync() method of the API facade", function () {
             expect(result.to_update).toEqual([expense_c]);
 
             expect(this.mockedHTTP).toHaveBeenCalledTimes(1);
-            let httpOpts: HttpRequestOptions = this.mockedHTTP.calls.argsFor(0)[0]; //options arg of first call
+            let httpOpts: HttpRequestOptions = getHttpOptsOfMockHTTPCall(this.mockedHTTP); //options arg of first call
             let expectedRequest = {
                 [this.request[0].id]: {'timestamp_utc_updated': this.request[0].timestamp_utc_updated},
                 [this.request[1].id]: {'timestamp_utc_updated': this.request[1].timestamp_utc_updated},
-            }
+            };
             expect(httpOpts.content).toBe(JSON.stringify(expectedRequest));
 
             done()
@@ -338,4 +349,55 @@ describe("test the sync() method of the API facade", function () {
             })
         })
 
+});
+
+describe("test the get_statistics methods of the API facade", function () {
+    let fromLocal = timeOperations({baseTime: currentTimeLocal(), action: "subtract", modifier: "weeks", amount: 1});
+    let toLocal = currentTimeLocal();
+    let dummyResponse = {
+        "EUR": 100,
+        "BGN": 50
+    };
+    beforeEach(function () {
+        setUpBeforeEach.call(this);
+    });
+
+    afterEach(function () {
+        setUpAfterEach.call(this);
+    });
+
+    it("method resolves with the value of the makeRequest()", function (done) {
+
+        this.mockedRequest.and.returnValue(Promise.resolve(dummyResponse));
+        new ExpenseDatabaseFacade().get_statistics({to_dt_local: toLocal, from_dt_local: fromLocal}).then(
+            result => {
+                expect(result['EUR']).toBe(100);
+                expect(result['BGN']).toBe(50);
+                done()
+            },
+            fail
+        );
+    });
+    it("method converts the timestamps to utc when making the request", function (done) {
+        this.mockedRequest.and.returnValue(Promise.resolve(dummyResponse));
+
+        new ExpenseDatabaseFacade().get_statistics({to_dt_local: toLocal, from_dt_local: fromLocal}).then(_ => {
+            let url = this.mockedRequest.calls.argsFor(0)[0];
+            let splitted = url.split('/').reverse();
+            let to_dt_utc = splitted[0];
+            let from_dt_utc = splitted[1];
+            expect(from_dt_utc).toBe(localTimeToUtc(fromLocal));
+            expect(to_dt_utc).toBe(localTimeToUtc(toLocal));
+            done();
+        }, fail)
+    });
+
+    it("fails immediately if to < from", function (done) {
+        let shouldBoom = () => new ExpenseDatabaseFacade().get_statistics({
+            from_dt_local: toLocal,
+            to_dt_local: fromLocal
+        });
+        expect(shouldBoom).toThrowError("Invalid time boundaries");
+        done()
+    });
 });

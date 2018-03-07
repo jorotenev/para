@@ -1,19 +1,19 @@
-import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
+import {Expense, IExpense} from "~/models/expense";
 import {APP_CONFIG} from "~/app_config";
 import * as u from 'underscore';
 import {RawResponseError, ResponseError, Utils} from "./common";
+import {
+    GetListOpts, HTTPMethod, Order, TimePeriod, SyncRequest, SyncResponse,
+    StatisticsResult
+} from "~/api_facade/types";
+import {COMPARE_RESULT} from "~/utils/misc";
+import {compareDatetimes, localTimeToUtc} from "~/utils/time";
 
 let apiAddr = APP_CONFIG.getInstance().apiAddress;
 let apiVer = APP_CONFIG.getInstance().apiVersion;
 export const EXPENSES_API_ENDPOINT = `${apiAddr}expenses_api/${apiVer}/`;
 console.log(`API ENDPOINT IS ${EXPENSES_API_ENDPOINT}`);
 
-export enum HTTPMethod {
-    POST = "POST",
-    DELETE = "DELETE",
-    GET = "GET",
-    PUT = "PUT"
-}
 
 export interface IExpenseDatabaseFacade {
     /**
@@ -35,21 +35,24 @@ export interface IExpenseDatabaseFacade {
     get_list(opts: GetListOpts): Promise<IExpense[]>
 
     sync(request: SyncRequest): Promise<SyncResponse>
-}
 
-export enum Order {
-    asc = 'asc',
-    desc = 'desc'
-}
-
-export interface GetListOpts {
-    start_from: IExpense | null,
-    batch_size?: number
-    sort_order?: Order,
-    sort_on?: keyof IExpense
+    /**
+     * Given a period of time, return an object which contains the sum
+     * of all expenses, grouped by their currency
+     * E.g. for a request === {from_dt_local: ""2018-03-07T10:44:23+02:00", to_dt_local:"2018-03-07T12:44:23+02:00"
+     * return: {
+     *      "BGN": 100,
+     *      "EUR": 50
+     * }
+     *
+     * @param {TimePeriod} request
+     * @return Promise<StatiscsResult>
+     */
+    get_statistics(request: TimePeriod): Promise<StatisticsResult>
 }
 
 export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
+
 
     static readonly GETListEndpointTemplate =
         u.template(
@@ -60,6 +63,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
     static readonly DELETERemove = `${EXPENSES_API_ENDPOINT}remove`;
     static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`;
+    static readonly GETStatisticsEndpoint = u.template(`${EXPENSES_API_ENDPOINT}statistics/<%= from %>/<%= to %>`)
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
@@ -167,7 +171,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
-        let payload = {}
+        let payload = {};
         let attrs_to_extract: [keyof IExpense] = ['timestamp_utc_updated'];
         request.forEach(exp => {
             payload[exp.id] = u.pick(exp, attrs_to_extract)
@@ -187,20 +191,24 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
                 }
                 return response
             }, err => {
-                console.dir(err)
+                console.dir(err);
                 throw err
             })
     }
 
-}
+    get_statistics(request: TimePeriod): Promise<StatisticsResult> {
+        if (compareDatetimes(request.to_dt_local, request.from_dt_local) !== COMPARE_RESULT.LARGER) {
+            throw new Error("Invalid time boundaries")
+        }
+        let url = ExpenseDatabaseFacade.GETStatisticsEndpoint({
+            from: localTimeToUtc(request.from_dt_local),
+            to: localTimeToUtc(request.to_dt_local)
+        });
 
-export interface SyncResponse {
-    to_add: IExpense[]
-    to_update: IExpense[]
-    to_remove: ExpenseIdType[]
-}
+        return Utils.makeRequestOpts({url: url})
+    }
 
-export type SyncRequest = IExpense[]
+}
 
 
 function validateSyncResponse(response: any) { // todo make it more robust
@@ -210,7 +218,7 @@ function validateSyncResponse(response: any) { // todo make it more robust
         'to_update': (val) => val.id,
         'to_add': (val) => val.id,
         'to_remove': (val) => val
-    }
+    };
     let hasAllProperties = expectedObjectKeys.every((key) => response.hasOwnProperty(key));
 
     if (!hasAllProperties) {

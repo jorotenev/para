@@ -15,12 +15,6 @@ export const defaultCurrency = "EUR";
 
 validateCurrency(defaultCurrency); // knowing me.
 
-// export function setCurrency(currency: string) {
-//     validateCurrency(currency)
-//     setString(userPreferredCurrencyKey, currency)
-//     userPreferredCurrency = currency
-// }
-
 interface _UserConfig {
     userPreferredCurrency: string
 }

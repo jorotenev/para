@@ -11,14 +11,13 @@
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
 import {
     ExpenseDatabaseFacade as _ExpenseDatabaseFacade,
-    IExpenseDatabaseFacade,
-    SyncRequest,
-    SyncResponse
+    IExpenseDatabaseFacade
 } from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import "~/utils/add/ObservableArrayfindIndex";
-import {COMPARE_RESULT} from "~/utils/misc"; // imported for its side effects
+import {COMPARE_RESULT} from "~/utils/misc";
+import {TimePeriod, SyncRequest, SyncResponse} from "~/api_facade/types"; // imported for its side effects
 //easier mocking
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
 
@@ -33,6 +32,7 @@ export interface IDataStore extends IExpenseDatabaseFacade {
 }
 
 export class DataStore implements IDataStore {
+
     public readonly expenses: ObservableArray<IExpense>;
     private readonly proxyTarget: IExpenseDatabaseFacade;
 
@@ -146,6 +146,14 @@ export class DataStore implements IDataStore {
         })
     }
 
+    get_statistics(request: TimePeriod) {
+        return this.proxyTarget.get_statistics.apply(this.proxyTarget, arguments)
+    }
+
+    /*
+     *Helpers
+     */
+
     public _addExpense(exp: IExpense) {
         if (this.expenseIsManaged(exp)) {
             throw <ResponseError> {'reason': "Invalid application state. Expenses with the same id = " + exp.id}
@@ -184,3 +192,4 @@ export class DataStore implements IDataStore {
         })
     }
 }
+

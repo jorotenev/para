@@ -2,8 +2,9 @@ import {Observable} from "tns-core-modules/data/observable";
 import {IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
-import {GetListOpts, SyncRequest} from "~/api_facade/db_facade";
+import {SyncRequest} from "~/api_facade/types";
 import {ObservableProperty} from "~/utils/misc";
+import {GetListOpts} from "~/api_facade/types";
 
 const dialogs = require("ui/dialogs");
 

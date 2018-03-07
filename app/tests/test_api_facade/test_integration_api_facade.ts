@@ -45,7 +45,7 @@ function setupTest(testThis, done) {
     })
 }
 
-describe("Integration test of the API facade for get_list", () => {
+xdescribe("Integration test of the API facade for get_list", () => {
     beforeAll(function (done) {
         setupTest(this, done)
     });
@@ -54,14 +54,6 @@ describe("Integration test of the API facade for get_list", () => {
     });
     afterEach(function () {
         mockFirebaseAfterEach.call(this)
-    });
-
-
-    it("should return correct list of expenses when the facade is working", function () {
-        if (!this.apiIsUp) {
-            pending("API IS NOT UP")
-        }
-        fail("not implemented")
     });
 
 });
