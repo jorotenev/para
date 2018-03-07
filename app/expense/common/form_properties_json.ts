@@ -74,7 +74,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
             //
             {
                 groupName: group_1,
-
+                hintText: "Comma separated labels - e.g. 'work', 'home', holiday''",
                 name: 'tags',
                 index: 2,
                 editor: "Text"
