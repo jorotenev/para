@@ -1,0 +1,30 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+      xmlns:exp="components/expense-form"
+      xmlns:sd="nativescript-ui-sidedrawer"
+      xmlns:drawer="components/drawer"
+      xmlns:action="components/para-action-bar"
+      xmlns:df="nativescript-ui-dataform"
+      navigatingTo="navigatingTo" class="page" actionBarHidden="false">
+
+    <action:para-action-bar action="back" title="Statistics">
+        <ActionItem text="Refresh" android.systemIcon="ic_popup_sync_1" android.position="actionBarIfRoom"
+                    tap="refresh"></ActionItem>
+    </action:para-action-bar>
+
+    <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
+
+        <sd:RadSideDrawer.drawerContent>
+            <drawer:drawer-content></drawer:drawer-content>
+        </sd:RadSideDrawer.drawerContent>
+        <sd:RadSideDrawer.mainContent>
+            <ScrollView>
+                <StackLayout id="statistics-container">
+
+                </StackLayout>
+            </ScrollView>
+
+        </sd:RadSideDrawer.mainContent>
+
+    </sd:RadSideDrawer>
+
+</Page>

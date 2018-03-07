@@ -17,6 +17,11 @@ const routes = {
         backstackVisible: true,
         deleteHistory: false,
     },
+    "statistics": {
+        path: "statistics/statistics",
+        backstackVisible: true,
+        deleteHistory: false,
+    },
     "settings": {
         path: "settings/settings",
         backstackVisible: true,

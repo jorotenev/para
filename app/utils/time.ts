@@ -24,6 +24,44 @@ export function timeOperations(opts: { baseTime: string, action: timeOperation, 
     return moment()[opts.action](opts.amount, opts.modifier)
 }
 
+
+export function startOfWeek(base: string) {
+    let dt = moment(resetSubdayProperties(base));
+    return dt.weekday(0).format()
+}
+
+export function startOfPreviousWeek(base: string) {
+    let dt = moment(resetSubdayProperties(base));
+    return dt.weekday(-7).format()
+}
+
+export function startOfMonth(base: string) {
+    let dt = moment(resetSubdayProperties(base));
+    return dt.date(1).format()
+}
+
+export function startOfPreviousMonth(base) {
+    let dt = moment(resetSubdayProperties(base));
+    return dt.month(dt.month() - 1).date(1).format()
+}
+
+function resetSubdayProperties(base) {
+    let dt = moment(base);
+
+    let options = {
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0
+    };
+
+    Object.keys(options).forEach(option => {
+        dt[option](options[option]) // momentjs's set() methods have side effects
+    });
+
+    return dt.format()
+}
+
 export function compareDatetimes(a, b): COMPARE_RESULT {
     let aIso = moment(a).toISOString();
     let bIso = moment(b).toISOString();
