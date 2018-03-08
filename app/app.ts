@@ -12,6 +12,8 @@ const localize = require("nativescript-localize");
 firebase.init();
 if (device.language === 'bg') {
     moment.locale('bg')
+} else {
+    moment.locale("en-gb")  // so that week starts on Monday. default is en-us.
 }
 
 app.setResources({
