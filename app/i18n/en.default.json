@@ -1,6 +1,6 @@
 {
   "app.name": "para",
-  "sign_in_with_fb": "&#xf230; Sign in with Facebook",
+  "sign_in_with_fb": "Sign in with Facebook",
   "auth_invalid_pass": "Invalid password. Maybe you entered a wrong password or you have registered with Facebook?",
   "pwd_min_len_error": "Minimum length of %s symbols",
   "field_cant_be_empty": "The field can't be empty",
