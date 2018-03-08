@@ -52,6 +52,7 @@ function add_single(entry: Entry) {
         if (Object.keys(response).length === 0) {
             let emptyResponseLbl = new Label();
             emptyResponseLbl.text = "No expenses for this period"
+            singleEntryContainer.addChild(emptyResponseLbl)
         } else {
             Object.keys(response).forEach(currencyName => {
                 let line = new DockLayout();
@@ -64,10 +65,11 @@ function add_single(entry: Entry) {
 
                 line.addChild(currencylbl);
                 line.addChild(totalAmountLbl);
-                activityIndicator.busy = false;
                 singleEntryContainer.addChild(line)
             })
         }
+        activityIndicator.busy = false;
+
     }, err => {
         activityIndicator.busy = false;
         let err_lbl = new Label();
