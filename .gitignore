@@ -5,3 +5,5 @@ platforms/
 **/*.js
 !hooks/
 .cloud/
+**/google-services.json
+google-services.json
