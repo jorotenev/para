@@ -7,6 +7,7 @@ import {navigateTo} from "~/utils/nav";
 import {passwordMetadata} from "~/auth/common/common";
 import * as firebase from "nativescript-plugin-firebase"
 import {ObservableProperty} from "~/utils/misc";
+import {hideKeyboard} from "~/utils/ui";
 
 let settingsSourceObject: { currency: string };
 let changePassSourceObject: { oldPassword: string, password: string, confirmPassword: string };
@@ -16,6 +17,8 @@ let changePassDataform: RadDataForm;
 let viewModel: SettingsVM;
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard()
+
     page = args.object;
     settingsDataform = page.getViewById("settings-form");
     changePassDataform = page.getViewById("change-password-form");

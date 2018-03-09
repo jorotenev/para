@@ -15,12 +15,15 @@ import {DataStore} from "~/expense_datastore/datastore";
 import {DockLayout} from "tns-core-modules/ui/layouts/dock-layout";
 import {View} from "tns-core-modules/ui/core/view";
 import {Layout} from "tns-core-modules/ui/layouts/layout";
+import {hideKeyboard} from "~/utils/ui";
 
 let page: Page;
 let container: Layout;
 
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard()
+
     page = <Page> args.object;
     container = page.getViewById('statistics-container');
 

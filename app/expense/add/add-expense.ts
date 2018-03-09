@@ -4,11 +4,14 @@ import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
 import {RadDataForm} from "nativescript-ui-dataform";
 import {Expense, IExpense} from "~/models/expense";
 import {navigateTo} from "~/utils/nav";
+import {hideKeyboard} from "~/utils/ui";
 
 
 let page: Page;
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard()
+
     page = <Page>args.object;
     let comingFromDrawer: boolean = !!page.navigationContext.fromDrawer;
     let navigationBtnType: string = comingFromDrawer ? "back" : "drawer";

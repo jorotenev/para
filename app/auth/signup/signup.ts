@@ -19,6 +19,8 @@ let page: Page;
 let model: SignUpViewModel;
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard()
+
     page = <Page> args.object;
     dataform = <RadDataForm> page.getViewById('signup-form');
     model = new SignUpViewModel();

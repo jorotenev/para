@@ -6,12 +6,15 @@ import * as dialogs from "ui/dialogs";
 import {DataStore} from "~/expense_datastore/datastore";
 import {navigateTo} from "~/utils/nav";
 import {IExpense} from "~/models/expense";
+import {hideKeyboard} from "~/utils/ui";
 
 let page: Page;
 let dataform: RadDataForm;
 let expense;
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard()
+
     page = <Page>args.object;
     expense = page.navigationContext.expense;
     dataform = <RadDataForm> page.getViewById('expense-form');

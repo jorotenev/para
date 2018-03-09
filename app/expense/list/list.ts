@@ -7,6 +7,7 @@ import {IExpense} from "~/models/expense";
 import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-ui-listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
+import {hideKeyboard} from "~/utils/ui";
 
 var dialogs = require("ui/dialogs");
 
@@ -16,6 +17,7 @@ let listView: RadListView;
 let flag = true;
 
 export function navigatingTo(args: EventData) {
+    hideKeyboard();
     page = <Page>args.object;
     listView = <RadListView> page.getViewById('expenses-list');
     page.bindingContext = listModel = new ListExpenseModel();
