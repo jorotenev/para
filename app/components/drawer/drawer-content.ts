@@ -1,9 +1,12 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {navigateTo} from "~/utils/nav";
 import {logout} from "~/auth/util";
+import {APP_CONFIG} from "~/app_config"
 
-export function onLoaded() {
-
+export function onLoaded(args) {
+    args.object.bindingContext = {
+        app_version: APP_CONFIG.getInstance().gitSha
+    }
 }
 
 const routes = {

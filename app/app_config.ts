@@ -2,7 +2,7 @@ import {getString, setString} from "application-settings";
 import {getCurrencies} from "~/utils/money";
 
 
-const currencies = getCurrencies()
+const currencies = getCurrencies();
 
 function validateCurrency(currency) {
     if (Object.keys(currencies).indexOf(currency) === -1) {
@@ -24,9 +24,11 @@ interface _AppConfig {
     viewLogIn: string;
     apiAddress: string;
     apiVersion: string;
+    gitSha: string;
 }
 
 export class APP_CONFIG implements _AppConfig {
+    gitSha: string;
     public viewAfterLogIn: string;
     public viewLogIn: string;
     public apiAddress: string;
@@ -39,7 +41,9 @@ export class APP_CONFIG implements _AppConfig {
         this.apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
         this.apiVersion = "v1";
         this.viewAfterLogIn = "expense/list/list";
-        this.viewLogIn = "auth/login/login-view"
+        this.viewLogIn = "auth/login/login-view";
+        let app_metadata = require("~/metadata.json");
+        this.gitSha = app_metadata.git_sha;
     }
 
     public static getInstance() {
