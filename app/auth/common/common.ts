@@ -51,8 +51,8 @@ export function passwordMetadata(opts: PasswordOpts) {
 
 export function generateEmailPasswordMetadata() {
     return {
-        commitMode: "Immediate",
-        validationMode: "Immediate",
+        commitMode: "OnLostFocus",
+        validationMode: "OnLostFocus",
         propertyAnnotations: [
             emailMetadata()
             ,

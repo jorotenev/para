@@ -28,7 +28,6 @@ export function navigatingTo(args: EventData) {
 }
 
 
-
 export function emailPassLoginBtnPressed() {
     hideKeyboard()
     dataform.validateAndCommitAll().then((ok) => {
@@ -47,10 +46,11 @@ export function emailPassLoginBtnPressed() {
                     } else {
                         msgToShow = l("Problem logging you in")
                     }
-
                     // TODO make it more informative
                     dialogs.alert(msgToShow)
                 })
+        } else {
+            console.log("validation failed")
         }
     })
 }
@@ -69,7 +69,8 @@ export function onFbLoginBtnPressed() {
 export function goToSignUp() {
     navigateTo({path: 'auth/signup/signup'})
 }
-export function goToRecoverPassword(){
+
+export function goToRecoverPassword() {
     console.log("recover pass")
     navigateTo({path: 'auth/recover_password/recover_password'})
 
