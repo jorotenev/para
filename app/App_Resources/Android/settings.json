@@ -1,5 +1,1 @@
-{
-  "appId": "org.tenev.para",
-  "minSdkVersion": 17,
-  "targetSdkVersion": 24
-}
+{"appId":"org.tenev.para","minSdkVersion":17,"targetSdkVersion":24}
