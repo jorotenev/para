@@ -41,11 +41,10 @@ export function loginWithPassword(opts: FirebasePasswordLoginOptions): Promise<F
  * @param {FirebaseUser} user
  */
 export function refreshUserCofigAndRedirectToViewAfterLogin(user: { uid: string }) {
-    console.log("here")
     USER_CONFIG.resetSingleton(); // if there was a previously logged-in user
     USER_CONFIG.getInstance({user_id: user.uid}); // called for its side-effect
 
     let navTo = APP_CONFIG.getInstance().viewAfterLogIn;
     console.log("Navigating to " + navTo);
-    navigateTo({path: navTo});
+    navigateTo({path: navTo, clearHistory:true});
 }
