@@ -6,5 +6,26 @@
   "field_cant_be_empty": "The field can't be empty",
   "invalid_email": "Invalid email",
   "signup_btn": "Signup",
-  "signup_use_fb":"or use Facebook"
+  "signup_use_fb":"or use Facebook",
+
+  "Login": "Login",
+  "Signup": "Signup",
+  "Create a new account": "Create a new account",
+  "Sign up with Facebook":"Sign up with Facebook",
+  "Preferred currency":"Preferred currency",
+  "Already have an account?":"Already have an account?",
+  "Login with email and password": "Login with email and password",
+  "or login via Facebook": "or login via Facebook",
+  "Don't have an account?": "Don't have an account?",
+  "Sign up": "Sign up",
+  "Problem logging you in": "Problem logging you in",
+  "No user with the provided credentials.": "No user with the provided credentials.",
+  "Login error": "Login error",
+  "Enter email": "Enter email",
+  "Enter password": "Enter password",
+  "Email can't be empty": "Email can't be empty",
+  "Connectivity issues with the server":"Connectivity issues with the server",
+  "Try reconnecting":"Try reconnecting",
+  "All expenses":"All expenses"
+
 }

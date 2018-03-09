@@ -17,8 +17,8 @@
                     tap="emailPassLoginBtnPressed"/>
             <Label text="{{L('or login via Facebook')}}" class="text-center" style="margin-top:10"></Label>
 
-            <Button text="{{'&#xf230; ' + L('sign_in_with_fb')}}" tap="onFbLoginBtnPressed"
-                    class="btn btn-outline font-awesome" style="//background-color:#3b5998"/>
+            <Button text="{{'&#xf230; ' + L('sign_in_with_fb') }}" tap="onFbLoginBtnPressed"
+                    class="btn btn-primary font-awesome" style="//background-color:#3b5998" />
             <StackLayout class="hr-light" style="margin-top:40"></StackLayout>
             <Button text="{{L('Sign up')}}" tap="goToSignUp" class="btn btn-primary"/>
             <Label text="" tap="goToRecoverPassword" class="text-center">

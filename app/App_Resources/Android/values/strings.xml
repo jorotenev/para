@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_All_expenses_Zs9hmC">"All expenses"</string>
+  <string name="_Try_reconnecting_Z25mIvA">"Try reconnecting"</string>
+  <string name="_Connectivity_issues_with_the_server_ZBKUdB">"Connectivity issues with the server"</string>
+  <string name="_Email_can_t_be_empty_Z1aBs6L">"Email can\'t be empty"</string>
+  <string name="_Enter_password_Y69Dd">"Enter password"</string>
+  <string name="_Enter_email_i5X7b">"Enter email"</string>
+  <string name="_Login_error_1LXgN1">"Login error"</string>
+  <string name="_No_user_with_the_provided_credentials__Z2goyoU">"No user with the provided credentials."</string>
+  <string name="_Problem_logging_you_in_Z1yKzP1">"Problem logging you in"</string>
+  <string name="_Sign_up_ZD9lx4">"Sign up"</string>
+  <string name="_Don_t_have_an_account__2sWDHD">"Don\'t have an account?"</string>
+  <string name="_or_login_via_Facebook_Z2k0Ufr">"or login via Facebook"</string>
+  <string name="_Login_with_email_and_password_2eCUSL">"Login with email and password"</string>
+  <string name="_Already_have_an_account__Z2lWQ0m">"Already have an account?"</string>
+  <string name="_Preferred_currency_Z1mGiCb">"Preferred currency"</string>
+  <string name="_Sign_up_with_Facebook_28XQCj">"Sign up with Facebook"</string>
+  <string name="_Create_a_new_account_Z2jgpH9">"Create a new account"</string>
+  <string name="_Signup_Z29l7BY">"Signup"</string>
+  <string name="_Login_5jeK1">"Login"</string>
   <string name="_signup_use_fb_ZU70Pz">"or use Facebook"</string>
   <string name="_signup_btn_ZAQF1R">"Signup"</string>
   <string name="_invalid_email_Z10mV75">"Invalid email"</string>
