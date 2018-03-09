@@ -5,7 +5,9 @@
       xmlns:lv="nativescript-ui-listview"
 
 >
-    <action:para-action-bar title="{{L('All expenses')}}"></action:para-action-bar>
+    <action:para-action-bar title="{{L('all_expenses')}}">
+
+    </action:para-action-bar>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>
@@ -18,8 +20,8 @@
                 <Label text="{{expenses.length +' ' + hasItems}}"></Label>
                 <StackLayout visibility="{{connectivity_issues ? 'visible':'collapse'}}">
                     <ActivityIndicator id="con-issue-act-ind" busy="false" visibility="collapse"/>
-                    <Label text="{{L('Connectivity issues with the server')}}"></Label>
-                    <Button text="{{L('Try reconnecting')}}" tap="tryToReconnectToAPI"></Button>
+                    <Label text="{{L('connectivity_issues')}}"></Label>
+                    <Button text="{{L('try_reconnecting')}}" tap="tryToReconnectToAPI"></Button>
                 </StackLayout>
                 <GridLayout rows="*">
                     <lv:RadListView visibility="{{hasItems ?  'visible' : 'collapse'}}" row="0"
@@ -48,9 +50,9 @@
                             row="1"
                             class="text-center">
 
-                        <Label class="h3 font-awesome" text="You don't have any expenses yet" textWrap="true"/>
-                        <Button class='btn font-awesome' text="&#xf067; Add an expense" tap="goToAddExpense"></Button>
-                        <Button class="btn" text="Refresh" tap="tryToReconnectToAPI"/>
+                        <Label class="h3 font-awesome" text="{{L('you_have_no_expenses_yet')}}" textWrap="true"/>
+                        <Button class='btn font-awesome' text="{{'&#xf067;' + L('add_expense')}}" tap="goToAddExpense"></Button>
+                        <Button class="btn" text="{{L('refresh')}}" tap="tryToReconnectToAPI"/>
                     </StackLayout>
                 </GridLayout>
             </StackLayout>

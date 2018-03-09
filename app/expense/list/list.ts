@@ -8,6 +8,7 @@ import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-ui-listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {hideKeyboard} from "~/utils/ui";
+import {localize as l} from "nativescript-localize";
 
 var dialogs = require("ui/dialogs");
 
@@ -57,7 +58,7 @@ export function onPullToRefreshInitiated() {
         listView.notifyPullToRefreshFinished();
 
         dialogs.alert({
-            title: "Refresh failed",
+            title: l('refresh_failed'),
             message: err,
             okButtonText: "Ok"
         });

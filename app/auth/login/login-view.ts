@@ -17,7 +17,7 @@ let loginModel;
 export function navigatingTo(args: EventData) {
     firebase.getCurrentUser().then(refreshUserCofigAndRedirectToViewAfterLogin, () => {
         loginModel.activity = false
-    })
+    });
     page = <Page>args.object;
     dataform = <RadDataForm>page.getViewById('login-form');
     loginModel = new LoginViewModel();
@@ -29,7 +29,7 @@ export function navigatingTo(args: EventData) {
 
 
 export function emailPassLoginBtnPressed() {
-    hideKeyboard()
+    hideKeyboard();
     dataform.validateAndCommitAll().then((ok) => {
         if (ok) {
             loginModel.loginWithEmailAndPassword()
@@ -40,11 +40,11 @@ export function emailPassLoginBtnPressed() {
                     }
                     let msgToShow;
                     if (errorMessage.indexOf("FirebaseAuthInvalidUserException") !== -1) {
-                        msgToShow = l("No user with the provided credentials.")
+                        msgToShow = l("no_usr_provided_credentials")
                     } else if (errorMessage.indexOf("FirebaseAuthInvalidCredentialsException") !== -1) {
                         msgToShow = l('auth_invalid_pass')
                     } else {
-                        msgToShow = l("Problem logging you in")
+                        msgToShow = l("problem_logging_in")
                     }
                     // TODO make it more informative
                     dialogs.alert(msgToShow)
@@ -59,7 +59,7 @@ export function emailPassLoginBtnPressed() {
 export function onFbLoginBtnPressed() {
     authWithFacebook().then(refreshUserCofigAndRedirectToViewAfterLogin, (err) => {
         dialogs.alert({
-            title: l("Login error"),
+            title: l("problem_logging_in"),
             message: err,
             okButtonText: "Ok"
         });
@@ -71,7 +71,5 @@ export function goToSignUp() {
 }
 
 export function goToRecoverPassword() {
-    console.log("recover pass")
     navigateTo({path: 'auth/recover_password/recover_password'})
-
 }

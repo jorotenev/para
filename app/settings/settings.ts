@@ -8,6 +8,7 @@ import {passwordMetadata} from "~/auth/common/common";
 import * as firebase from "nativescript-plugin-firebase"
 import {ObservableProperty} from "~/utils/misc";
 import {hideKeyboard} from "~/utils/ui";
+import {localize as l} from "nativescript-localize";
 
 let settingsSourceObject: { currency: string };
 let changePassSourceObject: { oldPassword: string, password: string, confirmPassword: string };
@@ -38,6 +39,9 @@ class SettingsVM extends Observable {
     @ObservableProperty()
     public showChangePassword: boolean = false;
 
+    @ObservableProperty()
+    public passwordChanging: boolean = false;
+
     constructor() {
         super();
         firebase.getCurrentUser().then(user => {
@@ -51,7 +55,7 @@ class SettingsVM extends Observable {
     public get settingsMetadata() {
         return {
             propertyAnnotations: [
-                metadataForCurrency({includeGroup: false, displayName: "Preferred currency",})
+                metadataForCurrency({includeGroup: false, displayName: l('preferred_currency'),})
             ]
         }
     }
@@ -67,9 +71,14 @@ class SettingsVM extends Observable {
     public get changePassMetadata() {
         return {
             propertyAnnotations: [
-                passwordMetadata({index: 0, name: "oldPassword", hintText: "Current password", displayName: " "}),
-                passwordMetadata({index: 1, name: "password", hintText: "New password", displayName: " "}),
-                passwordMetadata({index: 2, name: "confirmPassword", hintText: "Confirm password", displayName: " "}),
+                passwordMetadata({index: 0, name: "oldPassword", hintText: l("current_password"), displayName: " "}),
+                passwordMetadata({index: 1, name: "password", hintText: l("new_password"), displayName: " "}),
+                passwordMetadata({
+                    index: 2,
+                    name: "confirmPassword",
+                    hintText: l("confirm_password"),
+                    displayName: " "
+                }),
             ]
         }
     }
@@ -88,7 +97,7 @@ export function passwordValidate(args) {
         console.log(`validating passwords ${password1.valueCandidate} ${password2.valueCandidate}`)
 
         if (password1.valueCandidate != password2.valueCandidate) {
-            password2.errorMessage = "Passwords do not match.";
+            password2.errorMessage = l("passwords_dont_match");
             validationResult = false;
         }
     }
@@ -99,6 +108,7 @@ export function passwordValidate(args) {
 export function onChangePassBtn() {
     changePassDataform.validateAndCommitAll().then(ok => {
         if (ok) {
+            viewModel.passwordChanging = true
             firebase.getCurrentUser().then(user => {
                 firebase.changePassword({
                     email: user.email,
@@ -106,14 +116,17 @@ export function onChangePassBtn() {
                     newPassword: changePassSourceObject.password
                 }).then(
                     function () {
+                        viewModel.passwordChanging = false
+
                         // called when password change was successful
-                        dialogs.alert("Successfully changed your password.");
+                        dialogs.alert(l('success_change_password'));
                         navigateTo({path: "expense/list/list"})
                     },
                     function (errorMessage) {
-                        console.log(errorMessage);
-                        dialogs.alert("Couldn't change your password. Make sure you entered your correct current password");
+                        viewModel.passwordChanging = false
 
+                        console.log(errorMessage);
+                        dialogs.alert(l("failed_change_password"));
                     }
                 );
             })

@@ -3,7 +3,7 @@ import {ObservableProperty} from "~/utils/misc";
 import {Observable} from "tns-core-modules/data/observable";
 import {generateEmailPasswordMetadata} from "~/auth/common/common";
 import {defaultCurrency} from "~/app_config";
-
+import {localize as l} from "nativescript-localize"
 export class SignUpViewModel extends Observable {
 
     public user;
@@ -23,7 +23,7 @@ export class SignUpViewModel extends Observable {
         let currencyMetadata = metadataForCurrency({
             index: metadata.propertyAnnotations.length,
             name: 'preferredCurrency',
-            displayName: "Preferred currency"
+            displayName: l("preferred_currency")
         });
         metadata.propertyAnnotations.push(currencyMetadata);
         return metadata

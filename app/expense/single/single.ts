@@ -7,6 +7,7 @@ import {DataStore} from "~/expense_datastore/datastore";
 import {navigateTo} from "~/utils/nav";
 import {IExpense} from "~/models/expense";
 import {hideKeyboard} from "~/utils/ui";
+import {localize as l} from "nativescript-localize";
 
 let page: Page;
 let dataform: RadDataForm;
@@ -27,20 +28,20 @@ export function navigatingTo(args: EventData) {
             console.log("updated expense with id " + newExpense.id);
             navigateTo({path: 'expense/list/list', backstackVisible: false});
         }
-    })
+    });
     page.bindingContext = context
 
 }
 
 export function deleteExpense() {
-    dialogs.confirm("Are you sure you want to delete this expense?").then((confirmed) => {
+    dialogs.confirm(l("confirm_delete_expense")).then((confirmed) => {
         if (confirmed) {
             DataStore.getInstance().remove(expense).then(() => {
-                console.log("deleted")
+                console.log("deleted");
                 navigateTo({path: "expense/list/list", clearHistory: true, fromDrawer: false})
             }, (err) => {
-                console.dir(err)
-                dialogs.alert("Couldn't delete the expense")
+                console.dir(err);
+                dialogs.alert(l("couldnt_delete_expense"))
             })
 
         } else {

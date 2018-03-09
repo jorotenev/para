@@ -3,8 +3,7 @@
       navigatingTo="navigatingTo" class="page" actionBarHidden="true">
 
     <StackLayout class="p-20 ">
-        <Label text="{{L('Signup')}}" class="h1 text-center"/>
-        <Label text="{{L('Create a new account')}}" class="text-center"></Label>
+        <Label text="{{L('sign_up')}}" class="h1 text-center"/>
 
         <ActivityIndicator busy="{{activity}}" visibility="{{activity ? 'visible' : 'collapsed'}}"></ActivityIndicator>
 
@@ -16,11 +15,11 @@
 
         <button class="btn btn-outline" text="{{L('signup_btn')}}" id="submit-button" isEnabled="{{!activity}}" tap="signupBtnPressed"/>
         <Label class="text-center" text="{{L('signup_use_fb')}}"></Label>
-        <Button text="{{'&#xf230; ' + L('Sign up with Facebook')}}" tap="withFb"
+        <Button text="{{'&#xf230; ' + L('sign_up_with_fb')}}" tap="withFb"
                 class="btn btn-primary btn-active font-awesome"/>
 
-        <Label text="{{L('Already have an account?')}}" class="text-center"></Label>
-        <Button text="{{L('Login')}}" tap="goToLogin" class="btn btn-primary"/>
+        <Label text="{{L('already_have_account')}}" class="text-center"></Label>
+        <Button text="{{L('login')}}" tap="goToLogin" class="btn btn-primary"/>
 
     </StackLayout>
 </Page>

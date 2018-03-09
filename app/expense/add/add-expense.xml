@@ -5,7 +5,7 @@
       xmlns:action="components/para-action-bar"
       xmlns:drawer="components/drawer"
 >
-    <action:para-action-bar title="Add new" action="{{navigationBtnType}}"></action:para-action-bar>
+    <action:para-action-bar title="{{L('add_expense')}}" action="{{navigationBtnType}}"></action:para-action-bar>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
         <sd:RadSideDrawer.drawerContent>

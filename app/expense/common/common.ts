@@ -11,9 +11,10 @@ import {getJSONForm} from "./form_properties_json"
 import {DataStore} from "~/expense_datastore/datastore";
 import moment = require("moment");
 import {Observable} from "tns-core-modules/data/observable";
+import {localize as l} from "nativescript-localize"
 
 export const group_1 = " ";
-export const group_2 = "Extra";
+export const group_2 = l('extra');
 export const group_3 = "   ";
 
 const dateFormat: string = "YYYY-MM-DD";
@@ -63,7 +64,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         this.raw_initial_expense = {...options.expense};
         this.initialTimestampUTC = this.raw_initial_expense.timestamp_utc;
 
-        this.set('expense', this.convertForForm(options.expense))
+        this.set('expense', this.convertForForm(options.expense));
 
         this.dataform = options.dataform;
         this.page = options.page;
@@ -86,15 +87,15 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
 
     public get pageName() {
         return {
-            [ExpenseFormMode.new]: "Add an expense",
-            [ExpenseFormMode.update]: "Update an expense"
+            [ExpenseFormMode.new]: l("add_expense"),
+            [ExpenseFormMode.update]: l('update_expense')
         }[this.mode]
     }
 
     public get actionBtnText() {
         return {
-            [ExpenseFormMode.new]: "Add expense",
-            [ExpenseFormMode.update]: "Update expense"
+            [ExpenseFormMode.new]: l("add_expense"),
+            [ExpenseFormMode.update]: l('update_expense')
         }[this.mode]
     }
 
@@ -150,8 +151,8 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
                 console.dir(err);
                 if (err.showToUser) {
                     dialogs.alert({
-                        message: err.msg || "Failed to perform operation",
-                        title: "Failed",
+                        message: err.msg || l("failed_perform_operation"),
+                        title: "Error",
                         cancelable: true,
                         okButtonText: "Ok"
                     })
@@ -189,9 +190,9 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             console.dir(err);
             toggleActivityIndicator(that.activityIndicator, false);
             dialogs.alert({
-                title: `Couldn't ${verb} the expense`,
+                title: l('couldnt_process_the_expense', verb),
                 message: err.reason,
-                okButtonText: "cool :("
+                okButtonText: "ок :("
             })
         })
     }
@@ -282,7 +283,7 @@ function customFormValidation(dataform: RadDataForm): Promise<void> {
         if (!isNaN(candidateAmount)) { // if something's entered
             // needed because of https://github.com/telerik/nativescript-ui-feedback/issues/549
             if (candidateAmount < 0) {
-                dataform.getPropertyByName("amount").errorMessage = "Negative values are invalid";
+                dataform.getPropertyByName("amount").errorMessage = l("negative_values_invalid");
                 validated = amountIsValid = false;
             }
         }
@@ -299,17 +300,15 @@ function customFormValidation(dataform: RadDataForm): Promise<void> {
 
         ['amount', 'name'].forEach(propName => {
             if (!atLeastOne) {
-                dataform.getPropertyByName(propName).errorMessage = "At least one of the properties is required";
+                dataform.getPropertyByName(propName).errorMessage = l("at_least_one_required");
             }
             dataform.notifyValidated(propName, atLeastOne)
         });
 
         if (validated) {
-            console.log("validatedddd");
             resolve();
             return
         } else {
-            console.log("faileddd");
             reject();
             return
         }

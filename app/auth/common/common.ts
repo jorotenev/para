@@ -5,7 +5,7 @@ export function emailMetadata() {
         name: "email",
         displayName: "",
         index: 0,
-        hintText: l("Enter email"),
+        hintText: l("enter_email"),
         editor: "Email",
         required: true,
         validators: [
@@ -29,7 +29,7 @@ export function passwordMetadata(opts: PasswordOpts) {
     const options = {
         name: "password",
         displayName: "",
-        hintText: l("Enter password"),
+        hintText: l("enter_password"),
         index: 0,
         ...opts
     };

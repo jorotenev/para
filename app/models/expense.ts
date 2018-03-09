@@ -52,10 +52,10 @@ export class Expense implements IExpense {
     }
 
     public static validate_throw(exp): void {
-        let validationResult = tv4.validateResult(exp, expense_schema)
+        let validationResult = tv4.validateResult(exp, expense_schema);
         if (!validationResult.valid) {
-            let err = validationResult.error
-            let msg = err.dataPath + ": " + err.message
+            let err = validationResult.error;
+            let msg = err.dataPath + ": " + err.message;
             throw msg
         }
         return exp

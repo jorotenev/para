@@ -2,6 +2,7 @@ import {HttpResponse} from "tns-core-modules/http";
 import * as _http from 'http';
 import * as _firebase from "nativescript-plugin-firebase";
 import {HTTPMethod} from "~/api_facade/types";
+import {localize as l} from "nativescript-localize"
 
 // easier mocking
 export let firebase = _firebase;
@@ -26,18 +27,20 @@ export interface ResponseError {
 interface RequestOpts {
     url: string,
     method?: HTTPMethod,
-    payload?:any,
+    payload?: any,
     timeout?: number
 }
 
 
 export class Utils {
-    static readonly default_timeout = 3000
+    static readonly default_timeout = 3000;
     static readonly tokenHeader = "x-firebase-auth-token";
-    static makeRequestOpts(opts:RequestOpts){
+
+    static makeRequestOpts(opts: RequestOpts) {
         return Utils.makeRequest(opts.url, opts.method, opts.payload, opts.timeout)
     }
-    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout : number = Utils.default_timeout): Promise<any> {
+
+    static makeRequest(url: string, method: HTTPMethod = HTTPMethod.GET, payload: any = null, timeout: number = Utils.default_timeout): Promise<any> {
         let jsonPayload = null;
         try {
             jsonPayload = this.validateAndStringifyPayload(payload)
@@ -65,7 +68,7 @@ export class Utils {
                         try {
                             json = response.content.toJSON();
                         } catch (err) {
-                            reject({msg: "Can't decode received JSON", statusCode: response.statusCode});
+                            reject({msg: l("cant_decode_response"), statusCode: response.statusCode});
                             return
                         }
 

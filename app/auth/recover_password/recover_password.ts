@@ -27,16 +27,16 @@ export function onRecoverBtn() {
         }).then(
             function () {
                 dialogs.alert({
-                    title: l("Reset password"),
-                    message: l("Check your email for further instructions."),
+                    title: l("recover_password"),
+                    message: l("check_mail_instruction"),
                     okButtonText: "Ok"
                 })
                 navigateTo({path: "auth/login/login-view", clearHistory: true})
             },
             function (errorMessage) {
                 dialogs.alert({
-                    title: l("Reset password"),
-                    message: l("No account registered with") + ` ${email}`,
+                    title: l("recover_password"),
+                    message: l("no_acc_for_mail", email) + ` ${email}`,
                     okButtonText: "Ok"
                 })
             }

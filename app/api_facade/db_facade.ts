@@ -63,7 +63,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
     static readonly PUTUpdateEndpoint = `${EXPENSES_API_ENDPOINT}update`;
     static readonly DELETERemove = `${EXPENSES_API_ENDPOINT}remove`;
     static readonly GETSyncEndpoint = `${EXPENSES_API_ENDPOINT}sync`;
-    static readonly GETStatisticsEndpoint = u.template(`${EXPENSES_API_ENDPOINT}statistics/<%= from %>/<%= to %>`)
+    static readonly GETStatisticsEndpoint = u.template(`${EXPENSES_API_ENDPOINT}statistics/<%= from %>/<%= to %>`);
 
     persist(exp: IExpense): Promise<IExpense> {
         if (exp.id) {
@@ -235,7 +235,7 @@ function validateSyncResponse(response: any) { // todo make it more robust
 
     expectedObjectKeys.forEach(key => {
         response[key].forEach(exp => {
-            let id = getID[key](exp)
+            let id = getID[key](exp);
             if (ids.hasOwnProperty(id)) {
                 throw err
             }

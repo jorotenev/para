@@ -1,6 +1,7 @@
 import {IExpense} from "~/models/expense";
 import {ExpenseFormMode, group_1, group_2} from "~/expense/common/common";
 import {getCurrencies} from "~/utils/money";
+import {localize as l} from "nativescript-localize";
 
 export function metadataForCurrency(options) {
     let opts = {
@@ -25,7 +26,7 @@ export function metadataForCurrency(options) {
         required: true,
         validators: [],
         valuesProvider: prepareCurrencyObject(getCurrencies()),
-    }
+    };
     if (opts.includeGroup) {
         res['groupName'] = opts.groupName
     }
@@ -34,20 +35,19 @@ export function metadataForCurrency(options) {
 
 export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
     return {
-        // commitMode: "Manual",
-        // validationMode: "Manual",
         propertyAnnotations: [
             {
                 groupName: group_1,
 
+                displayName: "",
                 name: 'name',
-                hintText: "Expense description",
+                hintText: l('expense_description'),
                 index: 0
             },
             //
             {
                 groupName: group_1,
-
+                displayName: "",
                 name: 'amount',
                 hintText: '0.0',
                 index: 1,
@@ -58,6 +58,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
             {
                 groupName: group_2,
 
+                displayName: l('time'),
                 name: 'time',
                 index: 2,
                 columnIndex: 0,
@@ -67,6 +68,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 groupName: group_2,
 
                 name: 'date',
+                displayName: l('date'),
                 index: 2,
                 columnIndex: 1,
                 editor: "DatePicker"
@@ -74,10 +76,11 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
             //
             {
                 groupName: group_1,
-                hintText: "Comma separated labels - e.g. 'work', 'home', holiday''",
+                displayName: "",
+                hintText: l('tags_description'),
                 name: 'tags',
                 index: 2,
-                editor: "Text"
+                editor: "Text" // TODO text is not good enough.
             },
             {
                 name: 'id',

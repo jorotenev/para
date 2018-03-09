@@ -6,7 +6,7 @@
       xmlns:df="nativescript-ui-dataform"
       navigatingTo="navigatingTo" class="page" actionBarHidden="false">
 
-    <action:para-action-bar action="back" title="Statistics">
+    <action:para-action-bar action="back" title="{{L('statistics')}}">
         <ActionItem text="Refresh" android.systemIcon="ic_popup_sync_1" android.position="actionBarIfRoom"
                     tap="refresh"></ActionItem>
     </action:para-action-bar>

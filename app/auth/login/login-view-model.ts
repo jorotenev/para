@@ -40,7 +40,6 @@ export class LoginViewModel extends Observable {
                 function (errorMessage) {
                     console.log('rejected promise firebase' + errorMessage);
                     that.activity = false;
-
                     throw new Error(errorMessage)
                 }
             );

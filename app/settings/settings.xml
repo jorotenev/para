@@ -6,7 +6,7 @@
       xmlns:df="nativescript-ui-dataform"
       navigatingTo="navigatingTo" class="page" actionBarHidden="false">
 
-    <action:para-action-bar action="back" title="Settings"/>
+    <action:para-action-bar action="back" title="{{L('settings')}}"/>
 
     <sd:RadSideDrawer showOverNavigation="true" id="sideDrawer">
 
@@ -17,7 +17,7 @@
             <ScrollView>
                 <StackLayout>
                     <StackLayout class="p-20 form" row="1" loaded="onLoad" id="container">
-                        <Label text="Preferences" class="h1 text-center"></Label>
+                        <Label text="{{L('preferences_general')}}" class="h1 text-center"></Label>
                         <df:RadDataForm
                                 id="settings-form"
                                 source="{{settingsObject}}"
@@ -25,10 +25,10 @@
                                 validationMode="Immediate"
                                 commitMode="Manual"
                         />
-                        <Button id="actionBtn" class="btn btn-primary" tap='saveSettingsTapped' text="Save"/>
+                        <Button id="actionBtn" class="btn btn-primary" tap='saveSettingsTapped' text="{{L('save')}}"/>
                     </StackLayout>
                     <StackLayout visibility="{{ showChangePassword ? 'visible' :'collapse' }}">
-                        <Label text="Change password" class="h1 text-center"></Label>
+                        <Label text="{{L('change_password')}}" class="h1 text-center"></Label>
 
                         <df:RadDataForm
                                 id="change-password-form"
@@ -39,7 +39,7 @@
                                 propertyValidate="passwordValidate"
                         />
                         <Button id="change_pass_btn" class="btn btn-primary" tap='onChangePassBtn'
-                                text="Change password"/>
+                                text="{{L('change_password')}}" isEnabled="{{!passwordChanging}}"/>
                     </StackLayout>
                 </StackLayout>
             </ScrollView>

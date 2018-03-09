@@ -4,8 +4,8 @@
     <ScrollView>
 
         <StackLayout class="p-20 ">
-            <Label text="{{L('Login')}}" class="h1 text-center"/>
-            <Label text="{{L('Login with email and password')}}" class="text-center"></Label>
+            <Label text="{{L('login')}}" class="h1 text-center"/>
+            <Label text="{{L('login_email_password')}}" class="text-center"></Label>
 
             <ActivityIndicator busy="{{activity}}"
                                visibility="{{activity ? 'visible' : 'collapsed'}}"></ActivityIndicator>
@@ -13,17 +13,17 @@
 
             ></df:RadDataForm>
 
-            <Button class="btn btn-outline" text="{{L('Login')}}" id="submit-button" isEnabled="{{!activity}}"
+            <Button class="btn btn-outline" text="{{L('login')}}" id="submit-button" isEnabled="{{!activity}}"
                     tap="emailPassLoginBtnPressed"/>
-            <Label text="{{L('or login via Facebook')}}" class="text-center" style="margin-top:10"></Label>
+            <Label text="{{L('or_via_fb')}}" class="text-center" style="margin-top:10"></Label>
 
             <Button text="{{'&#xf230; ' + L('sign_in_with_fb') }}" tap="onFbLoginBtnPressed"
                     class="btn btn-primary font-awesome" style="//background-color:#3b5998" />
             <StackLayout class="hr-light" style="margin-top:40"></StackLayout>
-            <Button text="{{L('Sign up')}}" tap="goToSignUp" class="btn btn-primary"/>
+            <Button text="{{L('dont_have_an_account')}}" tap="goToSignUp" class="btn btn-primary"/>
             <Label text="" tap="goToRecoverPassword" class="text-center">
                 <FormattedString>
-                    <Span text="{{L('Recover password')}}" underline="true"></Span>
+                    <Span text="{{L('recover_password')}}" underline="true"></Span>
                 </FormattedString>
             </Label>
         </StackLayout>

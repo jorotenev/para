@@ -12,6 +12,8 @@ import {USER_CONFIG} from "~/app_config";
 import {CreateUserResult} from "nativescript-plugin-firebase";
 import {hideKeyboard} from "~/utils/ui";
 
+const l = require("nativescript-localize");
+
 var dialogs = require("ui/dialogs");
 
 let dataform: RadDataForm;
@@ -72,10 +74,10 @@ export function signupBtnPressed() {
                 // the UI have been updated by RadDataForm itself to notify the user about form errors
                 return
             } else if (reason.indexOf("FirebaseAuthUserCollisionException") !== -1) {
-                msg = "User with the same email already exists. " +
-                    "Possibly you've already registered or you've signed up via Facebook?"
+                msg = "signup_usr_exists"// "User with the same email already exists. " +
+                //""
             } else {
-                msg = "Failed to register you "
+                msg = l("failed_to_register_you")
             }
             dialogs.alert(msg)
         });
@@ -87,7 +89,7 @@ export function withFb() {
 
     authWithFacebook().then(refreshUserCofigAndRedirectToViewAfterLogin, (err) => {
         model.activity = false;
-        dialogs.alert("Failed to register you :(")
+        dialogs.alert(l("failed_to_register_you"))
 
 
     })
