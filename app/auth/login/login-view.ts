@@ -5,6 +5,7 @@ import {navigateTo} from "~/utils/nav";
 import {RadDataForm} from "nativescript-ui-dataform";
 import {firebase} from "nativescript-plugin-firebase/firebase-common";
 import {authWithFacebook, refreshUserCofigAndRedirectToViewAfterLogin} from "~/auth/common/firebase_auth";
+import {hideKeyboard} from "~/utils/ui";
 
 const l = require("nativescript-localize");
 const dialogs = require("ui/dialogs");
@@ -27,7 +28,9 @@ export function navigatingTo(args: EventData) {
 }
 
 
+
 export function emailPassLoginBtnPressed() {
+    hideKeyboard()
     dataform.validateAndCommitAll().then((ok) => {
         if (ok) {
             loginModel.loginWithEmailAndPassword()

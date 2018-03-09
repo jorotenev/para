@@ -10,6 +10,7 @@ import {
 import {SignUpViewModel} from "./signup-view-model"
 import {USER_CONFIG} from "~/app_config";
 import {CreateUserResult} from "nativescript-plugin-firebase";
+import {hideKeyboard} from "~/utils/ui";
 
 var dialogs = require("ui/dialogs");
 
@@ -26,6 +27,7 @@ export function navigatingTo(args: EventData) {
 }
 
 export function signupBtnPressed() {
+    hideKeyboard()
     const rejectedDataFormMsg = "rejected dataform promise";
     model.activity = true;
 

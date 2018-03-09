@@ -1,7 +1,7 @@
 import {Expense, IExpense} from "~/models/expense";
 import {hashCode} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import {toggleActivityIndicator} from "~/utils/ui";
+import {hideKeyboard, toggleActivityIndicator} from "~/utils/ui";
 import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {RadDataForm} from "nativescript-ui-dataform";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
@@ -115,13 +115,13 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
     }
 
     public btnPressed() {
+        hideKeyboard();
         const that = this;
         const dataform = this.dataform;
         let hackAmount = Number(String(that.dataform.getPropertyByName("amount").valueCandidate));
 
         const applyHackIfOkValidation = (ok) => {
             // HACK https://github.com/telerik/nativescript-ui-feedback/issues/549
-            console.log('hackAmount' + hackAmount)
             if (ok) {
                 that.get('expense').amount = hackAmount ? hackAmount : 0;
                 return Promise.resolve(that.get('expense'))
