@@ -13,21 +13,23 @@ import {Label} from "tns-core-modules/ui/label";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {DataStore} from "~/expense_datastore/datastore";
 import {DockLayout} from "tns-core-modules/ui/layouts/dock-layout";
-import {View} from "tns-core-modules/ui/core/view";
 import {Layout} from "tns-core-modules/ui/layouts/layout";
 import {hideKeyboard} from "~/utils/ui";
 import {localize as l} from "nativescript-localize";
+import {WrapLayout} from "tns-core-modules/ui/layouts/wrap-layout";
+import {GridLayout, GridUnitType, ItemSpec} from "tns-core-modules/ui/layouts/grid-layout";
 
 let page: Page;
 let container: Layout;
+type Entry = { name: string, id: string, from: string, to: string, };
 
 
 export function navigatingTo(args: EventData) {
-    hideKeyboard()
+    hideKeyboard();
 
     page = <Page> args.object;
     container = page.getViewById('statistics-container');
-    container.removeChildren()
+    container.removeChildren();
     populate()
 }
 
@@ -36,21 +38,33 @@ function populate() {
 }
 
 function add_single(entry: Entry) {
-    let singleEntryContainer = new StackLayout();
+    let singleEntryContainer: GridLayout = new GridLayout();
+    singleEntryContainer.addRow(new ItemSpec(1, GridUnitType.AUTO));
+    singleEntryContainer.addRow(new ItemSpec(1, GridUnitType.AUTO));
+
     singleEntryContainer.className = "statistics-entry-container";
     singleEntryContainer.id = entry.id;
-
     let heading = new Label();
     heading.text = entry.name;
-    heading.className = "h3";
+    heading.className = "h2 text-primary";
+    // heading.setInlineStyle('font-weight:bold;');
 
     let activityIndicator = new ActivityIndicator();
     activityIndicator.id = entry.id + "activity";
     activityIndicator.busy = true;
 
+    let currenciesContainer = new StackLayout();
+
     singleEntryContainer.addChild(heading);
     singleEntryContainer.addChild(activityIndicator);
+    singleEntryContainer.addChild(currenciesContainer);
+
+    GridLayout.setRow(heading, 0);
+    GridLayout.setRow(activityIndicator, 1);
+    GridLayout.setRow(currenciesContainer, 1);
+
     container.addChild(singleEntryContainer);
+
 
     DataStore.getInstance().get_statistics({from_dt_local: entry.from, to_dt_local: entry.to}).then(response => {
         if (Object.keys(response).length === 0) {
@@ -59,17 +73,12 @@ function add_single(entry: Entry) {
             singleEntryContainer.addChild(emptyResponseLbl)
         } else {
             Object.keys(response).forEach(currencyName => {
-                let line = new DockLayout();
-                line.stretchLastChild = false;
+                let singleCurrencyRow = new Label();
+                singleCurrencyRow.text = response[currencyName] + ' ' + currencyName;
+                singleCurrencyRow.setInlineStyle("margin-left:5;font-weight:bold;")
 
-                let currencylbl = new Label();
-                currencylbl.text = currencyName;
-                let totalAmountLbl = new Label();
-                totalAmountLbl.text = response[currencyName];
+                currenciesContainer.addChild(singleCurrencyRow);
 
-                line.addChild(currencylbl);
-                line.addChild(totalAmountLbl);
-                singleEntryContainer.addChild(line)
             })
         }
         activityIndicator.busy = false;
@@ -83,9 +92,6 @@ function add_single(entry: Entry) {
 
 
 }
-
-type periodName = string;
-type Entry = { name: string, id: string, from: string, to: string, };
 
 
 function getEntries(): Entry[] {
