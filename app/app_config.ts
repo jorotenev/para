@@ -2,19 +2,6 @@ import {getString, setString} from "application-settings";
 import {getCurrencies} from "~/utils/money";
 
 
-const currencies = getCurrencies();
-
-function validateCurrency(currency) {
-    if (Object.keys(currencies).indexOf(currency) === -1) {
-        throw new Error("Invalid default currency")
-    }
-}
-
-export const userPreferredCurrencyKey = 'user_preferred_currency_code_key';
-export const defaultCurrency = "EUR";
-
-validateCurrency(defaultCurrency); // knowing me.
-
 interface _UserConfig {
     userPreferredCurrency: string
 }
@@ -37,8 +24,8 @@ export class APP_CONFIG implements _AppConfig {
     private static instance: APP_CONFIG;
 
     private constructor() {
-        // this.apiAddress = "http://192.168.0.104:5000/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
-        this.apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+        this.apiAddress = "http://192.168.0.104:5000/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
+        // this.apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
         this.apiVersion = "v1";
         this.viewAfterLogIn = "expense/list/list";
         this.viewLogIn = "auth/login/login-view";
@@ -53,14 +40,6 @@ export class APP_CONFIG implements _AppConfig {
         return APP_CONFIG.instance
     }
 
-}
-
-function userAwareKey(key, user) {
-    return key + "____" + user
-}
-
-export interface UserConfigConstructor {
-    user_id: string
 }
 
 export class USER_CONFIG implements _UserConfig {
@@ -98,4 +77,24 @@ export class USER_CONFIG implements _UserConfig {
         setString(userAwareKey(userPreferredCurrencyKey, this.user_uid), currency)
         this._userPreferredCurrency = currency
     }
+}
+
+const currencies = getCurrencies();
+
+function validateCurrency(currency) {
+    if (Object.keys(currencies).indexOf(currency) === -1) {
+        throw new Error("Invalid default currency")
+    }
+}
+
+export const userPreferredCurrencyKey = 'user_preferred_currency_code_key';
+export const defaultCurrency = "EUR";
+
+validateCurrency(defaultCurrency); // knowing me.
+function userAwareKey(key, user) {
+    return key + "____" + user
+}
+
+export interface UserConfigConstructor {
+    user_id: string
 }
