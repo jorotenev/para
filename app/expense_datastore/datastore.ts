@@ -94,13 +94,14 @@ export class DataStore implements IDataStore {
 
     remove(exp: IExpense): Promise<void> {
         if (!this.expenseIsManaged(exp)) {
-            return Promise.reject(<ResponseError>{reason: "No such expense in the DataStore"})
+            let err = "No such expense in the DataStore"
+            console.log(err)
+            return Promise.reject(<ResponseError>{reason: err})
         }
         let index = this.indexOfExpense(exp);
         return this.proxyTarget.remove(exp)
             .then(_ => {
                 this._removeExpense(exp.id);
-                this.expenses.splice(index, 1); // delete the element at the given index
                 return Promise.resolve()
             }, err => {
                 throw err
@@ -170,7 +171,6 @@ export class DataStore implements IDataStore {
         if (index === -1) {
             throw new Error("no managed expense with such id")
         }
-
         this.expenses.splice(index, 1);
     }
 

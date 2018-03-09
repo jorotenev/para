@@ -314,15 +314,22 @@ describe("testing the remove() methods of the DataStore", function () {
     });
     it("if the api facade resolves, then the remove() of the datastore also resolves and also removes the" +
         "expense from its list", function (done) {
+        let secondExpense = Object.freeze({...exp, id: "obqdwah surmi", amount: 123});
+
+        // the API will successfully remove the expense
         this.mockedRemove.and.returnValue(Promise.resolve());
+
         let datastore = cleanDataStore();
         datastore._addExpense(persisted);
-        expect(datastore.expenses.length).toBe(1);
+        datastore._addExpense(secondExpense);
+        expect(datastore.expenses.length).toBe(2);
 
         datastore.remove(persisted).then(_ => {
             expect(this.mockedRemove).toHaveBeenCalledTimes(1);
             expect(this.mockedRemove).toHaveBeenCalledWith(persisted);
-            expect(datastore.expenses.length).toBe(0);
+            expect(datastore.expenses.length).toBe(1);
+            expect(datastore.expenses.getItem(0).amount).toBe(secondExpense.amount);
+
             done();
         }, fail)
 
