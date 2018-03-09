@@ -16,11 +16,15 @@ let listModel: ListExpenseModel;
 let page: Page;
 let listView: RadListView;
 let flag = true;
+let indicator: ActivityIndicator;
 
 export function navigatingTo(args: EventData) {
     hideKeyboard();
+
     page = <Page>args.object;
+    indicator = page.getViewById('act-ind-list-page');
     listView = <RadListView> page.getViewById('expenses-list');
+
     page.bindingContext = listModel = new ListExpenseModel();
 }
 
@@ -67,18 +71,17 @@ export function onPullToRefreshInitiated() {
 
 
 export function tryToReconnectToAPI() {
-    let indicator: ActivityIndicator = page.getViewById('con-issue-act-ind')
 
-    indicator.busy = true;
-    indicator.visibility = 'visible';
+    listModel.showIndicator = true;
 
     listModel.initList().then(_ => {
         listModel.connectivity_issues = false;
+        listModel.showIndicator = false;
+
         console.log("refreshing list view");
         listView.refresh();
     }, err => {
-        indicator.busy = false;
-        indicator.visibility = 'collapse';
+        listModel.showIndicator = false;
         console.log("refreshing list view");
 
         listView.refresh();

@@ -17,9 +17,10 @@
         </sd:RadSideDrawer.drawerContent>
         <sd:RadSideDrawer.mainContent>
             <StackLayout>
-                <Label text="{{expenses.length +' ' + hasItems}}"></Label>
+                <ActivityIndicator id="act-ind-list-page" busy="{{showIndicator}}"
+                                   visibility="{{showIndicator ? 'visible':'collapse'}}"/>
+
                 <StackLayout visibility="{{connectivity_issues ? 'visible':'collapse'}}">
-                    <ActivityIndicator id="con-issue-act-ind" busy="false" visibility="collapse"/>
                     <Label text="{{L('connectivity_issues')}}"></Label>
                     <Button text="{{L('try_reconnecting')}}" tap="tryToReconnectToAPI"></Button>
                 </StackLayout>
@@ -51,8 +52,9 @@
                             class="text-center">
 
                         <Label class="h3 font-awesome" text="{{L('you_have_no_expenses_yet')}}" textWrap="true"/>
-                        <Button class='btn font-awesome' text="{{'&#xf067;' + L('add_expense')}}" tap="goToAddExpense"></Button>
-                        <Button class="btn" text="{{L('refresh')}}" tap="tryToReconnectToAPI"/>
+                        <Button class='btn font-awesome' text="{{'&#xf067;' + L('add_expense')}}"
+                                tap="goToAddExpense" isEnabled="{{!showIndicator}}"></Button>
+                        <Button class="btn" text="{{L('refresh')}}" tap="tryToReconnectToAPI" isEnabled="{{!showIndicator}}"/>
                     </StackLayout>
                 </GridLayout>
             </StackLayout>

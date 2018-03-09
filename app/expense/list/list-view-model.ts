@@ -17,6 +17,9 @@ export class ListExpenseModel extends Observable {
     public connectivity_issues: boolean = false;
 
     @ObservableProperty()
+    public showIndicator: boolean = false;
+
+    @ObservableProperty()
     public hasItems: boolean;
 
     protected datastore: IDataStore;
@@ -32,10 +35,15 @@ export class ListExpenseModel extends Observable {
         this.datastore.expenses.on(ObservableArray.changeEvent, this.updateExpensesSize.bind(this));
 
         let that = this;
+        that.showIndicator = true;
+
         this.initList().then(() => {
+            that.showIndicator = false
+
         }, err => {
             console.log("connectivity_issues = true");
-            that.connectivity_issues = true
+            that.connectivity_issues = true;
+            that.showIndicator = false
         })
     }
 
