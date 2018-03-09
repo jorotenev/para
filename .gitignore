@@ -8,3 +8,4 @@ platforms/
 **/google-services.json
 google-services.json
 para-release-key.jks
+app/metadata.json
