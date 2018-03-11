@@ -52,7 +52,7 @@ export function getJSONForm(expense: IExpense, mode = ExpenseFormMode.update) {
                 hintText: '0.0',
                 index: 1,
                 columnIndex: 0,
-                editor: 'Number'
+                editor: 'Decimal'
             },
             metadataForCurrency({index: 1, columnIndex: 1, groupName: group_2}),
             {
