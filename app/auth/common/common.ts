@@ -40,11 +40,13 @@ export function passwordMetadata(opts: PasswordOpts) {
         editor: "Password",
         hintText: options.hintText,
         required: true,
-        validators: [{name: "NonEmpty", params: {"errorMessage": l("field_cant_be_empty")}}, {
-            name: "MinimumLength",
-            params: {min: 5, errorMessage: l("pwd_min_len_error", 5)},
+        validators: [
+            {name: "NonEmpty", params: {"errorMessage": l("field_cant_be_empty")}},
+            {
+                name: "MinimumLength",
+                params: {length: 5, errorMessage: l("pwd_min_len_error", 5)},
 
-        }]
+            }]
 
     }
 }
