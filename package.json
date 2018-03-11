@@ -42,5 +42,8 @@
     "nativescript-dev-typescript": "~0.6.0",
     "typescript": "~2.6.2"
   },
-  "author": "Georgi Tenev"
+  "author": "Georgi Tenev",
+  "scripts": {
+    "release": "node ./npm_scripts/release.js $(realpath para-release-key.jks) $PARA_KEYCHAIN_PASS $PARA_KEYCHAIN_ALIAS $PARA_KEYCHAIN_ALIAS_PASS"
+  }
 }

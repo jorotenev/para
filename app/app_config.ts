@@ -24,13 +24,15 @@ export class APP_CONFIG implements _AppConfig {
     private static instance: APP_CONFIG;
 
     private constructor() {
-        this.apiAddress = "http://192.168.0.104:5000/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
-        // this.apiAddress = "https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/"; //https://7k0z5nk6fc.execute-api.eu-central-1.amazonaws.com/staging/
-        this.apiVersion = "v1";
+        let app_metadata = require("~/app_config.json");
+
+        // this.apiAddress = "http://192.168.0.104:5000/";
+        this.apiAddress = app_metadata.api_address;
+        this.apiVersion = app_metadata.api_version;
+        this.gitSha = app_metadata.git_sha;
+
         this.viewAfterLogIn = "expense/list/list";
         this.viewLogIn = "auth/login/login-view";
-        let app_metadata = require("~/metadata.json");
-        this.gitSha = app_metadata.git_sha;
     }
 
     public static getInstance() {
