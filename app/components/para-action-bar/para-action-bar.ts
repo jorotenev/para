@@ -8,11 +8,11 @@ const topmost = require("ui/frame").topmost;
 export function onLoad(args) {
     let container = args.object;
     let action = container.action;
-    let actionBarTitle = container.title
+    let actionBarTitle = container.title;
     if (actionBarTitle){
         container.getViewById('action-bar').text = actionBarTitle
     }
-    let btn = container.getViewById('nav-btn')
+    let btn = container.getViewById('nav-btn');
 
     if (action === "back") {
         enableBackFunctionality(btn)
@@ -24,23 +24,23 @@ export function onLoad(args) {
 function enableBackFunctionality(btn) {
 
     btn.text = 'Back';
-    btn.on(Button.tapEvent, onBack)
+    btn.on(Button.tapEvent, onBack);
     btn.android.systemIcon = "ic_menu_back";
 }
 
 function enableSideDrawer(btn) {
-    btn.on(Button.tapEvent, toggleDrawer)
+    btn.on(Button.tapEvent, showDrawer);
     btn.icon = "res://ic_menu"
 }
 
 
 export function onBack() {
-    console.log('back pressed')
+    console.log('back pressed');
     topmost().goBack();
 }
 
-export function toggleDrawer(args: EventData) {
+export function showDrawer(args: EventData) {
     console.log("Show SideDrawer tapped.");
     let drawer: RadSideDrawer = <RadSideDrawer> frame.topmost().getViewById("sideDrawer");
-    drawer.toggleDrawerState();
+    drawer.showDrawer();
 }
