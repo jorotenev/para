@@ -70,7 +70,7 @@ function add_single(entry: Entry) {
         if (Object.keys(response).length === 0) {
             let emptyResponseLbl = new Label();
             emptyResponseLbl.text = l('no_expenses_current_period');
-            singleEntryContainer.addChild(emptyResponseLbl)
+            currenciesContainer.addChild(emptyResponseLbl)
         } else {
             Object.keys(response).forEach(currencyName => {
                 let singleCurrencyRow = new Label();
