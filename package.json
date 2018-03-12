@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
-    "moment": "^2.18.1",
+    "moment": "^2.21.0",
     "nativescript-localize": "^2.2.1",
     "nativescript-plugin-firebase": "^5.1.7",
     "nativescript-theme-core": "~1.0.4",
