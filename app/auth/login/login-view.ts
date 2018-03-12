@@ -15,8 +15,29 @@ let page: Page;
 let loginModel;
 
 export function navigatingTo(args: EventData) {
-    firebase.getCurrentUser().then(refreshUserCofigAndRedirectToViewAfterLogin, () => {
-        loginModel.activity = false
+
+    firebase.addAuthStateListener({
+        onAuthStateChanged: (data) => {
+            if (data.loggedIn) {
+
+                firebase.getCurrentUser().then((u) => {
+                    console.log("logging in automatically.");
+                    firebase.getAuthToken({forceRefresh: true}).then(() => {
+                        refreshUserCofigAndRedirectToViewAfterLogin(u)
+                    }, (e) => {
+                        console.log("Failed to force refresh the token.");
+                        console.dir(e)
+                    })
+                }, (err) => {
+                    loginModel.activity = false;
+                    console.dir(err);
+                    console.log("FAILED TO GET USER. FRESH LOGIN REQUIRED.")
+                });
+            } else {
+                loginModel.activity = false;
+                console.log("FAILED TO RE-LOGIN USER. FRESH LOGIN REQUIRED.")
+            }
+        }
     });
     page = <Page>args.object;
     dataform = <RadDataForm>page.getViewById('login-form');
