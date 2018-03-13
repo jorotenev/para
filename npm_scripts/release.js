@@ -8,20 +8,23 @@ let keystore_pass = process.argv[3];
 let keystore_alias = process.argv[4];
 let keystore_alias_pass = process.argv[5];
 
+const appSettingsFile = path.join(__dirname, "..", "app", "app_config.json");
+const settings = require(appSettingsFile);
+
 function checks() {
     // TODO check git is clean before releasing
 
     const addrIsAllowed = (addr) => u.some(['staging-para-api', 'production-para-api'], (valid) => addr.indexOf(valid) !== -1);
-    const appSettingsFile = path.join(__dirname, "..", "app", "app_config.json");
 
-    let settings = require(appSettingsFile);
-    if (!settings.api_address) {
+    let apiAddress = settings.api_address;
+
+    if (!apiAddress) {
         throw new Error("api address is missing!")
     }
-    if (!addrIsAllowed(settings.api_address)) {
+    if (!addrIsAllowed(apiAddress)) {
         throw new Erorr("ugh oh. Using non production API address.")
     }
-    if (!settings.api_address.chartAt(settings.api_address.length - 1) !== "/") {
+    if (apiAddress.charAt(apiAddress.length - 1) !== "/") {
         throw new Error("API address should end with '/'")
     }
 }
@@ -45,7 +48,7 @@ function build_android() {
         '--key-store-alias-password',
         keystore_alias_pass,
         '--copy-to',
-        `release-${moment().format()}.apk`
+        `release-${settings.git_sha}-${moment().format()}.apk`
     ];
     console.log(args);
     run('tns', args);
