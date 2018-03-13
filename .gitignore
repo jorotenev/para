@@ -2,8 +2,8 @@ node_modules/
 platforms/
 ./idea/
 .idea/
-**/*.js
 !hooks/
+**/*.js
 .cloud/
 **/google-services.json
 google-services.json
