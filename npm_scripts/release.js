@@ -21,6 +21,9 @@ function checks() {
     if (!addrIsAllowed(settings.api_address)) {
         throw new Erorr("ugh oh. Using non production API address.")
     }
+    if (!settings.api_address.chartAt(settings.api_address.length - 1) !== "/") {
+        throw new Error("API address should end with '/'")
+    }
 }
 
 if (!u.every([path_keystore, keystore_pass, keystore_alias, keystore_alias_pass], (arg) => !!arg)) {
