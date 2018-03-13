@@ -11,7 +11,7 @@ This repo contains the source code of the mobile app. The backend API is located
 
 ### Run locally
 * You need the IP of a running [para_api](https://github.com/jorotenev/para_api) server set in `app/app_config.json`
-    * [api documentation](github.com/jorotenev/para_api/app/expenses_api/README.md) of `para_api`
+    * [API documentation](https://github.com/jorotenev/para_api/app/expenses_api/README.md)
 * `tns run android`
 
 ### Test locally
@@ -19,9 +19,10 @@ This repo contains the source code of the mobile app. The backend API is located
 * `tns test android`
 
 # Build a release .apk
+[NativeScript docs](https://docs.nativescript.org/publishing/publishing-android-apps)
 * you need to have a `app/App_Resources/Android/google-services.release.json` file (available to collaborators only).
 * set env vars required in package.json -> scripts-> release
-    * You need the key to sign the package
+    * You need a release jks key to sign the package
 * npm run release
 
 Building without the --release flag requires just the `google-services.dev.json`.
