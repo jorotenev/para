@@ -10,6 +10,7 @@ This repo contains the source code of the mobile app. The backend API is located
 
 ### Run locally
 * You need the IP of a running [para_api](https://github.com/jorotenev/para_api) server set in `app/app_config.json`
+    * [api documentation](github.com/jorotenev/para_api/app/expenses_api/README.md) of `para_api`
 * `tns run android`
 
 ### Test locally
