@@ -30,6 +30,7 @@
                                     items="{{ expenses }}"
                                     loadOnDemandMode="Auto"
                                     loadMoreDataRequested="loadMoreItems"
+                                    loadOnDemandBufferSize="3"
                                     itemTap="onTap"
                                     pullToRefresh="true"
                                     pullToRefreshInitiated="onPullToRefreshInitiated"

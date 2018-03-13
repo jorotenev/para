@@ -4,28 +4,24 @@ import {Page} from "tns-core-modules/ui/page";
 import {ListExpenseModel} from "./list-view-model";
 import {navigateTo} from "~/utils/nav"
 import {IExpense} from "~/models/expense";
-import {topmost} from "ui/frame";
 import {RadListView} from "nativescript-ui-listview";
 import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {hideKeyboard} from "~/utils/ui";
 import {localize as l} from "nativescript-localize";
+import * as dialogs from "ui/dialogs";
 
-var dialogs = require("ui/dialogs");
-
-let listModel: ListExpenseModel;
+let listModel: ListExpenseModel = new ListExpenseModel();
 let page: Page;
 let listView: RadListView;
-let flag = true;
 let indicator: ActivityIndicator;
 
 export function navigatingTo(args: EventData) {
     hideKeyboard();
-
     page = <Page>args.object;
     indicator = page.getViewById('act-ind-list-page');
     listView = <RadListView> page.getViewById('expenses-list');
 
-    page.bindingContext = listModel = new ListExpenseModel();
+    page.bindingContext = listModel;
 }
 
 export function loadMoreItems(ev: EventData): void {
@@ -36,6 +32,7 @@ export function loadMoreItems(ev: EventData): void {
             listView.notifyLoadOnDemandFinished()
         }, (err) => {
             console.dir(err);
+            dialogs.alert(err.reason);
             listView.notifyLoadOnDemandFinished();
         });
     }, fireEventAfter);
@@ -49,7 +46,6 @@ export function onTap(ev: ItemEventData): void {
     navigateTo({path: 'expense/single/single', backstackVisible: true, extraContext: {'expense': expense}})
 
 }
-
 
 export function goToAddExpense() {
     navigateTo({path: 'expense/add/add-expense', backstackVisible: false})
@@ -68,7 +64,6 @@ export function onPullToRefreshInitiated() {
         });
     });
 }
-
 
 export function tryToReconnectToAPI() {
 

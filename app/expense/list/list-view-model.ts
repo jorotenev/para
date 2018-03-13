@@ -2,15 +2,13 @@ import {Observable} from "tns-core-modules/data/observable";
 import {IExpense} from '~/models/expense'
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
-import {SyncRequest} from "~/api_facade/types";
 import {ObservableProperty} from "~/utils/misc";
 import {GetListOpts} from "~/api_facade/types";
-
-const dialogs = require("ui/dialogs");
 
 type ExpensesList = ObservableArray<IExpense>;
 
 export class ListExpenseModel extends Observable {
+
     public expenses: ExpensesList;
 
     @ObservableProperty()
@@ -23,12 +21,17 @@ export class ListExpenseModel extends Observable {
     public hasItems: boolean;
 
     protected datastore: IDataStore;
+
     // How many items to fetch from the server in response to the loadMoreItems event
     batchSize: number = 10;
 
+    // simple flag to keep whether the user has fetched all available expenses
+    // from the api. when true, no further API requests will be made
+    // in response to RadListView's loadMoreData event
+    private loadedAllAvailableExpenses: boolean = false;
+
     constructor() {
         super();
-
         this.datastore = DataStore.getInstance();
         this.expenses = this.datastore.expenses;
         this.hasItems = this.datastore.expenses.length > 0;
@@ -48,6 +51,7 @@ export class ListExpenseModel extends Observable {
     }
 
     private updateExpensesSize() {
+        // HACK https://github.com/NativeScript/NativeScript/issues/5476
         this.hasItems = this.expenses.length > 0
     }
 
@@ -60,17 +64,22 @@ export class ListExpenseModel extends Observable {
     }
 
     public loadMoreItems(ev: any): Promise<void> {
-        if (this.isEmpty()) {
-            console.log("Trying to loadmoreitems before there're any expenses")
-            return Promise.reject("not initialized")
+        // no needed to query the API because a previous loadMoreItems call returned all available expenses
+        if (this.loadedAllAvailableExpenses) {
+            console.log("skipping loadMoreItems() - previous call delpleted the server")
+            return Promise.resolve();
         }
-        // const startFromID = Math.min(...this.expensesIds) - 1;
-        let last: IExpense = this.datastore.expenses.getItem(this.datastore.expenses.length - 1)
-        return this.fetchItems(last).then(() => {
-                console.log("loadMoreItems promise returned");
-                return
+
+        if (this.isEmpty()) return Promise.reject("not initialized");
+
+        let last: IExpense = this.datastore.expenses.getItem(this.datastore.expenses.length - 1);
+        let batchSize = this.batchSize;
+        return this.fetchItems(last).then((fetched_expenses) => {
+                if (fetched_expenses.length < batchSize) {
+                    this.loadedAllAvailableExpenses = true;
+                }
             }, (err) => {
-                dialogs.alert(err.reason)
+                throw err
             }
         )
     }
