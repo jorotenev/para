@@ -18,7 +18,9 @@ This repo contains the source code of the mobile app. The backend API is located
 * `tns test android`
 
 # Build a release .apk
-* you need to have a `app/App_Resources/Android/google-services.release.json` file.
+* you need to have a `app/App_Resources/Android/google-services.release.json` file (available to collaborators only).
 * set env vars required in package.json -> scripts-> release
     * You need the key to sign the package
 * npm run release
+
+Building without the --release flag requires just the `google-services.dev.json`.

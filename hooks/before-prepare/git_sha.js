@@ -1,7 +1,6 @@
 var path = require("path");
 var fs = require("fs");
 var git_sha = require("git-rev-sync");
-var {render} = require("prettyjson");
 
 module.exports = function ($logger, $projectData, $options, hookArgs) {
 
