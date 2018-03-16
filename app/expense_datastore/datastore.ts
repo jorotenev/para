@@ -1,11 +1,11 @@
 /**
  * Proxy of the API facade.
- * Instance of the DataStore holds a mirror of a subset of the expenses on the backend.
- * CRUD operations pass through the datastore en route to the API facade(IExpenseDatabaseFacade).
- * This way there's a centralised, stateful, repository of expenses locally on the phone.
- * add/updating/deleting an expense via the UI will alter the state of the datastore.
+ * Singleton object of the DataStore holds a mirror of a subset of the expenses on the backend.
+ * CRUD operations pass through the datastore en route to the API facade (ExpenseDatabaseFacade).
+ * This way there's a centralised, stateful, run-time repository of expenses locally on the phone.
+ * add/updating/deleting an expense via the UI will alter the state of this DataStore.
  *
- * When a call is made to the datastore, the call will firs be forwarded to the API facade.
+ * When a call is made to the DataStore, the call will firs be forwarded to the API facade.
  * Only then the result will be used to alter (if needed) the state of the DataStore.
  */
 import {Expense, ExpenseIdType, IExpense} from "~/models/expense";
@@ -15,11 +15,10 @@ import {
 } from "~/api_facade/db_facade";
 import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
-import "~/utils/add/ObservableArrayfindIndex";
-import {COMPARE_RESULT} from "~/utils/misc";
-import {TimePeriod, SyncRequest, SyncResponse} from "~/api_facade/types"; // imported for its side effects
-//easier mocking
-export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade;
+import "~/utils/add/ObservableArrayfindIndex"; // imported for its side-effect
+import {TimePeriod, SyncRequest, SyncResponse} from "~/api_facade/types";
+
+export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade; //easier mocking
 
 export interface IDataStore extends IExpenseDatabaseFacade {
     expenses: ObservableArray<IExpense>

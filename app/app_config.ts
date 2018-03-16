@@ -1,4 +1,4 @@
-import {getString, setString} from "application-settings";
+import {getString, setString, flush} from "application-settings";
 import {getCurrencies} from "~/utils/money";
 
 
@@ -52,8 +52,9 @@ export class USER_CONFIG implements _UserConfig {
     private _userPreferredCurrency: string;
 
     private constructor(user_uid) {
-        this._userPreferredCurrency = getString(userAwareKey(userPreferredCurrencyKey, user_uid), defaultCurrency)
-
+        let key = userAwareKey(userPreferredCurrencyKey, user_uid);
+        this._userPreferredCurrency = getString(key, defaultCurrency);
+        this.user_uid = user_uid
     }
 
     public static getInstance(sideEffect: UserConfigConstructor = null) {
@@ -76,8 +77,10 @@ export class USER_CONFIG implements _UserConfig {
 
     public set userPreferredCurrency(currency: string) {
         validateCurrency(currency);
-        setString(userAwareKey(userPreferredCurrencyKey, this.user_uid), currency)
-        this._userPreferredCurrency = currency
+        let key = userAwareKey(userPreferredCurrencyKey, this.user_uid);
+        setString(key, currency);
+        this._userPreferredCurrency = currency;
+        flush()
     }
 }
 
@@ -93,6 +96,12 @@ export const userPreferredCurrencyKey = 'user_preferred_currency_code_key';
 export const defaultCurrency = "EUR";
 
 validateCurrency(defaultCurrency); // knowing me.
+/**
+ * Helps in simulating different per-user namespacaces in the persisted configuration
+ * @param key
+ * @param user
+ * @return {string}
+ */
 function userAwareKey(key, user) {
     return key + "____" + user
 }

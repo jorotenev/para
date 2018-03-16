@@ -87,8 +87,6 @@ export class Expense implements IExpense {
     // when the expense was most recently edited
     public timestamp_utc_updated: string;
 
-    // TODO `recurring` flag + date
-
 
     public static createEmptyExpense(): IExpense {
         return {
