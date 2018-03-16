@@ -6,7 +6,8 @@ import * as u from "underscore";
 import {SyncRequest, TimePeriod} from "~/api_facade/types";
 import {GetListOpts, SyncResponse} from "~/api_facade/types";
 import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
-import {currentTimeLocal} from "~/utils/time";
+import {currentTimeLocal, currentTimeUTC, timeOperations} from "~/utils/time";
+import {APP_CONFIG} from "~/app_config";
 
 /**
  * proxy = DataStore
@@ -456,6 +457,43 @@ describe('testing the sync() method of the DataStore', function () {
         }, fail)
     });
 
+    fit("expenses over the APP_CONFIG.maximumSyncRequestSize are spliced", function (done) {
+        /*
+            Plan:
+            - make more expensive than the max sync request size
+            - sync() and mock the response to require no changes to the expenses
+            - check the expenses left in the datastore
+         */
+        let maximumSyncRequestSize = APP_CONFIG.getInstance().maximumSyncRequestSize;
+
+        // make the initial expenses
+        let now = currentTimeUTC(true);
+        let ds = cleanDataStore();
+        let initialLength = maximumSyncRequestSize + 10;
+        for (let i = 0; i < initialLength; i++) {
+            let exp: IExpense = {...SINGLE_EXPENSE};
+            exp.id = i + "";
+            exp.timestamp_utc = timeOperations({baseTime: now, action: "subtract", modifier: "days", amount: i});
+            ds._addExpense(exp)
+        }
+        expect(ds.expenses.length).toBe(initialLength);
+
+        // mock the API
+        this.mockedSync.and.returnValue(Promise.resolve(<SyncResponse>{
+            to_add: [],
+            to_update: [],
+            to_remove: []
+        }));
+
+        let expectedRemainingExpenses = ds.simpleExpensesArray().slice(0, maximumSyncRequestSize);
+        expect(expectedRemainingExpenses.length).toBe(maximumSyncRequestSize);
+        ds.sync(ds.simpleExpensesArray()).then(() => {
+            expect(ds.expenses.length).toBe(maximumSyncRequestSize);
+            expect(ds.simpleExpensesArray()).toEqual(expectedRemainingExpenses);
+            done();
+        }, fail)
+
+    });
 });
 
 
