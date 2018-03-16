@@ -7,20 +7,33 @@ interface _UserConfig {
 }
 
 interface _AppConfig {
-    viewAfterLogIn: string;
+
+    // which page to show when the user has to login
     viewLogIn: string;
+
+    // and when he logs in successfully
+    viewAfterLogIn: string;
+
+    // the address of the backend, with a mandatory trailing slash
     apiAddress: string;
+
     apiVersion: string;
+
+    // the git sha of the most recently updated git sha (update happens on app prepare
+    // the result is written to app_config.json
     gitSha: string;
+
+    // https://github.com/jorotenev/para_api/issues/1
+    maximumSyncRequestSize: number;
 }
 
 export class APP_CONFIG implements _AppConfig {
-    gitSha: string;
-    public viewAfterLogIn: string;
-    public viewLogIn: string;
-    public apiAddress: string;
-    public apiVersion: string;
-
+    public readonly gitSha: string;
+    public readonly viewAfterLogIn: string;
+    public readonly viewLogIn: string;
+    public readonly apiAddress: string;
+    public readonly apiVersion: string;
+    public readonly maximumSyncRequestSize;
     private static instance: APP_CONFIG;
 
     private constructor() {
@@ -33,6 +46,8 @@ export class APP_CONFIG implements _AppConfig {
 
         this.viewAfterLogIn = "expense/list/list";
         this.viewLogIn = "auth/login/login-view";
+
+        this.maximumSyncRequestSize = 15;
     }
 
     public static getInstance() {

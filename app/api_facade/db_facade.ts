@@ -172,7 +172,7 @@ export class ExpenseDatabaseFacade implements IExpenseDatabaseFacade {
 
     sync(request: SyncRequest): Promise<SyncResponse> {
         let payload = {};
-        let attrs_to_extract: [keyof IExpense] = ['timestamp_utc_updated'];
+        let attrs_to_extract: [keyof IExpense] = ['timestamp_utc', 'timestamp_utc_updated'];
         request.forEach(exp => {
             payload[exp.id] = u.pick(exp, attrs_to_extract)
         });

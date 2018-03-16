@@ -17,6 +17,7 @@ import {ResponseError} from "~/api_facade/common";
 import {ObservableArray} from "tns-core-modules/data/observable-array";
 import "~/utils/add/ObservableArrayfindIndex"; // imported for its side-effect
 import {TimePeriod, SyncRequest, SyncResponse} from "~/api_facade/types";
+import {APP_CONFIG} from "~/app_config"
 
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade; //easier mocking
 
@@ -93,13 +94,12 @@ export class DataStore implements IDataStore {
 
     remove(exp: IExpense): Promise<void> {
         if (!this.expenseIsManaged(exp)) {
-            let err = "No such expense in the DataStore"
-            console.log(err)
+            let err = "No such expense in the DataStore";
+            console.log(err);
             return Promise.reject(<ResponseError>{reason: err})
         }
-        let index = this.indexOfExpense(exp);
         return this.proxyTarget.remove(exp)
-            .then(_ => {
+            .then(() => {
                 this._removeExpense(exp.id);
                 return Promise.resolve()
             }, err => {
@@ -113,6 +113,11 @@ export class DataStore implements IDataStore {
     }
 
     sync(request: SyncRequest): Promise<SyncResponse> {
+        let maxRequestSize = APP_CONFIG.getInstance().maximumSyncRequestSize;
+        if (this.expenses.length > maxRequestSize) {
+            let excessiveNumber = this.expenses.length - maxRequestSize;
+            this.expenses.splice(maxRequestSize, excessiveNumber);
+        }
         return this.proxyTarget.sync(request).then((response: SyncResponse) => {
             // remove
             response.to_remove.forEach((id: ExpenseIdType) => {
@@ -125,11 +130,11 @@ export class DataStore implements IDataStore {
 
             //update
             response.to_update.forEach((expense: IExpense) => {
-                let index = this.indexOfExpense(expense)
+                let index = this.indexOfExpense(expense);
                 if (index !== -1) {
                     this.expenses.setItem(index, expense)
                 }
-            })
+            });
 
             //add
             response.to_add.forEach((expense: IExpense) => {
@@ -139,7 +144,7 @@ export class DataStore implements IDataStore {
                 } catch (err) {
                     console.dir(err)
                 }
-            })
+            });
             return response
         }, err => {
             throw err
