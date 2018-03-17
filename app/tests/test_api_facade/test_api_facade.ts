@@ -296,11 +296,11 @@ describe("test the sync() method of the API facade", function () {
         let expense_b = ten_expenses[1];
         let expense_c = ten_expenses[2];
         let httpResult = <SyncResponse>{
-                "to_add": [expense_a],
-                "to_remove": [expense_b.id],
-                "to_update": [expense_c]
-            }
-        ;
+            "to_add": [expense_a],
+            "to_remove": [expense_b.id],
+            "to_update": [expense_c]
+        };
+
         this.mockedHTTP.and.returnValue(Promise.resolve(fakeHTTPResponse(JSON.stringify(httpResult), 200)));
 
         new ExpenseDatabaseFacade().sync(this.request).then((result: SyncResponse) => {
@@ -311,8 +311,14 @@ describe("test the sync() method of the API facade", function () {
             expect(this.mockedHTTP).toHaveBeenCalledTimes(1);
             let httpOpts: HttpRequestOptions = getHttpOptsOfMockHTTPCall(this.mockedHTTP); //options arg of first call
             let expectedRequest = {
-                [this.request[0].id]: {'timestamp_utc_updated': this.request[0].timestamp_utc_updated},
-                [this.request[1].id]: {'timestamp_utc_updated': this.request[1].timestamp_utc_updated},
+                [this.request[0].id]: {
+                    'timestamp_utc': this.request[0].timestamp_utc,
+                    'timestamp_utc_updated': this.request[0].timestamp_utc_updated
+                },
+                [this.request[1].id]: {
+                    'timestamp_utc': this.request[1].timestamp_utc,
+                    'timestamp_utc_updated': this.request[1].timestamp_utc_updated
+                },
             };
             expect(httpOpts.content).toBe(JSON.stringify(expectedRequest));
 

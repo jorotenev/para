@@ -112,12 +112,16 @@ export class DataStore implements IDataStore {
         return this.proxyTarget.get_list.apply(this.proxyTarget, arguments);
     }
 
-    sync(request: SyncRequest): Promise<SyncResponse> {
+    sync(ignored): Promise<SyncResponse> {
         let maxRequestSize = APP_CONFIG.getInstance().maximumSyncRequestSize;
         if (this.expenses.length > maxRequestSize) {
             let excessiveNumber = this.expenses.length - maxRequestSize;
             this.expenses.splice(maxRequestSize, excessiveNumber);
+
+            console.log(`spliced ${excessiveNumber} items. ${this.expenses.length} items left`)
         }
+        let request = this.simpleExpensesArray();
+        console.log(`calling sync with ${request.length} items`)
         return this.proxyTarget.sync(request).then((response: SyncResponse) => {
             // remove
             response.to_remove.forEach((id: ExpenseIdType) => {

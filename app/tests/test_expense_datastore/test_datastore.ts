@@ -66,6 +66,7 @@ describe("For all methods of the DataStore", function () {
                 }
             },
             sync: {
+                skipCheckCalledWithSameArgs: true,
                 mock: <any> spyOn(ExpenseDatabaseFacade.prototype, 'sync'),
                 methodArgument: [<SyncRequest>[ten_expenses[0]]],
                 apiResolvesWith: <SyncResponse>{to_add: [], to_update: [], to_remove: []},
@@ -134,8 +135,8 @@ describe("For all methods of the DataStore", function () {
             // verify that the datastore has called the API with the same argument
             setTimeout(() => {
                 Object.keys(mocks).forEach((methodName) => {
-                    if (methodName === 'get_list') {
-                        console.dir(mocks[methodName].mock.calls.first())
+                    if (mocks[methodName].skipCheckCalledWithSameArgs) {
+                        return; // i.e. `continue`
                     }
                     expect(mocks[methodName].mock).toHaveBeenCalledTimes(1);
                     expect(mocks[methodName].mock).toHaveBeenCalledWith(...mocks[methodName].methodArgument)
@@ -457,7 +458,7 @@ describe('testing the sync() method of the DataStore', function () {
         }, fail)
     });
 
-    fit("expenses over the APP_CONFIG.maximumSyncRequestSize are spliced", function (done) {
+    it("expenses over the APP_CONFIG.maximumSyncRequestSize are spliced", function (done) {
         /*
             Plan:
             - make more expensive than the max sync request size
@@ -494,6 +495,7 @@ describe('testing the sync() method of the DataStore', function () {
         }, fail)
 
     });
+
 });
 
 

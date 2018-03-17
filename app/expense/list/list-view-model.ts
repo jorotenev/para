@@ -4,6 +4,7 @@ import {ObservableArray} from "tns-core-modules/data/observable-array";
 import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 import {ObservableProperty} from "~/utils/misc";
 import {GetListOpts} from "~/api_facade/types";
+import {APP_CONFIG} from "~/app_config";
 
 type ExpensesList = ObservableArray<IExpense>;
 
@@ -56,6 +57,13 @@ export class ListExpenseModel extends Observable {
     }
 
     public pullToRefresh() {
+        if (this.datastore.expenses.length > APP_CONFIG.getInstance().maximumSyncRequestSize) {
+            // if we pull to refresh, the oldest expenses might get trimmed.
+            // thus we set the flag to false, so that after the pull-to-refresh
+            // if we scroll down, we will make an API request
+            this.loadedAllAvailableExpenses = false
+        }
+
         return this.datastore.sync(this.datastore.simpleExpensesArray())
     }
 
