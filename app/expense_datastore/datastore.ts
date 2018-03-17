@@ -117,11 +117,10 @@ export class DataStore implements IDataStore {
         if (this.expenses.length > maxRequestSize) {
             let excessiveNumber = this.expenses.length - maxRequestSize;
             this.expenses.splice(maxRequestSize, excessiveNumber);
-
-            console.log(`spliced ${excessiveNumber} items. ${this.expenses.length} items left`)
+            console.log(`spliced ${excessiveNumber} expenses. ${this.expenses.length} expenses left`)
         }
+
         let request = this.simpleExpensesArray();
-        console.log(`calling sync with ${request.length} items`)
         return this.proxyTarget.sync(request).then((response: SyncResponse) => {
             // remove
             response.to_remove.forEach((id: ExpenseIdType) => {

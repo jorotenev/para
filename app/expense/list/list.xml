@@ -35,6 +35,9 @@
                                     pullToRefresh="true"
                                     pullToRefreshInitiated="onPullToRefreshInitiated"
                     >
+                        <lv:RadListView.pullToRefreshStyle>
+                            <lv:PullToRefreshStyle indicatorColor="#fd8c5b"/>
+                        </lv:RadListView.pullToRefreshStyle>
                         <lv:RadListView.itemTemplate>
                             <DockLayout stretchLastChild="false" class='expense' height="100">
 
@@ -55,7 +58,8 @@
                         <Label class="h3 font-awesome" text="{{L('you_have_no_expenses_yet')}}" textWrap="true"/>
                         <Button class='btn font-awesome' text="{{'&#xf067;' + L('add_expense')}}"
                                 tap="goToAddExpense" isEnabled="{{!showIndicator}}"></Button>
-                        <Button class="btn" text="{{L('refresh')}}" tap="tryToReconnectToAPI" isEnabled="{{!showIndicator}}"/>
+                        <Button class="btn" text="{{L('refresh')}}" tap="tryToReconnectToAPI"
+                                isEnabled="{{!showIndicator}}"/>
                     </StackLayout>
                 </GridLayout>
             </StackLayout>

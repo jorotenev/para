@@ -1,9 +1,16 @@
-import {getString, setString, flush} from "application-settings";
+import {getString, setString, flush, getBoolean, setBoolean} from "application-settings";
 import {getCurrencies} from "~/utils/money";
 
 
 interface _UserConfig {
     userPreferredCurrency: string
+
+    /*
+     * used to govern how are datetimes shown.
+     * true -> 11/11/2017 13:11
+     * false -> "Yesterday at 13:11"
+     */
+    userPrefersShortDateFormat: boolean
 }
 
 interface _AppConfig {
@@ -66,9 +73,15 @@ export class USER_CONFIG implements _UserConfig {
     private readonly user_uid;
     private _userPreferredCurrency: string;
 
+    private _userPrefersShortDateString: boolean;
+
     private constructor(user_uid) {
-        let key = userAwareKey(userPreferredCurrencyKey, user_uid);
-        this._userPreferredCurrency = getString(key, defaultCurrency);
+        let currencyKey = userAwareKey(userPreferredCurrencyKey, user_uid);
+        let dateFormatKey = userAwareKey(userPreferredDateFormatKey, user_uid);
+
+        this._userPreferredCurrency = getString(currencyKey, defaultCurrency);
+        this._userPrefersShortDateString = getBoolean(dateFormatKey, true);
+
         this.user_uid = user_uid
     }
 
@@ -90,11 +103,22 @@ export class USER_CONFIG implements _UserConfig {
         return this._userPreferredCurrency
     }
 
+    public get userPrefersShortDateFormat() {
+        return this._userPrefersShortDateString
+    }
+
     public set userPreferredCurrency(currency: string) {
         validateCurrency(currency);
         let key = userAwareKey(userPreferredCurrencyKey, this.user_uid);
         setString(key, currency);
         this._userPreferredCurrency = currency;
+        flush()
+    }
+
+    public set userPrefersShortDateFormat(prefers: boolean) {
+        let key = userAwareKey(userPreferredDateFormatKey, this.user_uid);
+        setBoolean(key, prefers);
+        this._userPrefersShortDateString = prefers;
         flush()
     }
 }
@@ -108,6 +132,7 @@ function validateCurrency(currency) {
 }
 
 export const userPreferredCurrencyKey = 'user_preferred_currency_code_key';
+export const userPreferredDateFormatKey = 'user_preferred_data_format_key';
 export const defaultCurrency = "EUR";
 
 validateCurrency(defaultCurrency); // knowing me.

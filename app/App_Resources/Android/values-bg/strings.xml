@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_settings_relative_date_1lMU5q">"Сбит формат на датите"</string>
   <string name="_preferences_general_Z1hOK7K">"Общи настройки"</string>
   <string name="_time_fFKX">"Час"</string>
   <string name="_date_dxEs">"Дата"</string>
@@ -38,6 +39,7 @@
   <string name="_failed_to_register_you_Z1DAmEl">"Неуспех при създаването на акаунт"</string>
   <string name="_cant_decode_response_2uYiM1">"Грешка при обработването на отговора от сървъра."</string>
   <string name="_refresh_1ho5Ou">"Обнови"</string>
+  <string name="_add_expense_drawer_1LwRkF">"Добави разход"</string>
   <string name="_add_expense_HN3j">"Добави разход"</string>
   <string name="_you_have_no_expenses_yet_ZcTOue">"Все още нямаш разходи"</string>
   <string name="_all_expenses_1OflSk">"Всички разходи"</string>

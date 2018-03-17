@@ -1,6 +1,6 @@
 {
   "app.name": "para",
-  "sign_in_with_fb": "Login in with Facebook",
+  "sign_in_with_fb": "Facebook Login",
   "auth_invalid_pass": "Invalid password. Maybe you entered a wrong password or you have registered with Facebook?",
   "pwd_min_len_error": "Minimum length of %s symbols",
   "field_cant_be_empty": "The field can't be empty",
@@ -25,7 +25,8 @@
   "try_reconnecting": "Try reconnecting",
   "all_expenses": "All expenses",
   "you_have_no_expenses_yet": "You don't have any expenses yet",
-  "add_expense": "Add an expense",
+  "add_expense": "Add expense",
+  "add_expense_drawer": "Add new",
   "refresh": "Refresh",
   "cant_decode_response": "Can't decode the server response",
   "failed_to_register_you": "Failed to register you",
@@ -36,7 +37,7 @@
   "settings": "Settings",
   "log_out": "Log out",
   "extra": "Extra",
-  "update_expense": "Update an expense",
+  "update_expense": "Update expense",
   "failed_perform_operation": "Failed to perform operation",
   "couldnt_process_the_expense": "Couldn't process the expense",
   "negative_values_invalid": "Negative values are invalid",
@@ -60,9 +61,9 @@
   "previous_week": "Previous week",
   "current_month": "Current month",
   "previous_month": "Previous month",
-  "save":"Save",
+  "save": "Save",
   "date": "Date",
-  "time":"Time",
-  "preferences_general":"General preferences"
-
+  "time": "Time",
+  "preferences_general": "General preferences",
+  "settings_relative_date": "Show calendar shortened dates format"
 }

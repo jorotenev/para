@@ -1,13 +1,27 @@
 <StackLayout class="sidedrawer-left" loaded="onLoaded">
-    <GridLayout rows="*, auto" width="100%">
-        <StackLayout row="0" class="sidedrawer-content">
-            <Button class='btn' id="new" text="{{L('add_expense')}}" tap="onTap"/>
-            <Button class='btn' id="view_all" text="{{L('view_all')}}" tap="onTap"/>
-            <Button class='btn' id="statistics" text="{{L('statistics')}}" tap="onTap"/>
-            <Button class='btn' id="settings" text="{{L('settings')}}" tap="onTap"/>
-            <Button class='btn' id="logout" text="{{L('log_out')}}" tap="onTap"/>
+    <GridLayout rows="70,*,auto" width="100%" class="drawer-wrapper">
+
+        <Image row="0" src="res://icon" class="logo"/>
+
+        <StackLayout row="1" class="drawer-content text-left ">
+
+
+            <Button class='my-btn drawer-item font-awesome' id="new" text="{{'&#xf067;   ' + L('add_expense_drawer')}}"
+                    tap="onTap"/>
+
+            <Button class='my-btn drawer-item font-awesome' id="view_all" text="{{'&#xf0cb;   '+L('view_all')}}"
+                    tap="onTap"/>
+
+            <Button class='my-btn drawer-item font-awesome' id="statistics" text="{{'&#xf1ec;   '+L('statistics')}}"
+                    tap="onTap"/>
+
+            <Button class='my-btn drawer-item font-awesome' id="settings" text="{{'&#xf013;   '+L('settings')}}"
+                    tap="onTap"/>
+
+            <Button class='my-btn drawer-item font-awesome' id="logout" text="{{'&#xf08b;   '+L('log_out')}}" tap="onTap"/>
         </StackLayout>
-        <Label row="2" class="text-center" text="{{'v. '+app_version}}"  verticalAlignment="bottom" ></Label>
+
+        <Label row="2" class="text-center" text="{{'v. '+app_version}}" verticalAlignment="bottom"></Label>
     </GridLayout>
 
 </StackLayout>

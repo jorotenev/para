@@ -13,7 +13,7 @@
 
             ></df:RadDataForm>
 
-            <Button class="btn btn-outline" text="{{L('login')}}" id="submit-button" isEnabled="{{!activity}}"
+            <Button class="btn btn-outline font-awesome" text="{{L('login')}}" id="submit-button" isEnabled="{{!activity}}"
                     tap="emailPassLoginBtnPressed"/>
             <Label text="{{L('or_via_fb')}}" class="text-center" style="margin-top:10"></Label>
 

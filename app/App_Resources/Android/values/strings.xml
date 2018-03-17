@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="_settings_relative_date_1lMU5q">"Show calendar shortened dates format"</string>
   <string name="_preferences_general_Z1hOK7K">"General preferences"</string>
   <string name="_time_fFKX">"Time"</string>
   <string name="_date_dxEs">"Date"</string>
@@ -27,7 +28,7 @@
   <string name="_negative_values_invalid_Zx6qEr">"Negative values are invalid"</string>
   <string name="_couldnt_process_the_expense_1axeaC">"Couldn\'t process the expense"</string>
   <string name="_failed_perform_operation_1hFnT2">"Failed to perform operation"</string>
-  <string name="_update_expense_2bUO3Y">"Update an expense"</string>
+  <string name="_update_expense_2bUO3Y">"Update expense"</string>
   <string name="_extra_70c1M">"Extra"</string>
   <string name="_log_out_oGVR7">"Log out"</string>
   <string name="_settings_1GBtTj">"Settings"</string>
@@ -38,7 +39,8 @@
   <string name="_failed_to_register_you_Z1DAmEl">"Failed to register you"</string>
   <string name="_cant_decode_response_2uYiM1">"Can\'t decode the server response"</string>
   <string name="_refresh_1ho5Ou">"Refresh"</string>
-  <string name="_add_expense_HN3j">"Add an expense"</string>
+  <string name="_add_expense_drawer_1LwRkF">"Add new"</string>
+  <string name="_add_expense_HN3j">"Add expense"</string>
   <string name="_you_have_no_expenses_yet_ZcTOue">"You don\'t have any expenses yet"</string>
   <string name="_all_expenses_1OflSk">"All expenses"</string>
   <string name="_try_reconnecting_2rt7Iu">"Try reconnecting"</string>
@@ -63,7 +65,7 @@
   <string name="_field_cant_be_empty_Z1Y1KYx">"The field can\'t be empty"</string>
   <string name="_pwd_min_len_error_1DlXep">"Minimum length of %1$s symbols"</string>
   <string name="_auth_invalid_pass_Z1cbWTr">"Invalid password. Maybe you entered a wrong password or you have registered with Facebook?"</string>
-  <string name="_sign_in_with_fb_1vsAcR">"Login in with Facebook"</string>
+  <string name="_sign_in_with_fb_1vsAcR">"Facebook Login"</string>
   <string name="_app_name_1k3Sbz">"para"</string>
   <string name="app_name">"para"</string>
   <string name="title_activity_kimera">"para"</string>

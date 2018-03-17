@@ -5,7 +5,6 @@
     <action-bar.actionItems>
         <ios>
             <action-item id="nav-btn" ios.position="left"/>
-
         </ios>
     </action-bar.actionItems>
 </ActionBar>

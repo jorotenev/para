@@ -9,8 +9,9 @@ import * as firebase from "nativescript-plugin-firebase"
 import {ObservableProperty} from "~/utils/misc";
 import {hideKeyboard} from "~/utils/ui";
 import {localize as l} from "nativescript-localize";
+import {group_1} from "~/expense/common/common";
 
-let settingsSourceObject: { currency: string };
+let settingsSourceObject: { currency: string, useShortDateFormat: boolean };
 let changePassSourceObject: { oldPassword: string, password: string, confirmPassword: string };
 let page;
 let settingsDataform: RadDataForm;
@@ -18,13 +19,14 @@ let changePassDataform: RadDataForm;
 let viewModel: SettingsVM;
 
 export function navigatingTo(args: EventData) {
-    hideKeyboard()
+    hideKeyboard();
 
     page = args.object;
     settingsDataform = page.getViewById("settings-form");
     changePassDataform = page.getViewById("change-password-form");
     settingsSourceObject = {
         currency: USER_CONFIG.getInstance().userPreferredCurrency,
+        useShortDateFormat: USER_CONFIG.getInstance().userPrefersShortDateFormat
     };
     changePassSourceObject = {
         oldPassword: null,
@@ -55,6 +57,12 @@ class SettingsVM extends Observable {
     public get settingsMetadata() {
         return {
             propertyAnnotations: [
+                {
+                    editor: "Switch",
+                    displayName: l('settings_relative_date'),
+                    name: 'useShortDateFormat',
+                    index: 0
+                },
                 metadataForCurrency({includeGroup: false, displayName: l('preferred_currency'),})
             ]
         }
@@ -152,6 +160,7 @@ export function saveSettingsTapped() {
 
 function applySettings() {
     USER_CONFIG.getInstance().userPreferredCurrency = settingsSourceObject.currency;
+    USER_CONFIG.getInstance().userPrefersShortDateFormat = settingsSourceObject.useShortDateFormat;
     console.log("settings applied");
     console.dir(settingsSourceObject);
 }

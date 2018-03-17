@@ -1,4 +1,5 @@
 import {COMPARE_RESULT} from "~/utils/misc";
+import {USER_CONFIG} from "~/app_config";
 
 let moment = require('moment');
 
@@ -75,5 +76,13 @@ export function compareDatetimes(a, b): COMPARE_RESULT {
 }
 
 export function readableTimestamp(timestamp_utc: string): string {
-    return moment(timestamp_utc).calendar()
+    if (USER_CONFIG.getInstance().userPrefersShortDateFormat) {
+        const date = moment(timestamp_utc).format(moment.localeData().longDateFormat('l'));
+        const time = moment(timestamp_utc).format(moment.localeData().longDateFormat('LT'));
+        return `${date} ${time}`
+
+    } else {
+        return moment(timestamp_utc).calendar()
+
+    }
 }

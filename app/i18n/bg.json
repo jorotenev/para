@@ -26,6 +26,7 @@
   "all_expenses": "Всички разходи",
   "you_have_no_expenses_yet": "Все още нямаш разходи",
   "add_expense": "Добави разход",
+  "add_expense_drawer":"Добави разход",
   "refresh": "Обнови",
   "cant_decode_response": "Грешка при обработването на отговора от сървъра.",
   "failed_to_register_you": "Неуспех при създаването на акаунт",
@@ -63,5 +64,7 @@
   "save": "Запази",
   "date": "Дата",
   "time": "Час",
-  "preferences_general":"Общи настройки"
+  "preferences_general":"Общи настройки",
+  "settings_relative_date": "Сбит формат на датите"
+
 }

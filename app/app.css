@@ -20,11 +20,18 @@ components that have the btn class name.
     font-size: 18;
 }
 
+.my-btn {
+    font-size: 20;
+    color: #646464;
+    background-color: white;
+    height: 50;
+}
 
-.action-bar{
+.action-bar {
     background-color: #fd8c5b;
     color: white;
 }
+
 .font-awesome {
     font-family: "FontAwesome";
 }

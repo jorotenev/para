@@ -25,7 +25,7 @@
                                 validationMode="Immediate"
                                 commitMode="Manual"
                         />
-                        <Button id="actionBtn" class="btn btn-primary" tap='saveSettingsTapped' text="{{L('save')}}"/>
+                        <Button style="margin-top:5" id="actionBtn" class="my-btn font-awesome" tap='saveSettingsTapped' text="{{'&#xf0c7;  ' + L('save')}}"/>
                     </StackLayout>
                     <StackLayout visibility="{{ showChangePassword ? 'visible' :'collapse' }}">
                         <Label text="{{L('change_password')}}" class="h1 text-center"></Label>
@@ -38,8 +38,10 @@
                                 commitMode="Manual"
                                 propertyValidate="passwordValidate"
                         />
-                        <Button id="change_pass_btn" class="btn btn-primary" tap='onChangePassBtn'
-                                text="{{L('change_password')}}" isEnabled="{{!passwordChanging}}"/>
+                        <Button id="change_pass_btn" class="my-btn font-awesome" tap='onChangePassBtn'
+                                text="{{'&#xf084;  '+L('change_password')}}" isEnabled="{{!passwordChanging}}"
+                                style="margin-bottom:10"
+                        />
                     </StackLayout>
                 </StackLayout>
             </ScrollView>

@@ -20,7 +20,7 @@
 
                     <exp:expense-form/>
 
-                    <Button id="actionBtn" class="btn btn-primary" text="{{actionBtnText}}"/>
+                    <Button id="actionBtn"  style="margin-top:10" class="my-btn font-awesome" text="{{'&#xf067;  ' + actionBtnText}}"/>
 
                 </StackLayout>
             </ScrollView>
