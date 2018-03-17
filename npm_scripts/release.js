@@ -9,7 +9,15 @@ let keystore_alias = process.argv[4];
 let keystore_alias_pass = process.argv[5];
 
 const appSettingsFile = path.join(__dirname, "..", "app", "app_config.json");
+const releaseFirebaseSettingsFile = path.join(__dirname, "..", "platforms", "android", "app", "google-services.json");
 const settings = require(appSettingsFile);
+
+function postBuildChecks() {
+    const releaseFirebaseSettings = require(releaseFirebaseSettingsFile);
+    if (releaseFirebaseSettings['project_info']['project_id'] !== 'para-72573') {
+        throw new Error("Wrong Firebase project ended up in the build.");
+    }
+}
 
 function checks() {
     // TODO check git is clean before releasing
@@ -74,3 +82,4 @@ function run(command, args) {
 // RUN
 checks();
 build_android();
+postBuildChecks();
