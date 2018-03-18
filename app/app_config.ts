@@ -80,7 +80,7 @@ export class USER_CONFIG implements _UserConfig {
         let dateFormatKey = userAwareKey(userPreferredDateFormatKey, user_uid);
 
         this._userPreferredCurrency = getString(currencyKey, defaultCurrency);
-        this._userPrefersShortDateString = getBoolean(dateFormatKey, true);
+        this._userPrefersShortDateString = getBoolean(dateFormatKey, false);
 
         this.user_uid = user_uid
     }
