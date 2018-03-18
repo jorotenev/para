@@ -37,7 +37,7 @@
   "settings": "Настройки",
   "log_out": "Излез",
   "extra": "Допълнителни",
-  "update_expense": "Обновни разход",
+  "update_expense": "Обнови разход",
   "failed_perform_operation": "Грешка при изпълнение на операцията",
   "couldnt_process_the_expense": "Грешка при обработване на разхода",
   "negative_values_invalid": "Отрицателни стойности са невалидни",
