@@ -41,9 +41,9 @@ if (!u.every([path_keystore, keystore_pass, keystore_alias, keystore_alias_pass]
     throw new Error("not all args avaialable")
 }
 
-function build_android() {
+function release_android() {
     // tns build android --release --key-store-path <path-to-your-keystore> --key-store-password <your-key-store-password> --key-store-alias <your-alias-name> --key-store-alias-password <your-alias-password> --copy-to <apk-location>.apk
-    let args = [
+    let buildArgs = [
         'build',
         'android',
         '--release',
@@ -58,28 +58,43 @@ function build_android() {
         '--copy-to',
         `release-${settings.git_sha}-${moment().format()}.apk`
     ];
-    console.log(args);
-    run('tns', args);
+    console.log(buildArgs);
+
+    run('tns', ['prepare', 'android', '--force', '--release'])
+        .then(() => {
+            return run('tns', buildArgs)
+        })
+        .then(postBuildChecks)
+        .catch(err => {
+            console.error(err)
+        })
 }
 
 function run(command, args) {
-    let child = spawn(command, args);
+    return new Promise((resolve, reject) => {
+        let child = spawn(command, args);
 
-    child.stdout.on('data', data => {
-        console.log(`[tns build]: ${data}`);
-    });
+        child.stdout.on('data', data => {
+            console.log(`[tns build]: ${data}`);
+        });
 
-    child.stderr.on('data', data => {
-        console.log(`[tns build ERR]: ${data}`);
-    });
+        child.stderr.on('data', data => {
+            console.log(`[tns build ERR]: ${data}`);
+        });
 
-    child.on('close', code => {
-        console.log(`child process exited with code ${code}`);
-    });
+        child.on('close', code => {
+            if (Number(code) === 0) {
+                resolve()
+            } else {
+                reject()
+            }
+            console.log(`child process exited with code ${code}`);
+        });
+    })
+
 }
 
 
 // RUN
 checks();
-build_android();
-postBuildChecks();
+release_android();
