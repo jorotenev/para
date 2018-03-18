@@ -5,6 +5,7 @@ import {DataStore, IDataStore} from "~/expense_datastore/datastore";
 import {ObservableProperty} from "~/utils/misc";
 import {GetListOpts} from "~/api_facade/types";
 import {APP_CONFIG} from "~/app_config";
+import {authObservable} from "~/auth/auth_event";
 
 type ExpensesList = ObservableArray<IExpense>;
 
@@ -49,6 +50,7 @@ export class ListExpenseModel extends Observable {
             that.connectivity_issues = true;
             that.showIndicator = false
         })
+
     }
 
     private updateExpensesSize() {

@@ -8,6 +8,7 @@ import {
     FirebasePasswordLoginOptions,
     User as FirebaseUser
 } from "nativescript-plugin-firebase/firebase"
+import {authObservable} from "~/auth/auth_event";
 
 
 export function authWithFacebook(): Promise<FirebaseUser> {
@@ -46,5 +47,6 @@ export function refreshUserCofigAndRedirectToViewAfterLogin(user: { uid: string 
 
     let navTo = APP_CONFIG.getInstance().viewAfterLogIn;
     console.log("Navigating to " + navTo);
-    navigateTo({path: navTo, clearHistory:true});
+    navigateTo({path: navTo, clearHistory: true});
+    authObservable.loginOccurred()
 }

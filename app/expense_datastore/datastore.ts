@@ -18,6 +18,7 @@ import {ObservableArray} from "tns-core-modules/data/observable-array";
 import "~/utils/add/ObservableArrayfindIndex"; // imported for its side-effect
 import {TimePeriod, SyncRequest, SyncResponse} from "~/api_facade/types";
 import {APP_CONFIG} from "~/app_config"
+import {authObservable} from "~/auth/auth_event"
 
 export let ExpenseDatabaseFacade = _ExpenseDatabaseFacade; //easier mocking
 
@@ -40,7 +41,8 @@ export class DataStore implements IDataStore {
 
     private constructor() {
         this.expenses = new ObservableArray([]);
-        this.proxyTarget = new ExpenseDatabaseFacade()
+        this.proxyTarget = new ExpenseDatabaseFacade();
+
     }
 
     // DataStore is a singleton
@@ -52,6 +54,9 @@ export class DataStore implements IDataStore {
     }
 
     public static resetDataStore() {
+        let expenses = DataStore.getInstance().expenses;
+        expenses.splice(0, expenses.length);
+
         DataStore._instance = null;
     }
 

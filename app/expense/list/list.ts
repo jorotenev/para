@@ -9,11 +9,29 @@ import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {hideKeyboard} from "~/utils/ui";
 import {localize as l} from "nativescript-localize";
 import * as dialogs from "ui/dialogs";
+import {authObservable} from "~/auth/auth_event"
+import {DataStore} from "~/expense_datastore/datastore";
 
 let listModel: ListExpenseModel = new ListExpenseModel();
 let page: Page;
 let listView: RadListView;
 let indicator: ActivityIndicator;
+
+/*
+when the user logs out, clean up the data store
+not touching the ListExpenseModel because  re-initialising it might
+lead to API requests which are pointless - we don't have a user
+*/
+authObservable.addEventListener(authObservable.logoutEvent, DataStore.resetDataStore);
+/*
+ relevant when a user has logged in, then logs out
+ and a different user logs in. We call this particular method
+ because we care about the *order* of re-initialising.
+ First we want to empty the datastore and only then
+ re-initialise the list-view-model.
+ */
+authObservable.addEventListener(authObservable.loginEvent, startFresh);
+
 
 export function navigatingTo(args: EventData) {
     hideKeyboard();
@@ -81,4 +99,10 @@ export function tryToReconnectToAPI() {
 
         listView.refresh();
     })
+}
+
+function startFresh() {
+    console.log("START FRESH");
+    DataStore.resetDataStore();
+    listModel = new ListExpenseModel();
 }
