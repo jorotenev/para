@@ -1,5 +1,5 @@
 {
-    "git_sha": "7704a1a",
-    "api_address": "https://staging-para-api.tenev.tech/",
+    "git_sha": "3530a88",
+    "api_address": "https://production-para-api.tenev.tech/",
     "api_version": "v1"
 }
