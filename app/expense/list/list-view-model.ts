@@ -76,13 +76,11 @@ export class ListExpenseModel extends Observable {
     public loadMoreItems(ev: any): Promise<void> {
         // no needed to query the API because a previous loadMoreItems call returned all available expenses
         if (this.loadedAllAvailableExpenses) {
-            console.log("skipping loadMoreItems() - previous call delpleted the server")
+            console.log("skipping loadMoreItems() - previous call delpleted the server");
             return Promise.resolve();
         }
 
-        if (this.isEmpty()) return Promise.reject("not initialized");
-
-        let last: IExpense = this.datastore.expenses.getItem(this.datastore.expenses.length - 1);
+        let last: IExpense = this.isEmpty() ? null : this.datastore.expenses.getItem(this.datastore.expenses.length - 1);
         let batchSize = this.batchSize;
         return this.fetchItems(last).then((fetched_expenses) => {
                 if (fetched_expenses.length < batchSize) {

@@ -56,7 +56,7 @@ function release_android() {
         '--key-store-alias-password',
         keystore_alias_pass,
         '--copy-to',
-        `release-${settings.git_sha}-${moment().format()}.apk`
+        `para-release-${settings.git_sha}-${moment().format()}.apk`
     ];
     console.log(buildArgs);
 
