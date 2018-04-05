@@ -1,7 +1,8 @@
 # Para
 Para is a simple & and easy to use mobile application to track expenses.
-This repo contains the source code of the mobile app. The backend API is located in [para_api](https://github.com/jorotenev/para_api)
+This repo contains the source code of the mobile app. The backend API is located in [para_api](https://github.com/jorotenev/para_api).  
 
+An [article](https://medium.com/@georgitenev/creating-a-native-mobile-app-with-typescript-and-nativescript-28e649e90130) highlighting some of the gotchas encountered during development
 # Development & Testing
 ### Prerequisites
 * [Install NativeScript](https://docs.nativescript.org/start/quick-setup). If on Linux, note the [advanced steps](https://docs.nativescript.org/start/ns-setup-linux) from __Step 3__
