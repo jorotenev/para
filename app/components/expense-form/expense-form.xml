@@ -1,7 +1,7 @@
 <!--When referencing the component, we follow the syntax of <namespace:component/> where namespace is the
 name we gave to the path and component is the filename (no extension) of our component XML-->
 <StackLayout loaded="loadedRad" xmlns:df="nativescript-ui-dataform">
-        <ActivityIndicator id="busy-ind" busy="false" visibility="collapse"/>
+        <ActivityIndicator id="busy-ind" busy="{{activity}}" visibility="{{activity ? 'visible':'collapse'}}"/>
 
         <df:RadDataForm id="expense-form"
                         commitMode="Manual"

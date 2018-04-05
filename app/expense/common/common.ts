@@ -1,10 +1,9 @@
 import {Expense, IExpense} from "~/models/expense";
-import {hashCode} from "~/utils/misc";
+import {hashCode, ObservableProperty} from "~/utils/misc";
 import * as dialogs from "tns-core-modules/ui/dialogs";
-import {hideKeyboard, toggleActivityIndicator} from "~/utils/ui";
+import {hideKeyboard} from "~/utils/ui";
 import {IExpenseDatabaseFacade} from "~/api_facade/db_facade";
 import {RadDataForm} from "nativescript-ui-dataform";
-import {ActivityIndicator} from "tns-core-modules/ui/activity-indicator";
 import {Page} from "tns-core-modules/ui/page";
 import {Button} from "tns-core-modules/ui/button";
 import {getJSONForm} from "./form_properties_json"
@@ -20,8 +19,34 @@ export const group_3 = "   ";
 const dateFormat: string = "YYYY-MM-DD";
 const timeFormat: string = "HH:mm";
 
+/**
+ * This interface contains the attributes which are available to the View
+ */
+export interface CommonExpenseViewModel {
+    // used by RadDataForm to create the data form. contains field definitions
+    metadata: object
 
-export function viewModelFactory(options: Constructor): CommonExpenseViewModel {
+    // the values is bind to an ActivityIndicator UI element
+    activity: boolean
+
+    // Update/Save
+    actionBtnText: string
+
+    // the dataform has collapsible field groups. the values below hold the names of these groups
+    group_1: string
+    group_2: string
+    group_3: string
+
+    // callback invoked when the user has pressed the action button
+    btnPressed(): void
+
+    // handy if the navigatingTo() wants to add more fields before assigning instance of this interface
+    // as a bindingContext
+    [key: string]: any
+}
+
+export function createViewModel(options: Constructor): CommonExpenseViewModel {
+
     if (options.mode === ExpenseFormMode.new) {
         return new NewExpenseHelper(options)
     } else if (options.mode === ExpenseFormMode.update) {
@@ -29,58 +54,40 @@ export function viewModelFactory(options: Constructor): CommonExpenseViewModel {
     }
 }
 
-export interface CommonExpenseViewModel {
-    metadata: object
-    // expense: IExpense
-    actionBtnText: string
-    group_1: string
-    group_2: string
-    group_3: string
-
-    btnPressed(): void
-
-    [key: string]: any
-}
-
+/**
+ * This view-model is reused for handling both "add new" and "update" expense forms.
+ * It provides the metadata needed to create a RadDataForm, validates the
+ * form and triggers a call to the appropriate API call (update()/persist(); indirectly, via our DataStore API)
+ *
+ */
 abstract class _ExpenseViewModelHelper extends Observable implements CommonExpenseViewModel {
-
-    // public _expense: IExpense;
-
     private readonly raw_initial_expense: IExpense;
+
     private readonly mode: ExpenseFormMode;
 
-    private activityIndicator: ActivityIndicator;
-    // first it's the initial object; if the object is successfully updated, the hash is also updated
-    // used to determine whether or not to make an HTTP API request (reduce unnecessary API calls)
+    @ObservableProperty()
+    public activity: boolean;
+
+    // used to avoid unnecessary calls to the API if the object hasn't been updated but "Update" is pressed.
     private objectHash: number;
-    private initialTimestampUTC: string;
+
     private readonly dataform: RadDataForm;
-    private readonly page: Page;
 
     private onSuccessfulOperation: (IExpense) => void;
 
     public constructor(options: Constructor) {
         super();
         this.raw_initial_expense = {...options.expense};
-        this.initialTimestampUTC = this.raw_initial_expense.timestamp_utc;
 
         this.set('expense', this.convertForForm(options.expense));
 
         this.dataform = options.dataform;
-        this.page = options.page;
+
         this.mode = options.mode;
+
         this.onSuccessfulOperation = options.onSuccessfulOperation;
-        this.activityIndicator = <ActivityIndicator> this.page.getViewById('busy-ind');
-        if (!this.activityIndicator) {
-            throw new Error("no activity indicator on page")
-        }
-        let btn = <Button> this.page.getViewById('actionBtn');
-        if (!btn) {
-            throw new Error("no action btn")
-        }
 
-        btn.on(Button.tapEvent, this.btnPressed, this);
-
+        this.activity = false;
 
         this.objectHash = hashCode(JSON.stringify(this.get('expense')));
     }
@@ -115,26 +122,24 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         return getJSONForm(this.get('expense'), this.mode)
     }
 
+
     public btnPressed() {
         hideKeyboard();
         const that = this;
         const dataform = this.dataform;
-        let hackAmount = Number(String(that.dataform.getPropertyByName("amount").valueCandidate));
+        const hackedAmount = fixedAmount(dataform.getPropertyByName("amount").valueCandidate);
 
-        const applyHackIfOkValidation = (ok) => {
-            // HACK https://github.com/telerik/nativescript-ui-feedback/issues/549
-            if (ok) {
-                that.get('expense').amount = hackAmount ? hackAmount : 0;
-                return Promise.resolve(that.get('expense'))
-            } else {
-                return Promise.reject("Form validation failed")
-            }
-        };
-
-        // fml https://stackoverflow.com/questions/34930771/why-is-this-undefined-inside-class-method-when-using-promises
+        // using `bind()` because: https://stackoverflow.com/questions/34930771/why-is-this-undefined-inside-class-method-when-using-promises
         customFormValidation(dataform)
             .then(dataform.validateAndCommitAll.bind(dataform))
-            .then(applyHackIfOkValidation.bind(this))
+            .then((ok) => {
+                if (ok) {
+                    that.get('expense').amount = hackedAmount;
+                    return that.get('expense')
+                } else {
+                    throw new Error("Form validation failed")
+                }
+            })
             .then(this.convertFromForm.bind(this))
             .then((exp) => {
                 try {
@@ -148,7 +153,6 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             })
             .then(this.onSuccessfullyCommitted.bind(this))
             .catch(err => {
-                console.dir(err);
                 if (err.showToUser) {
                     dialogs.alert({
                         message: err.msg || l("failed_perform_operation"),
@@ -157,12 +161,19 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
                         okButtonText: "Ok"
                     })
                 }
-                toggleActivityIndicator(that.activityIndicator, false);
+                that.activity = false;
             })
     }
 
-
-    private onSuccessfullyCommitted(committedExpense) {
+    /**
+     * Executed when RadDataForm has flushed to the source (data) object.
+     * i.e. when the data from the form is applied to our expense object.
+     * The method will send the expense to the appropriate DataStore API (depending on whether we update an object
+     * or create a new one)
+     *
+     * @param committedExpense
+     */
+    private onSuccessfullyCommitted(committedExpense: IExpense) {
         const that = this;
         const verb = {[ExpenseFormMode.update]: "update", [ExpenseFormMode.new]: "create"}[this.mode];
         if (this.objectHash === hashCode(JSON.stringify(committedExpense))) { //todo that's broken
@@ -170,9 +181,8 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             return;
         }
 
-        toggleActivityIndicator(this.activityIndicator, true);
-        console.log(`about to ${this.mode}...`);
-        console.dir(committedExpense);
+        this.activity = true;
+
         let facade: IExpenseDatabaseFacade = DataStore.getInstance();
         let apiMethod = {
             [ExpenseFormMode.new]: () => facade.persist(committedExpense),
@@ -182,13 +192,12 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         apiMethod().then(function (updatedExpense: IExpense) {
             that.objectHash = hashCode(JSON.stringify(updatedExpense));
 
-            toggleActivityIndicator(that.activityIndicator, false);
+            that.activity = false;
+
             console.log(`${verb} API call: ok`);
             that.onSuccessfulOperation(updatedExpense)
-
         }, function (err) {
-            console.dir(err);
-            toggleActivityIndicator(that.activityIndicator, false);
+            that.activity = false;
             dialogs.alert({
                 title: l('couldnt_process_the_expense', verb),
                 message: err.reason,
@@ -201,8 +210,6 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
 
         let copy: any = {...expense};
 
-        console.log("original timestamp " + copy.timestamp_utc)
-        console.log(moment(copy.timestamp_utc).format());
         copy.date = moment(copy.timestamp_utc).valueOf();
         copy.time = moment(copy.timestamp_utc).valueOf();
 
@@ -219,7 +226,7 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
             exp.amount = 0;
         }
 
-        // reduce to an object with keys as trimmed tags. get just they keys via Object.keys()
+        // reduce to an object with keys as trimmed tags. get just the keys via Object.keys()
         exp.tags = Object.keys(e.tags.split(",").reduce(function (previousValue, currentValue) {
             let t = currentValue.trim();
             if (t) {
@@ -236,16 +243,16 @@ abstract class _ExpenseViewModelHelper extends Observable implements CommonExpen
         return exp
     }
 
-    private extractTimestampUTC(e: any) {
-        let timeStr = moment(e.time).format(timeFormat);
-        let dateStr = moment(e.date).format(dateFormat);
-        let subMinuteSymbols = moment(this.initialTimestampUTC).format("ss.SSS");
-        let localTimeStr = `${dateStr}T${timeStr}:${subMinuteSymbols}`;
-        let dateTimeUTC = moment(localTimeStr).utc();
-        console.log(`localTimeStr ${localTimeStr}`);
-        if (dateTimeUTC.isValid()) {
-            console.log(`returning ${dateTimeUTC.toISOString()}`);
-            return dateTimeUTC.toISOString()
+    private extractTimestampUTC(expense: any) {
+        let timeStr = moment(expense.time).format(timeFormat);
+        let dateStr = moment(expense.date).format(dateFormat);
+
+        let subMinuteSymbols = moment(this.raw_initial_expense.timestamp_utc).format("ss.SSS");
+        let localDateTimeStr = `${dateStr}T${timeStr}:${subMinuteSymbols}`;
+        let dateTimeUTCStr = moment(localDateTimeStr).utc();
+
+        if (dateTimeUTCStr.isValid()) {
+            return dateTimeUTCStr.toISOString()
         } else {
             throw new Error("couldn't convert to a utc timestamp")
         }
@@ -261,7 +268,6 @@ class NewExpenseHelper extends _ExpenseViewModelHelper {
 }
 
 export class Constructor {
-    page: Page;
     dataform: RadDataForm;
     expense: IExpense;
     mode: ExpenseFormMode;
@@ -279,7 +285,7 @@ function customFormValidation(dataform: RadDataForm): Promise<void> {
         let validated = true;
         // >> validate the amount
         let amountIsValid = true;
-        let candidateAmount = Number(String(dataform.getPropertyByName('amount').valueCandidate));
+        let candidateAmount = fixedAmount(dataform.getPropertyByName("amount").valueCandidate);
         if (!isNaN(candidateAmount)) { // if something's entered
             // needed because of https://github.com/telerik/nativescript-ui-feedback/issues/549
             if (candidateAmount < 0) {
@@ -314,4 +320,10 @@ function customFormValidation(dataform: RadDataForm): Promise<void> {
         }
     })
 
+}
+
+function fixedAmount(badAmount) {
+    // HACK. see https://github.com/telerik/nativescript-ui-feedback/issues/549
+    let hackAmount = Number(String(badAmount));
+    return hackAmount ? hackAmount : 0;
 }

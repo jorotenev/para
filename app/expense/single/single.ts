@@ -1,6 +1,6 @@
 import {EventData} from "tns-core-modules/data/observable";
 import {Page} from "tns-core-modules/ui/page";
-import {ExpenseFormMode, viewModelFactory} from "~/expense/common/common";
+import {ExpenseFormMode, createViewModel} from "~/expense/common/common";
 import {RadDataForm} from "nativescript-ui-dataform";
 import * as dialogs from "ui/dialogs";
 import {DataStore} from "~/expense_datastore/datastore";
@@ -8,19 +8,19 @@ import {navigateTo} from "~/utils/nav";
 import {IExpense} from "~/models/expense";
 import {hideKeyboard} from "~/utils/ui";
 import {localize as l} from "nativescript-localize";
+import {Button} from "tns-core-modules/ui/button";
 
 let page: Page;
 let dataform: RadDataForm;
 let expense;
 
 export function navigatingTo(args: EventData) {
-    hideKeyboard()
+    hideKeyboard();
 
     page = <Page>args.object;
     expense = page.navigationContext.expense;
     dataform = <RadDataForm> page.getViewById('expense-form');
-    let context = viewModelFactory({
-        page: page,
+    let viewModel = createViewModel({
         dataform: dataform,
         mode: ExpenseFormMode.update,
         expense: expense,
@@ -29,7 +29,14 @@ export function navigatingTo(args: EventData) {
             navigateTo({path: 'expense/list/list', backstackVisible: false});
         }
     });
-    page.bindingContext = context
+    let btn: Button = <Button> page.getViewById('actionBtn');
+    if (!btn) {
+        throw new Error("no action btn")
+    }
+    // what to do when the action btn (Save/Update) is pressed
+    btn.on(Button.tapEvent, viewModel.btnPressed, viewModel);
+
+    page.bindingContext = viewModel
 
 }
 
